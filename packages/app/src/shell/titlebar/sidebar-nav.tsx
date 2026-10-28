@@ -1,9 +1,16 @@
 import { createMemo, For, Show } from "solid-js"
 import { Icon } from "@contextcode/ui/icon"
+import { Menu } from "@contextcode/ui/menu"
 import { Tooltip } from "@contextcode/ui/tooltip"
+import { getFilename } from "@contextcode/util/path"
 import { useCommand } from "@/shell/commands/command"
 import { useLanguage } from "@/runtime/i18n/language"
 import { useLayout } from "@/shell/state/layout"
+import { usePlatform } from "@/runtime/platform/platform"
+import { useGlobal } from "@/runtime/server/runtime"
+import { useServers } from "@/runtime/server/registry"
+import { inferHomeDirectory } from "@/runtime/server/global-sync/bootstrap"
+import { useSettingsSurface } from "@/settings/surface"
 import { createSessionInbox, type InboxEntry } from "./inbox-model"
 import "./sidebar-nav.css"
 
@@ -48,8 +55,76 @@ export function SidebarRail() {
       <div data-slot="sidebar-rail-divider" aria-hidden="true" />
       {item({ icon: "pull-request", label: language.t("sidebar.rail.review"), command: "review.toggle" })}
       <div class="flex-1" />
-      {item({ icon: "settings-gear", label: language.t("sidebar.settings"), command: "settings.open" })}
+      <AccountMenu />
     </nav>
+  )
+}
+
+/** The person behind the app, with the places that belong to them rather than to a project. */
+function AccountMenu() {
+  const command = useCommand()
+  const language = useLanguage()
+  const platform = usePlatform()
+  const servers = useServers()
+  const global = useGlobal()
+  const surface = useSettingsSurface()
+
+  // There is no account, so the name is the local user's, read from the current server's home folder. The path query
+  // may not have loaded yet, so a known project's folder stands in for it.
+  const name = createMemo(() => {
+    const conn = servers.visible.find((item) => servers.current(item)) ?? servers.visible[0]
+    const ctx = conn ? global.ensureServerCtx(conn) : undefined
+    const home = ctx?.sync.data.path.home || inferHomeDirectory(ctx?.projects.list()[0]?.worktree ?? "")
+    const user = getFilename(home.replace(/[\\/]+$/, ""))
+
+    return user ? user[0]!.toUpperCase() + user.slice(1) : language.t("sidebar.settings")
+  })
+
+  const avatar = () => <span data-slot="account-avatar">{name()[0]}</span>
+
+  return (
+    <Menu placement="right-end" gutter={10}>
+      <Menu.Trigger as="button" type="button" data-slot="sidebar-rail-item" aria-label={name()}>
+        {avatar()}
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Content class="account-menu">
+          <div data-slot="account-menu-header">
+            {avatar()}
+            <span>{name()}</span>
+          </div>
+          <Menu.Separator />
+          <Menu.Item onSelect={() => command.trigger("usage.view")}>
+            <Icon name="window-analytics" />
+            {language.t("sidebar.rail.usage")}
+          </Menu.Item>
+          <Menu.Item onSelect={() => surface.open("appearance")}>
+            <Icon name="appearance" />
+            {language.t("settings.general.section.appearance")}
+          </Menu.Item>
+          <Menu.Item onSelect={() => command.trigger("settings.open")} shortcut={command.keybind("settings.open")}>
+            <Icon name="settings-gear" />
+            {language.t("sidebar.settings")}
+          </Menu.Item>
+          <Menu.Separator />
+          <Menu.Sub>
+            <Menu.SubTrigger>
+              <Icon name="help" />
+              {language.t("sidebar.help")}
+            </Menu.SubTrigger>
+            <Menu.Portal>
+              <Menu.SubContent class="account-menu">
+                <Menu.Item onSelect={() => surface.open("shortcuts")}>{language.t("settings.tab.shortcuts")}</Menu.Item>
+                <Menu.Item onSelect={() => surface.open("about")}>{language.t("settings.tab.about")}</Menu.Item>
+                <Menu.Item onSelect={() => platform.openExternal("https://opencode.ai/desktop-feedback")}>
+                  {language.t("sidebar.feedback")}
+                </Menu.Item>
+              </Menu.SubContent>
+            </Menu.Portal>
+          </Menu.Sub>
+        </Menu.Content>
+      </Menu.Portal>
+    </Menu>
   )
 }
 

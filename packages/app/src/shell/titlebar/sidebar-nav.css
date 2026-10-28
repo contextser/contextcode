@@ -225,3 +225,56 @@
     animation: none;
   }
 }
+
+/* The person's initial on a dark disc, at the foot of the rail and atop their menu. */
+[data-slot="account-avatar"] {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #3a3f4b, #16181d);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* Roomier than other menus: it is the person's own corner of the app. */
+[data-component="menu-v2-content"].account-menu {
+  min-width: 260px;
+  padding: 8px;
+  border-radius: 16px;
+
+  [data-slot="account-menu-header"] {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px 10px;
+    color: var(--v2-text-text-base);
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  [data-component="menu-v2-item"] {
+    height: 38px;
+    padding-inline: 10px;
+    border-radius: 9px;
+  }
+
+  [data-slot="menu-v2-item-content"] {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14.5px;
+  }
+
+  [data-slot="menu-v2-item-shortcut"] {
+    font-size: 13px;
+  }
+
+  [data-slot="menu-v2-separator"] {
+    margin-block: 6px;
+  }
+}

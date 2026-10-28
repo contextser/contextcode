@@ -752,6 +752,7 @@ export const dict = {
   "sidebar.rail.usage": "Usage",
   "sidebar.rail.more": "More",
   "sidebar.rail.review": "Review changes",
+  "sidebar.feedback": "Send feedback",
   "sidebar.inbox.empty": "Sessions you work on will appear here",
   "sidebar.inbox.section.needsAttention": "Needs attention",
   "sidebar.inbox.section.working": "Working",
