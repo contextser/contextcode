@@ -1141,7 +1141,9 @@
     align-items: center;
     gap: 8px;
     min-width: 0;
-    overflow: hidden;
+    /* Clips long targets but leaves room for a running glyph's ping ring. */
+    overflow: clip;
+    overflow-clip-margin: 8px;
     font-family: var(--v2-font-family-sans);
     font-size: 13px;
     line-height: var(--line-height-compact);
@@ -1872,6 +1874,6 @@
   }
   to {
     opacity: 0;
-    transform: scale(1.45);
+    transform: scale(1.35);
   }
 }

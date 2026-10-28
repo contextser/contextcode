@@ -346,7 +346,8 @@ const activityIcons = {
 
 /**
  * What a group of tool calls did, as short sentences by kind of work: "Browsed devmonks.co", "Read 3 files". A lone
- * call names its subject; repeated generic work ("Searched the codebase") carries a ×N count instead.
+ * call names its subject; repeated generic work ("Searched the codebase") carries a ×N count instead. The words stay
+ * the same while calls run so the header never shifts; only the glyph shows which work is still running.
  */
 function activitySegments(parts: readonly ContextGroupPart[], i18n: UiI18n) {
   const groups = parts.reduce((map, part) => {
@@ -367,7 +368,7 @@ function activitySegments(parts: readonly ContextGroupPart[], i18n: UiI18n) {
       kind,
       active,
       icon: activityIcons[kind],
-      verb: i18n.t(`ui.messagePart.activity.verb.${kind}${active ? ".active" : ""}`),
+      verb: i18n.t(`ui.messagePart.activity.verb.${kind}`),
       target: target.text,
       times: target.generic && items.length > 1 ? items.length : undefined,
     }
@@ -768,20 +769,17 @@ export function CurrentContextToolGroup(props: {
             >
               <span data-slot="context-tool-group-activity">
                 <For each={segments().slice(0, 3)}>
-                  {(segment) => (
+                  {(segment, index) => (
                     <span
                       data-slot="context-tool-group-segment"
                       data-kind={segment.kind}
                       data-active={segment.active ? "" : undefined}
                     >
+                      {index() > 0 ? " " : ""}
                       <span data-slot="context-tool-group-glyph" aria-hidden="true">
                         <Icon name={segment.icon} size="small" />
                       </span>
-                      <span data-slot="context-tool-group-verb">
-                        <Show when={segment.active} fallback={segment.verb}>
-                          <TextShimmer text={segment.verb} active />
-                        </Show>
-                      </span>{" "}
+                      <span data-slot="context-tool-group-verb">{segment.verb}</span>{" "}
                       <span data-slot="context-tool-group-target">{segment.target}</span>
                       <Show when={segment.times}>
                         {(times) => (
@@ -790,7 +788,7 @@ export function CurrentContextToolGroup(props: {
                             <span data-slot="context-tool-group-times">×{times()}</span>
                           </>
                         )}
-                      </Show>{" "}
+                      </Show>
                     </span>
                   )}
                 </For>

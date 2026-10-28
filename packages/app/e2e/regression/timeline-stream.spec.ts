@@ -599,7 +599,7 @@ test("shows a background subagent's outcome as its own row where it finished", a
     sessions: [session(), session({ id: childID, parentID: sessionID, title: "Map the inbox" })],
   })
 
-  await expect(page.getByText(/^Used\s*1\s*Read$/)).toBeVisible()
+  await expect(page.getByText(/^Read\s*1\s*file$/)).toBeVisible()
 
   await timeline.send([
     inboxEnqueued({
@@ -626,10 +626,10 @@ test("shows a background subagent's outcome as its own row where it finished", a
 
   // The outcome sits between the work before and after it instead of folding into either group.
   const notice = page.locator('[data-slot="session-timeline-notice"]')
-  await expect(page.getByText(/^Used\s*1\s*Read$/).or(notice)).toHaveText([
-    /^Used\s*1\s*Read$/,
+  await expect(page.getByText(/^Read\s*1\s*file$/).or(notice)).toHaveText([
+    /^Read\s*1\s*file$/,
     /^Explore finished · Map the inbox$/,
-    /^Used\s*1\s*Read$/,
+    /^Read\s*1\s*file$/,
   ])
   await expect(notice).toHaveAttribute("data-outcome", "completed")
 
@@ -815,7 +815,7 @@ test.describe("Working", () => {
 
     await timeline.send(partUpdated(toolPart("prt_after_thought", "read", "running", { filePath: "package.json" })))
     await expect(group).toHaveAttribute("data-timeline-part-ids", `${assistantID}:reasoning:0,prt_after_thought`)
-    await expect(trigger).toHaveAttribute("aria-label", "Reading 1 file")
+    await expect(trigger).toHaveAttribute("aria-label", "Read 1 file")
     await expect(elapsed).toHaveCount(0)
     await expect(working).toBeVisible()
   })
@@ -1299,7 +1299,7 @@ test.describe("background shortcut", () => {
       .locator('[data-timeline-part-ids="call_shell_backgrounded"]')
       .locator(':scope > [data-component="collapsible"] > [data-slot="collapsible-trigger"]')
 
-    await expect(used).toHaveText(/^Used\s*1\s*Shell$/)
+    await expect(used).toHaveText(/^Ran\s*1\s*command$/)
     await expect(used).toHaveAttribute("aria-expanded", "false")
     const activity = page.getByRole("button", { name: "2 subagents · 1 shell", exact: true })
     const list = page.getByRole("menu", { name: "2 subagents · 1 shell", exact: true })
