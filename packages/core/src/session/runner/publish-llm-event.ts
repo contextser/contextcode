@@ -94,6 +94,8 @@ const hostedContent = (result: ToolResultValue): NonEmptyContent => {
  * order: each publishing fiber is sequential, so per-source order holds by construction,
  * and consumers fold by id/ordinal rather than global position.
  */
+const liveInputTools = new Set(["write", "edit", "patch"])
+
 export const createLLMEventPublisher = (bus: Pick<Bus.Interface, "publish">, input: Input) => {
   const deltaBatchInterval = 100
   type ToolState = {
@@ -274,19 +276,32 @@ export const createLLMEventPublisher = (bus: Pick<Bus.Interface, "publish">, inp
       }),
     true,
   )
-  const toolInput = fragments("tool input", (id, value) =>
-    Effect.gen(function* () {
-      const tool = tools.get(id)
-      if (!tool) return yield* Effect.die(new Error(`Tool input end before start: ${id}`))
-      // Keep a bounded excerpt for recovery errors; the full argument text is persisted below.
-      tool.input = inputExcerpt(value)
-      yield* bus.publish(SessionEvent.Tool.Input.Ended, {
-        sessionID: input.sessionID,
-        assistantMessageID,
-        id,
-        text: value,
-      })
-    }),
+  const toolInput = fragments(
+    "tool input",
+    (id, value) =>
+      Effect.gen(function* () {
+        const tool = tools.get(id)
+        if (!tool) return yield* Effect.die(new Error(`Tool input end before start: ${id}`))
+        // Keep a bounded excerpt for recovery errors; the full argument text is persisted below.
+        tool.input = inputExcerpt(value)
+        yield* bus.publish(SessionEvent.Tool.Input.Ended, {
+          sessionID: input.sessionID,
+          assistantMessageID,
+          id,
+          text: value,
+        })
+      }),
+    // Live-only fragments let clients show a file being written as the model streams it. Other calls' arguments stay
+    // unpublished until they end, since no client renders them partially.
+    (id, value) =>
+      liveInputTools.has(tools.get(id)?.name ?? "")
+        ? bus.publish(SessionEvent.Tool.Input.Delta, {
+            sessionID: input.sessionID,
+            assistantMessageID,
+            id,
+            delta: value,
+          })
+        : Effect.void,
   )
 
   // Deltas are batched, but block starts are not. Publishing held deltas first keeps each

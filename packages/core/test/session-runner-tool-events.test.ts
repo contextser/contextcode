@@ -507,7 +507,7 @@ test("authoritative end values replace accumulated deltas in the durable ended e
   })
 })
 
-test("tool input deltas are accumulated without being published", async () => {
+test("only file-writing tool input deltas are published as they stream", async () => {
   const { published, publisher } = capture()
   await Effect.runPromise(
     Effect.forEach(
@@ -516,13 +516,20 @@ test("tool input deltas are accumulated without being published", async () => {
         LLMEvent.toolInputDelta({ id: "call", name: "read", text: '{"path":' }),
         LLMEvent.toolInputDelta({ id: "call", name: "read", text: '"file.txt"}' }),
         LLMEvent.toolInputEnd({ id: "call", name: "read" }),
+        LLMEvent.toolInputStart({ id: "write", name: "write" }),
+        LLMEvent.toolInputDelta({ id: "write", name: "write", text: '{"path":"a.ts","content":"one' }),
+        LLMEvent.toolInputDelta({ id: "write", name: "write", text: '\\ntwo"}' }),
+        LLMEvent.toolInputEnd({ id: "write", name: "write" }),
       ],
       publisher.publish,
       { discard: true },
     ),
   )
 
-  expect(published.some((event) => event.type === "session.tool.input.delta")).toBe(false)
+  // Both deltas arrive before the batch interval, so the end of input publishes them as one fragment.
+  expect(published.filter((event) => event.type === "session.tool.input.delta").map((event) => event.data)).toEqual([
+    expect.objectContaining({ id: "write", delta: '{"path":"a.ts","content":"one\\ntwo"}' }),
+  ])
   expect(published.find((event) => event.type === "session.tool.input.ended.1")?.data).toMatchObject({
     text: '{"path":"file.txt"}',
   })
