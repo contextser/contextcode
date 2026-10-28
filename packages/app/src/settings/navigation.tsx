@@ -108,10 +108,11 @@ export function SettingsNavigation(props: {
       </div>
       <aside class="settings-sidebar" data-searchable={searchable()}>
         <div class="settings-nav">
-          <button type="button" class="settings-back" onClick={back}>
+          <button type="button" class="settings-back" aria-label={backLabel()} onClick={back}>
             <Icon name="arrow-left" size="small" class="settings-back-icon" />
             <span>{backLabel()}</span>
           </button>
+          <div class="settings-nav-title">{language.t("sidebar.settings")}</div>
           <Show when={searchable()}>
             <SettingsSearch />
           </Show>

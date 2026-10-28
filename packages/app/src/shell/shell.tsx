@@ -245,6 +245,9 @@ export default function Layout(props: ParentProps) {
             style={{ "--sidebar-peek-width": `${state.tabsWidth}px` }}
             ref={(element) => setState("tabsAside", element)}
             class="relative z-10 h-full min-h-0 shrink-0"
+            // Settings brings its own navigation into this column; hidden rather than unmounted so the sidebar's portal
+            // keeps its mount.
+            classList={{ hidden: settings.active() }}
           >
             {/* Skipped rather than display: none or inert, so neither direction restyles the sidebar's contents and
                   a reopen reuses their layout. */}

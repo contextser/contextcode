@@ -2211,3 +2211,169 @@
   [data-slot="tabs-v2-trigger"] {
   padding-inline: 8px;
 }
+
+/* Desktop: the navigation takes the app sidebar's place beside the rail, and the page is a card of its own. */
+@media (min-width: 768px) {
+  .settings-screen {
+    justify-content: flex-start;
+    margin-inline-start: 0;
+    overflow: visible;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .settings-screen > .settings {
+    width: 100%;
+  }
+
+  .settings-screen
+    > .settings[data-component="tabs-v2"][data-variant="settings"][data-orientation="vertical"]
+    > .settings-sidebar {
+    width: 300px;
+    min-width: 300px;
+    padding-block: 0 8px;
+    padding-inline: 12px 14px;
+  }
+
+  .settings-screen .settings-nav {
+    width: 100%;
+    gap: 0;
+  }
+
+  /* An arrow on the traffic lights' line, where the sidebar keeps back and forward. */
+  .settings-screen .settings-nav > .settings-back {
+    align-self: flex-start;
+    width: 28px;
+    height: 28px;
+    margin-block: 10px 6px;
+    margin-inline-start: 6px;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--v2-text-text-muted);
+
+    span {
+      display: none;
+    }
+
+    &:hover {
+      background: var(--v2-background-bg-layer-02);
+    }
+  }
+
+  .settings-screen .settings-nav-title {
+    padding: 14px 8px 14px;
+    color: var(--v2-text-text-base);
+    font-size: 17px;
+    font-weight: 560;
+    letter-spacing: -0.2px;
+  }
+
+  .settings-screen .settings-search {
+    margin-bottom: 18px;
+  }
+
+  .settings-screen .settings-search [data-component="text-input-v2"] {
+    height: 36px;
+    border-radius: 999px;
+    background: var(--v2-background-bg-layer-02);
+  }
+
+  .settings-screen .settings-nav-groups {
+    gap: 22px;
+  }
+
+  .settings-screen .settings-nav-group-header {
+    height: 28px;
+    padding-inline: 8px;
+    color: var(--v2-text-text-faint);
+    font-size: 13.5px;
+  }
+
+  .settings-screen .settings-nav-groups [data-slot="tabs-v2-trigger-wrapper"] {
+    height: 34px;
+    border-radius: 8px;
+    color: var(--v2-text-text-base);
+    font-size: 14.5px;
+  }
+
+  .settings-screen .settings-nav-groups [data-slot="tabs-v2-trigger"] {
+    gap: 10px;
+    padding: 0 8px;
+  }
+
+  /* The screen already keeps the shell's insets around this card. */
+  .settings-screen > .settings > .settings-content {
+    max-width: none;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--v2-background-bg-base);
+    box-shadow: var(--v2-elevation-raised);
+  }
+
+  .settings-screen .settings-tab-header,
+  .settings-screen .settings-tab-body {
+    width: min(100% - 96px, 1030px);
+    margin-inline: auto;
+  }
+
+  .settings-screen .settings-tab-header {
+    padding-top: 72px;
+    padding-bottom: 28px;
+  }
+
+  .settings-screen .settings-tab-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    line-height: 36px;
+  }
+
+  .settings-screen .settings-section-stack {
+    gap: 44px;
+  }
+
+  .settings-screen .settings-section-title {
+    font-size: 15px;
+    font-weight: 560;
+  }
+
+  .settings-screen [data-component="settings-list"] {
+    padding-inline: 22px;
+    border-radius: 14px;
+    background-color: var(--v2-background-bg-base);
+    box-shadow: inset 0 0 0 1px var(--v2-border-border-base);
+  }
+
+  .settings-screen [data-slot="settings-row-title"] {
+    font-size: 14px;
+  }
+
+  /* Rounded switches with a white knob, as on the rest of the platform. */
+  .settings-screen [data-component="switch"] {
+    [data-slot="switch-control"] {
+      width: 40px;
+      height: 24px;
+      border-radius: 999px;
+    }
+
+    [data-slot="switch-thumb"],
+    &:hover:not([data-disabled], [data-readonly]) [data-slot="switch-thumb"] {
+      width: 20px;
+      height: 20px;
+      border: none;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.2);
+    }
+
+    &[data-checked] [data-slot="switch-thumb"] {
+      transform: translateX(16px);
+      background: #fff;
+    }
+
+    &:dir(rtl)[data-checked] [data-slot="switch-thumb"] {
+      transform: translateX(-16px);
+    }
+  }
+}
