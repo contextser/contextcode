@@ -514,6 +514,17 @@ describe("LocationServiceMap", () => {
 
           const blockedID = Provider.ID.make("blocked-location")
           const allowedID = Provider.ID.make("allowed-location")
+          // Only the Contextser router is offered by default, so each location allows its test provider.
+          yield* Effect.promise(() =>
+            Promise.all(
+              [blocked.path, allowed.path].map((directory) =>
+                fs.writeFile(
+                  path.join(directory, "contextcode.json"),
+                  JSON.stringify({ policies: [{ action: "provider.use", resource: "*-location", effect: "allow" }] }),
+                ),
+              ),
+            ),
+          )
           const blockedState = yield* update(blocked.path, blockedID)
           expect(blockedState.providers.some((provider) => provider.id === blockedID)).toBe(true)
           expect(blockedState.providers.some((provider) => provider.id === allowedID)).toBe(false)

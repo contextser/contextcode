@@ -4,6 +4,7 @@ import { CerebrasPlugin } from "./provider/cerebras.js"
 import { ChatGPTPlugin } from "./provider/chatgpt.js"
 import { CloudflareAIGatewayPlugin } from "./provider/cloudflare-ai-gateway.js"
 import { CloudflareWorkersAIPlugin } from "./provider/cloudflare-workers-ai.js"
+import { ContextserPlugin } from "./provider/contextser.js"
 import { DatabricksPlugin } from "./provider/databricks.js"
 import { DigitalOceanPlugin } from "./provider/digitalocean.js"
 import { DynamicProviderPlugin } from "./provider/dynamic.js"
@@ -37,6 +38,7 @@ export const ProviderPlugins: PluginInternal.InternalPlugin[] = [
   ChatGPTPlugin,
   CloudflareAIGatewayPlugin,
   CloudflareWorkersAIPlugin,
+  ContextserPlugin,
   DatabricksPlugin,
   DigitalOceanPlugin,
   GithubCopilotPlugin,

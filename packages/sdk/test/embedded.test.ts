@@ -125,7 +125,11 @@ it.live("seeds host plugins from CreateOptions and waits for delayed model plugi
           config: {
             directory: fixture.directory,
             project: false,
-            content: JSON.stringify({ model: "seeded/fictional-chat" }),
+            content: JSON.stringify({
+              model: "seeded/fictional-chat",
+              // Only the Contextser router is offered by default, so the plugin's provider is allowed explicitly.
+              policies: [{ action: "provider.use", resource: "seeded", effect: "allow" }],
+            }),
           },
           models: { fetch: false },
           fs: { filewatcher: false },
@@ -137,7 +141,10 @@ it.live("seeds host plugins from CreateOptions and waits for delayed model plugi
       )
 
       const [defaultModel, generated] = yield* Effect.all(
-        [contextcode.model.default({ location: location(fixture) }), contextcode.generate.text({ prompt: "Say ready" })],
+        [
+          contextcode.model.default({ location: location(fixture) }),
+          contextcode.generate.text({ prompt: "Say ready" }),
+        ],
         { concurrency: "unbounded" },
       )
 
@@ -158,7 +165,10 @@ it.live("ContextCodeWorkerd seeds plugins before cold model resolution", () =>
       const contextcode = yield* ContextCodeWorkerd.create({
         storage: makeDurableObjectStorage(),
         models: { fetch: false },
-        config: { model: "workerd-seeded/fictional-chat" },
+        config: {
+          model: "workerd-seeded/fictional-chat",
+          policies: [{ action: "provider.use", resource: "workerd-seeded", effect: "allow" }],
+        },
         plugins: [
           Plugin.define({
             id: "workerd-seeded-models",
@@ -257,7 +267,9 @@ it.live(
           [
             contextcode.sessions.log({ sessionID: missingSessionID }).pipe(Stream.runHead, Effect.flip),
             contextcode.sessions.interrupt({ sessionID: missingSessionID }).pipe(Effect.flip),
-            contextcode.sessions.message.get({ sessionID: missingSessionID, messageID: modelMessage.id }).pipe(Effect.flip),
+            contextcode.sessions.message
+              .get({ sessionID: missingSessionID, messageID: modelMessage.id })
+              .pipe(Effect.flip),
             contextcode.sessions.instructions.entry.list({ sessionID: missingSessionID }).pipe(Effect.flip),
             contextcode.sessions.inbox.list({ sessionID: missingSessionID }).pipe(Effect.flip),
           ],
@@ -322,7 +334,7 @@ it.live("embedded client exposes plugin-backed web search", () =>
       })
 
       const result = yield* contextcode.websearch.query({
-        query: "opencode",
+        query: "contextcode",
         providerID,
         location: location(fixture),
       })

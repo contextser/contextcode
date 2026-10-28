@@ -1,12 +1,16 @@
 export * as ConfigPolicyPlugin from "./policy.js"
 
 import { define } from "@contextcode/plugin/effect/plugin"
+import type { Document } from "@contextcode/schema/config"
 import { Effect } from "effect"
 import { Config } from "../../config.js"
 import { ManagedPolicy } from "../../managed-policy.js"
 import { State } from "../../state.js"
 import { Wildcard } from "../../util/wildcard.js"
 import { ConfigEntryObserver } from "./entry-observer.js"
+
+const allow = (resource: string) =>
+  ({ action: "provider.use", resource, effect: "allow", message: "Blocked by configuration policy" }) as const
 
 export const Plugin = define({
   id: "contextcode.config.policy",
@@ -18,7 +22,16 @@ export const Plugin = define({
     const loaded = yield* ConfigEntryObserver.observe(config, ctx.event, reload)
     // Documents reverse so earlier-loaded policy wins: managed policy, then a Console config document, then user
     // and project files.
-    const policies = () => ManagedPolicy.statements(loaded.entries)
+    // Context Code offers only its own model router and the providers a config document sets up; built-in and catalog
+    // providers stay hidden. These defaults come first, so any loaded policy overrides them.
+    const policies = () => [
+      { ...allow("*"), effect: "deny" as const },
+      allow("contextser"),
+      ...loaded.entries
+        .filter((entry): entry is Document => entry.type === "document")
+        .flatMap((entry) => Object.keys(entry.info.providers ?? {}).map(allow)),
+      ...ManagedPolicy.statements(loaded.entries),
+    ]
     const runSync = Effect.runSyncWith(yield* Effect.context())
     yield* ctx.provider.transform((providers) => {
       const current = policies()

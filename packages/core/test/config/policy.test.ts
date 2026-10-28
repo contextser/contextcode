@@ -68,6 +68,35 @@ describe("ConfigPolicyPlugin.Plugin", () => {
     }),
   )
 
+  it.effect("offers only the Contextser router until config allows another provider", () =>
+    Effect.gen(function* () {
+      const catalog = yield* Provider.Service
+      yield* catalog.transform((catalog) => {
+        catalog.update(Provider.ID.make("contextser"), () => {})
+        catalog.update(Provider.ID.openai, () => {})
+      })
+      yield* addPlugin([])
+      expect(yield* catalog.get(Provider.ID.make("contextser"))).toBeDefined()
+      expect(yield* catalog.get(Provider.ID.openai)).toBeUndefined()
+    }),
+  )
+
+  it.effect("keeps providers a config document sets up or allows", () =>
+    Effect.gen(function* () {
+      const catalog = yield* Provider.Service
+      yield* catalog.transform((catalog) => {
+        catalog.update(Provider.ID.openai, () => {})
+        catalog.update(Provider.ID.make("company-internal"), () => {})
+      })
+      yield* addPlugin([
+        document(provider("allow", "openai")),
+        new Document({ type: "document", info: decode({ providers: { "company-internal": {} } }) }),
+      ])
+      expect(yield* catalog.get(Provider.ID.openai)).toBeDefined()
+      expect(yield* catalog.get(Provider.ID.make("company-internal"))).toBeDefined()
+    }),
+  )
+
   it.effect("filters plugin-provided providers with ordered wildcard policies", () =>
     Effect.gen(function* () {
       const catalog = yield* Provider.Service
@@ -212,17 +241,18 @@ describe("ConfigPolicyPlugin.Plugin", () => {
       const test = yield* Config.Test
       const host = yield* PluginHost.make(yield* Plugin.Service)
       const contextcode = Integration.ID.make("opencode")
-      yield* catalog.transform((catalog) => catalog.update(Provider.ID.openai, () => {}))
+      const contextser = Provider.ID.make("contextser")
+      yield* catalog.transform((catalog) => catalog.update(contextser, () => {}))
       yield* ConfigPolicyPlugin.Plugin.effect(host)
-      expect(yield* catalog.get(Provider.ID.openai)).toBeDefined()
+      expect(yield* catalog.get(contextser)).toBeDefined()
 
-      yield* test.integration?.(contextcode, organizationPolicy([provider("deny", "openai")])) ?? Effect.void
+      yield* test.integration?.(contextcode, organizationPolicy([provider("deny", "contextser")])) ?? Effect.void
       yield* bus.publish(Event.Updated, {})
-      yield* waitUntil(catalog.get(Provider.ID.openai).pipe(Effect.map((provider) => provider === undefined)))
+      yield* waitUntil(catalog.get(contextser).pipe(Effect.map((provider) => provider === undefined)))
 
       yield* test.integration?.(contextcode, undefined) ?? Effect.void
       yield* bus.publish(Event.Updated, {})
-      yield* waitUntil(catalog.get(Provider.ID.openai).pipe(Effect.map((provider) => provider !== undefined)))
+      yield* waitUntil(catalog.get(contextser).pipe(Effect.map((provider) => provider !== undefined)))
     }).pipe(Effect.provide(Config.testLayer())),
   )
 })
