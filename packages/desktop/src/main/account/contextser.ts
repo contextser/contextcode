@@ -265,5 +265,9 @@ function page(ok: boolean) {
   const title = ok ? "You're signed in" : "Sign-in didn't finish"
   const body = ok ? "You can close this tab and return to Context Code." : "Return to Context Code and try again."
 
-  return `<!doctype html><meta charset="utf-8"><title>${title}</title><style>body{margin:0;display:grid;place-items:center;height:100vh;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f6f6f9;color:#141414}main{text-align:center}h1{font-size:22px;margin:0 0 6px}p{margin:0;color:#494852}</style><main><h1>${title}</h1><p>${body}</p></main>`
+  // Browsers let a page close its own tab only when the tab has no history to go back to, which holds when the
+  // provider redirected straight here and not after a sign-in form; otherwise the message stays and asks the person.
+  const close = ok ? "<script>setTimeout(() => window.close(), 400)</script>" : ""
+
+  return `<!doctype html><meta charset="utf-8"><title>${title}</title>${close}<style>body{margin:0;display:grid;place-items:center;height:100vh;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f6f6f9;color:#141414}main{text-align:center}h1{font-size:22px;margin:0 0 6px}p{margin:0;color:#494852}</style><main><h1>${title}</h1><p>${body}</p></main>`
 }
