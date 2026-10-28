@@ -50,7 +50,9 @@ import { SessionLocationMissing } from "./location-missing"
 import { SessionPluginPills } from "./plugin-pills"
 import { SessionLiveWriter } from "./live-writer"
 import { ComposerPermissions } from "@/composer/permissions"
+import { Portal } from "solid-js/web"
 import { SessionActivityDock } from "./activity-dock"
+import { chromeActivityMount } from "@/shell/chrome-title"
 import type { MountedSession, SessionScreen } from "@contextcode/plugin/gui"
 
 export function createActiveSessionRegion(input: {
@@ -514,13 +516,32 @@ export function ActiveSessionComposerRegion(props: {
       }
       aside={
         <Show when={!missing() && !props.session.data.isChild()}>
-          <SessionActivityDock
-            subagents={subagents()}
-            shells={shells()}
-            onOpen={open}
-            onStop={stop}
-            onFit={setDocked}
-          />
+          {/* With the session's title in the chrome row, running work is a menu among its actions instead. */}
+          <Show
+            when={chromeActivityMount()}
+            fallback={
+              <SessionActivityDock
+                subagents={subagents()}
+                shells={shells()}
+                onOpen={open}
+                onStop={stop}
+                onFit={setDocked}
+              />
+            }
+          >
+            {(mount) => (
+              <Portal mount={mount()} ref={(element) => (element.className = "flex items-center")}>
+                <SessionActivityDock
+                  inline
+                  subagents={subagents()}
+                  shells={shells()}
+                  onOpen={open}
+                  onStop={stop}
+                  onFit={setDocked}
+                />
+              </Portal>
+            )}
+          </Show>
         </Show>
       }
       above={

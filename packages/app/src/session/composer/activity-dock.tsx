@@ -22,6 +22,8 @@ export function SessionActivityDock(props: {
   onOpen: (item: SessionActivityItem) => void
   onStop: (item: SessionActivityItem) => void
   onFit: (fits: boolean) => void
+  /** In the chrome row's header actions: a pill in the row's flow whose list drops down beneath it. */
+  inline?: boolean
 }) {
   const language = useLanguage()
   const settings = useSettings()
@@ -49,7 +51,18 @@ export function SessionActivityDock(props: {
     onCleanup(() => clearInterval(timer))
   })
 
+  // The dropped-down list closes on a press anywhere outside the pill and its list.
+  createEffect(() => {
+    if (!props.inline || state.collapsed) return
+    const close = (event: PointerEvent) => {
+      if (!anchor.contains(event.target as Node)) setState("collapsed", true)
+    }
+    document.addEventListener("pointerdown", close, true)
+    onCleanup(() => document.removeEventListener("pointerdown", close, true))
+  })
+
   onMount(() => {
+    if (props.inline) return
     const dock = anchor.parentElement
     const column = dock?.firstElementChild
 
@@ -61,20 +74,29 @@ export function SessionActivityDock(props: {
   const stoppable = (item: SessionActivityItem) => item.type === "shell" || !!item.sessionID
 
   return (
-    <div ref={anchor} data-component="session-activity-dock" class="pointer-events-none absolute inset-0">
+    <div
+      ref={anchor}
+      data-component="session-activity-dock"
+      class={props.inline ? "relative flex items-center" : "pointer-events-none absolute inset-0"}
+    >
       <Show when={active()}>
         {/* Beside the composer it rests on the dock's floor; without room, it floats above the composer's end edge,
             whose column has 12px of padding. */}
         <section
           data-slot="session-activity-dock-panel"
           data-collapsed={state.collapsed ? "" : undefined}
+          data-inline={props.inline ? "" : undefined}
           aria-label={language.activitySummary({ subagents: props.subagents.length, shells: props.shells.length })}
-          class="pointer-events-auto absolute"
-          style={{
-            width: state.collapsed ? undefined : `${width}px`,
-            "inset-inline-end": `${state.fits ? margin : state.edge + 12}px`,
-            bottom: state.fits ? "12px" : "calc(100% + 8px)",
-          }}
+          class={props.inline ? "pointer-events-auto relative" : "pointer-events-auto absolute"}
+          style={
+            props.inline
+              ? undefined
+              : {
+                  width: state.collapsed ? undefined : `${width}px`,
+                  "inset-inline-end": `${state.fits ? margin : state.edge + 12}px`,
+                  bottom: state.fits ? "12px" : "calc(100% + 8px)",
+                }
+          }
         >
           <header
             data-slot="session-activity-dock-header"

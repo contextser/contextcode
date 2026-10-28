@@ -392,3 +392,43 @@
     animation: none;
   }
 }
+
+/* In the chrome row: a quiet pill among the header's actions, whose list drops down beneath it. */
+[data-slot="session-activity-dock-panel"][data-inline] {
+  overflow: visible;
+  border-radius: 999px;
+  box-shadow: none;
+  animation: none;
+
+  [data-slot="session-activity-dock-header"] {
+    height: 28px;
+    gap: 6px;
+    padding-inline: 10px 2px;
+  }
+
+  [data-slot="session-activity-dock-count"] {
+    flex: none;
+  }
+
+  /* Points down while closed and up while the list is open, the reverse of the bar above the composer. */
+  &[data-collapsed] [data-slot="session-activity-dock-toggle"] {
+    transform: none;
+  }
+
+  &:not([data-collapsed]) [data-slot="session-activity-dock-toggle"] {
+    transform: rotate(180deg);
+  }
+
+  [data-slot="session-activity-dock-list"] {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 8px);
+    inset-inline-end: 0;
+    width: 288px;
+    padding: 6px;
+    border: 0.5px solid var(--v2-border-border-muted);
+    border-radius: 14px;
+    background: var(--v2-background-bg-base);
+    box-shadow: var(--v2-elevation-floating);
+  }
+}

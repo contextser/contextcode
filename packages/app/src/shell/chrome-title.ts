@@ -5,3 +5,6 @@ import { createSignal } from "solid-js"
  * row here instead of at the top of its card, as Codex does.
  */
 export const [chromeTitleMount, setChromeTitleMount] = createSignal<HTMLElement>()
+
+/** A slot at the start of the chrome row's header actions, where the running-work menu renders. */
+export const [chromeActivityMount, setChromeActivityMount] = createSignal<HTMLElement>()

@@ -1,4 +1,5 @@
 import { createEffect, createMemo, createSignal, on, onCleanup, Show, type Accessor, type JSX } from "solid-js"
+import { chromeTitleMount, setChromeActivityMount } from "@/shell/chrome-title"
 import { createStore } from "solid-js/store"
 import { Predicate } from "effect"
 import { abort } from "@contextcode/util/abort"
@@ -541,6 +542,15 @@ function MessageTimelineView(
                 <Show when={sessionID()} keyed>
                   {(_id) => (
                     <>
+                      <Show when={props.active !== false && chromeTitleMount()}>
+                        <div
+                          class="flex items-center"
+                          ref={(element) => {
+                            setChromeActivityMount(element)
+                            onCleanup(() => setChromeActivityMount(undefined))
+                          }}
+                        />
+                      </Show>
                       {props.search}
                       <PluginSlot
                         at="session.header"
