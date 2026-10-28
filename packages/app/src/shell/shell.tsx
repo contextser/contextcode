@@ -21,6 +21,7 @@ import { useServers } from "@/runtime/server/registry"
 import { useTabs } from "@/shell/tabs/tabs"
 import {
   CollapsedSidebarToggle,
+  CollapsedSidebarToggleSpace,
   collapsedSidebarToggleEnd,
   measureSidebarToggles,
   paintCollapsedSlots,
@@ -206,8 +207,10 @@ export default function Layout(props: ParentProps) {
     },
   ])
   const bottomTitlebar = () => mobile() && preferences.general.mobileTitlebarPosition() === "bottom"
-  // Sidebar and main card read as one card under the window's chrome row, as in Codex.
-  const joined = () => verticalTabs() && preferences.appearance.sidebarOpen() && !settings.active()
+  // The main card sits under a chrome row that holds the window controls and the session's title, as in Codex. With the
+  // sidebar open, the sidebar and main card also read as one card.
+  const chrome = () => verticalTabs() && !settings.active()
+  const joined = () => chrome() && preferences.appearance.sidebarOpen()
   const dragInset = () => windowDragEnabled(platform) && !mobile()
 
   return (
@@ -229,7 +232,11 @@ export default function Layout(props: ParentProps) {
       }}
     >
       <Titlebar verticalTabs={verticalTabs() ? { mount: state.tabsMount } : undefined} />
-      <div class="relative flex flex-1 min-h-0 min-w-0 flex-row" data-shell-joined={joined() ? "" : undefined}>
+      <div
+        class="relative flex flex-1 min-h-0 min-w-0 flex-row"
+        data-shell-chrome={chrome() ? "" : undefined}
+        data-shell-joined={joined() ? "" : undefined}
+      >
         {/* The empty inset above the panels moves the window, as the titlebar does. */}
         <Show when={dragInset()}>
           <div
@@ -304,7 +311,8 @@ export default function Layout(props: ParentProps) {
           class="flex-1 min-h-0 min-w-0 overflow-x-hidden flex flex-col items-start contain-content"
           style={{
             // Joined to the sidebar, the main card starts on the sidebar tile's line and meets its edge.
-            ...(joined() ? { "--shell-top-inset": `${joinedTop}px`, "margin-inline-start": "-8px" } : {}),
+            ...(chrome() ? { "--shell-top-inset": `${joinedTop}px` } : {}),
+            ...(joined() ? { "margin-inline-start": "-8px" } : {}),
             "padding-top": bottomTitlebar() ? "env(safe-area-inset-top, 0px)" : "0px",
             "padding-bottom":
               bottomTitlebar() || settings.active()
@@ -315,8 +323,8 @@ export default function Layout(props: ParentProps) {
               : "var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))",
           }}
         >
-          <Show when={joined()}>
-            {/* The chrome row above the joined card: it moves the window, as the titlebar does, and holds the active
+          <Show when={chrome()}>
+            {/* The chrome row above the main card: it moves the window, as the titlebar does, and holds the active
                 session's title row after a divider, as in Codex. Controls inside a drag region opt out of dragging. */}
             <div
               data-slot="shell-chrome"
@@ -324,6 +332,9 @@ export default function Layout(props: ParentProps) {
               style={{ height: `${joinedTop}px` }}
               data-tauri-drag-region={dragInset() ? "" : undefined}
             >
+              {/* With the sidebar closed the floating toggle sits after the traffic lights; this row starts after the
+                  rail and its own 8px padding, so it keeps the rest of the toggle's room. */}
+              <CollapsedSidebarToggleSpace start={64} />
               <div aria-hidden="true" class="h-4 w-px shrink-0 bg-v2-border-border-base" />
               <div
                 class="flex h-full min-w-0 flex-1"
