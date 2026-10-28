@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test"
 import { project, provider, sessionHref } from "../utils/app"
-import { mockOpenCodeServer } from "../utils/mock-server"
+import { mockContextCodeServer } from "../utils/mock-server"
 import { expectAppVisible } from "../utils/waits"
 import { openSession } from "../utils/workspace"
 
-const directory = "C:/OpenCode/NewProject"
+const directory = "C:/Context Code/NewProject"
 
 test("creates a session in a new project and selects its model", async ({ page }) => {
   // An empty draft must remain usable when the file viewer is unavailable.
@@ -14,7 +14,7 @@ test("creates a session in a new project and selects its model", async ({ page }
   const created = project({ id: "proj_model_selection_flow", directory, name: "NewProject" })
   // The server knows no project until the user adds this one.
   const projects: unknown[] = []
-  await mockOpenCodeServer(page, {
+  await mockContextCodeServer(page, {
     directory,
     project: created,
     projects: () => projects,
@@ -26,7 +26,7 @@ test("creates a session in a new project and selects its model", async ({ page }
       all: [
         {
           id: "opencode",
-          name: "OpenCode",
+          name: "Context Code",
           models: {
             "free-model": {
               id: "free-model",
@@ -55,11 +55,11 @@ test("creates a session in a new project and selects its model", async ({ page }
     sessions: [],
     pageMessages: () => ({ items: [] }),
     // Listings are requested by absolute path and returned relative to the stable Location.
-    fileList: (path) => (path === "C:/OpenCode" ? [{ path: "./", type: "directory", ignored: false }] : []),
+    fileList: (path) => (path === "C:/Context Code" ? [{ path: "./", type: "directory", ignored: false }] : []),
   })
   await page.addInitScript(() => {
     localStorage.setItem(
-      "opencode.global.dat:model",
+      "contextcode.global.dat:model",
       JSON.stringify({
         user: [
           { providerID: "opencode", modelID: "free-model", visibility: "show" },
@@ -81,7 +81,7 @@ test("creates a session in a new project and selects its model", async ({ page }
   const listing = page.waitForRequest((request) => {
     const url = new URL(request.url())
 
-    return url.pathname === "/api/fs/list" && url.searchParams.get("path") === "C:/OpenCode"
+    return url.pathname === "/api/fs/list" && url.searchParams.get("path") === "C:/Context Code"
   })
 
   await picker.getByRole("button", { name: "Parent", exact: true }).click()
@@ -90,7 +90,7 @@ test("creates a session in a new project and selects its model", async ({ page }
   await expect(directoryItem).toBeVisible()
   await directoryItem.click()
   await expect(directoryItem).toHaveAttribute("aria-selected", "true")
-  await expect(picker.getByText("C:\\OpenCode\\NewProject", { exact: true })).toBeVisible()
+  await expect(picker.getByText("C:\\Context Code\\NewProject", { exact: true })).toBeVisible()
   const selectFolder = picker.getByRole("button", { name: "Select folder", exact: true })
   await expect(selectFolder).toBeEnabled()
   await selectFolder.click()
@@ -140,7 +140,7 @@ test("restores each existing session's model and variant when switching tabs", a
   const composer = page.locator('[data-component="composer"]')
   const modelControl = composer.locator('[data-action="composer-model"]')
   const variant = composer.getByRole("button", { name: "Choose model variant", exact: true })
-  await expect(modelControl).toHaveText("OpenCode / Model A")
+  await expect(modelControl).toHaveText("Context Code / Model A")
   await expect(variant).toHaveText("balanced")
   await variant.click()
   await page.getByRole("menuitemradio", { name: "high", exact: true }).click()
@@ -148,7 +148,7 @@ test("restores each existing session's model and variant when switching tabs", a
 
   await page.locator(`[data-titlebar-tab-link][href="${hrefB}"]`).click()
   await expect(page).toHaveURL(hrefB)
-  await expect(modelControl).toHaveText("OpenCode / Model B")
+  await expect(modelControl).toHaveText("Context Code / Model B")
   await expect(variant).toHaveText("balanced")
   await variant.click()
   await page.getByRole("menuitemradio", { name: "high", exact: true }).click()
@@ -157,11 +157,11 @@ test("restores each existing session's model and variant when switching tabs", a
   // A new draft starts from the current session's non-default model and chosen variant.
   await page.getByRole("button", { name: "New session", exact: true }).click()
   await expect(page).toHaveURL(/\/new-session\?draftId=/)
-  await expect(modelControl).toHaveText("OpenCode / Model B")
+  await expect(modelControl).toHaveText("Context Code / Model B")
   await expect(variant).toHaveText("high")
 
   await page.locator(`[data-titlebar-tab-link][href="${hrefA}"]`).click()
   await expect(page).toHaveURL(hrefA)
-  await expect(modelControl).toHaveText("OpenCode / Model A")
+  await expect(modelControl).toHaveText("Context Code / Model A")
   await expect(variant).toHaveText("high")
 })

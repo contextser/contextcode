@@ -1,20 +1,20 @@
-import type { OpenCodeClient, OpenCodeEvent } from "@opencode/client"
-import { createClientConnection, createPersistentPtyClient } from "@opencode/client/solid"
+import type { ContextCodeClient, ContextCodeEvent } from "@contextcode/client"
+import { createClientConnection, createPersistentPtyClient } from "@contextcode/client/solid"
 import { createGlobalEmitter } from "@solid-primitives/event-bus"
 import { onCleanup } from "solid-js"
 import { createSimpleContext } from "./helper"
 import { useLog } from "./log"
 
 type ManagedService = {
-  reconnect: (signal: AbortSignal) => Promise<{ api: OpenCodeClient; url?: string; headers?: Record<string, string> }>
+  reconnect: (signal: AbortSignal) => Promise<{ api: ContextCodeClient; url?: string; headers?: Record<string, string> }>
   restart: () => Promise<void>
 }
 
-type ClientEventMap = { [Type in OpenCodeEvent["type"]]: Extract<OpenCodeEvent, { type: Type }> }
+type ClientEventMap = { [Type in ContextCodeEvent["type"]]: Extract<ContextCodeEvent, { type: Type }> }
 
 export const { use: useClient, provider: ClientProvider } = createSimpleContext({
   name: "Client",
-  init: (props: { api: OpenCodeClient; url?: string; headers?: Record<string, string>; service?: ManagedService }) => {
+  init: (props: { api: ContextCodeClient; url?: string; headers?: Record<string, string>; service?: ManagedService }) => {
     const log = useLog({ component: "client" })
     const service = props.service
     const events = createGlobalEmitter<ClientEventMap>()

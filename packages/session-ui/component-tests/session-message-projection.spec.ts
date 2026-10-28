@@ -158,8 +158,8 @@ story("marks pending metadata without badging delivered, starting, or queued pro
   await expect(indicator).toBeVisible()
   await expect(indicator).toHaveAttribute("aria-hidden", "true")
 
-  await expect(voice.locator("use")).toHaveAttribute("href", "#opencode-v2-icon-outline-wave-audio")
-  await expect(indicator.locator("use")).toHaveAttribute("href", "#opencode-v2-icon-outline-steer")
+  await expect(voice.locator("use")).toHaveAttribute("href", "#contextcode-v2-icon-outline-wave-audio")
+  await expect(indicator.locator("use")).toHaveAttribute("href", "#contextcode-v2-icon-outline-steer")
 
   const icon = await indicator.locator("svg").boundingBox()
   const label = await timeline.locator('[data-slot="user-message-meta"]').boundingBox()
@@ -316,9 +316,9 @@ story("links URLs in user messages without swallowing punctuation or mentions", 
   await expect(links.nth(0)).toHaveAttribute("href", "https://github.com/Hona/mesh")
   await expect(links.nth(0)).toHaveAttribute("target", "_blank")
   await expect(links.nth(0)).toHaveCSS("cursor", "pointer")
-  await expect(links.nth(1)).toHaveText("https://opencode.ai/docs")
+  await expect(links.nth(1)).toHaveText("https://contextser.com/docs")
   await expect(timeline.getByText("@src/a.ts", { exact: true })).toBeVisible()
   await expect(timeline.locator('[data-slot="user-message-text"]')).toHaveText(
-    "set it up on this pc https://github.com/Hona/mesh, then compare @src/a.ts with (https://opencode.ai/docs).",
+    "set it up on this pc https://github.com/Hona/mesh, then compare @src/a.ts with (https://contextser.com/docs).",
   )
 })

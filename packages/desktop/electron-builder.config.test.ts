@@ -13,28 +13,28 @@ import { CLI_BINARIES, nodePtyPackage } from "./script/utils"
 const { FileMatcher } = createRequire(import.meta.resolve("electron-builder"))("app-builder-lib/out/fileMatcher")
 
 const channels = [
-  { channel: "dev", appId: "ai.opencode.desktop.dev", feed: "dev" },
-  { channel: "beta", appId: "ai.opencode.desktop.beta", feed: "beta" },
-  { channel: "prod", appId: "ai.opencode.desktop", feed: "latest" },
+  { channel: "dev", appId: "ai.contextcode.desktop.dev", feed: "dev" },
+  { channel: "beta", appId: "ai.contextcode.desktop.beta", feed: "beta" },
+  { channel: "prod", appId: "ai.contextcode.desktop", feed: "latest" },
 ] as const
 
 function load(channel: string, target?: string): Configuration {
-  const previous = process.env.OPENCODE_CHANNEL
-  const previousTarget = process.env.OPENCODE_TARGET
-  process.env.OPENCODE_CHANNEL = channel
+  const previous = process.env.CONTEXTCODE_CHANNEL
+  const previousTarget = process.env.CONTEXTCODE_TARGET
+  process.env.CONTEXTCODE_CHANNEL = channel
 
-  if (target !== undefined) process.env.OPENCODE_TARGET = target
-  else delete process.env.OPENCODE_TARGET
+  if (target !== undefined) process.env.CONTEXTCODE_TARGET = target
+  else delete process.env.CONTEXTCODE_TARGET
 
   try {
     return getConfig()
   } finally {
-    delete process.env.OPENCODE_CHANNEL
-    delete process.env.OPENCODE_TARGET
+    delete process.env.CONTEXTCODE_CHANNEL
+    delete process.env.CONTEXTCODE_TARGET
 
-    if (previous !== undefined) process.env.OPENCODE_CHANNEL = previous
+    if (previous !== undefined) process.env.CONTEXTCODE_CHANNEL = previous
 
-    if (previousTarget !== undefined) process.env.OPENCODE_TARGET = previousTarget
+    if (previousTarget !== undefined) process.env.CONTEXTCODE_TARGET = previousTarget
   }
 }
 
@@ -59,7 +59,7 @@ test.each(channels)("channel identity for $channel", ({ channel, appId, feed }) 
   expect(config.extraMetadata?.desktopName).toBe(`${appId}.desktop`)
   // The executable must never end in `.desktop`: libappimage resolves the
   // AppImage's desktop entry by globbing `*.desktop`, and an ELF matching
-  // that glob breaks integration (anomalyco/opencode#51867).
+  // that glob breaks integration (contextser/contextcode#51867).
   expect(config.linux?.executableName).toBe(appId.replace(/\.desktop$/, ""))
   expect(config.linux?.executableName).not.toMatch(/\.desktop$/)
   // The installed `.desktop` filename still derives from `desktopName` so
@@ -70,7 +70,7 @@ test.each(channels)("channel identity for $channel", ({ channel, appId, feed }) 
   for (const fpm of [config.deb?.fpm, config.rpm?.fpm]) {
     expect(fpm).toContainEqual(expect.stringContaining(`/usr/share/metainfo/${appId}.metainfo.xml`))
     expect(
-      fpm?.some((entry) => entry.endsWith("opencode-desktop.desktop=/usr/share/applications/opencode-desktop.desktop")),
+      fpm?.some((entry) => entry.endsWith("contextcode-desktop.desktop=/usr/share/applications/contextcode-desktop.desktop")),
     ).toBe(channel === "prod")
   }
 
@@ -81,10 +81,10 @@ test.each(channels)("channel identity for $channel", ({ channel, appId, feed }) 
 })
 
 test("legacy Linux launcher stays hidden", async () => {
-  const desktop = await Bun.file(path.join(import.meta.dirname, "resources/linux/opencode-desktop.desktop")).text()
-  expect(desktop).toContain("Exec=/opt/OpenCode/ai.opencode %U")
-  expect(desktop).toContain("Icon=ai.opencode")
-  expect(desktop).toContain("StartupWMClass=ai.opencode.desktop")
+  const desktop = await Bun.file(path.join(import.meta.dirname, "resources/linux/contextcode-desktop.desktop")).text()
+  expect(desktop).toContain("Exec=/opt/Context Code/ai.contextcode %U")
+  expect(desktop).toContain("Icon=ai.contextcode")
+  expect(desktop).toContain("StartupWMClass=ai.contextcode.desktop")
   expect(desktop).toContain("NoDisplay=true")
 })
 
@@ -99,9 +99,9 @@ test("shared packaging defaults", async () => {
   const include = path.join(import.meta.dirname, "resources/windows/installer.nsh")
   expect(config.nsis?.include).toBe(include)
   expect(await Bun.file(include).exists()).toBe(true)
-  expect(config.files).toContain("!resources/opencode-cli*")
+  expect(config.files).toContain("!resources/contextcode-cli*")
   expect(config.extraResources).toEqual([
-    { from: "resources/", to: "", filter: ["opencode-cli", "opencode-cli.exe", "opencode-cli.version"] },
+    { from: "resources/", to: "", filter: ["contextcode-cli", "contextcode-cli.exe", "contextcode-cli.version"] },
   ])
 })
 
@@ -174,7 +174,7 @@ test("trims external dependencies without excluding runtime files", () => {
 
 test("the trimmed Zip.js package can still export compressed logs", async () => {
   const config = load("dev")
-  const dir = await mkdtemp(path.join(os.tmpdir(), "opencode-zip-package-"))
+  const dir = await mkdtemp(path.join(os.tmpdir(), "contextcode-zip-package-"))
   const source = path.dirname(fileURLToPath(import.meta.resolve("@zip.js/zip.js/package.json")))
   const filter = trimFilter(dir, config)
 

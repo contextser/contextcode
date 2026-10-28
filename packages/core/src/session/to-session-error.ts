@@ -1,6 +1,6 @@
-import { AIError, ToolFailure, type FinishReasonDetails } from "@opencode/ai/effect"
-import { Tool } from "@opencode/schema/tool"
-import { SessionError } from "@opencode/schema/session-error"
+import { AIError, ToolFailure, type FinishReasonDetails } from "@contextcode/ai/effect"
+import { Tool } from "@contextcode/schema/tool"
+import { SessionError } from "@contextcode/schema/session-error"
 import { Permission } from "../permission.js"
 import { Integration } from "../integration.js"
 import { AgentNotFoundError, StepFailedError } from "./error.js"
@@ -102,7 +102,7 @@ export function contentFilterError(summary: string, reason: FinishReasonDetails)
   }
 }
 
-// OpenCode Console names what a refusing budget covers, in its envelope's metadata or, for Google clients, ErrorInfo.
+// Context Code Console names what a refusing budget covers, in its envelope's metadata or, for Google clients, ErrorInfo.
 function budgetLimit(reason: AIError["reason"]): SessionError.Error {
   if (/"coverage"\s*:\s*"models"/.test(reason.body ?? ""))
     return { ...providerError("provider.model-budget-limit", reason), message: MODEL_BUDGET_LIMIT_MESSAGE }

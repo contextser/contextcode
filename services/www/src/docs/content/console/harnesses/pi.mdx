@@ -3,27 +3,27 @@ title: "Pi"
 description: "Use Console and Go models from the Pi coding agent."
 ---
 
-[Pi](https://pi.dev) includes OpenCode providers for pay-as-you-go and Go. It picks the right API for each paid or Go
-model. Free-tier chat models require OpenCode and return HTTP `403` from Pi.
+[Pi](https://pi.dev) includes Context Code providers for pay-as-you-go and Go. It picks the right API for each paid or Go
+model. Free-tier chat models require Context Code and return HTTP `403` from Pi.
 
 | Provider      | Plan          |
 | ------------- | ------------- |
-| `opencode`    | Pay-as-you-go |
+| `contextcode`    | Pay-as-you-go |
 | `opencode-go` | Go            |
 
 ## Configure
 
-Both providers read the key from `OPENCODE_API_KEY`. Create a [personal API key](/console/harnesses#get-an-api-key).
+Both providers read the key from `CONTEXTCODE_API_KEY`. Create a [personal API key](/console/harnesses#get-an-api-key).
 
 ```bash
-export OPENCODE_API_KEY="oc_sk_..."
+export CONTEXTCODE_API_KEY="oc_sk_..."
 pi --model opencode/claude-sonnet-5-5
 ```
 
 You can also run `/login` in Pi and select the provider. Pi stores the key in `~/.pi/agent/auth.json`.
 
 ```text
-/login opencode
+/login contextcode
 ```
 
 ## Go
@@ -60,6 +60,6 @@ Pi v0.99.0 and later support MCP. Add the [Console MCP](/console/harnesses#conso
 browser.
 
 ```bash
-pi mcp add opencode-console --url https://opencode.ai/console/mcp
-pi mcp login opencode-console
+pi mcp add contextcode-console --url https://opencode.ai/console/mcp
+pi mcp login contextcode-console
 ```

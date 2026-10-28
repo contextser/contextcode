@@ -10,8 +10,8 @@ import {
   type Media,
   Message,
   SystemPart,
-} from "@opencode/ai/effect"
-import type { StreamOptions } from "@opencode/ai/route"
+} from "@contextcode/ai/effect"
+import type { StreamOptions } from "@contextcode/ai/route"
 import type {
   SessionCompaction,
   SessionContext,
@@ -19,13 +19,13 @@ import type {
   SessionRequest,
   SessionRequestKind,
   SessionTitle,
-} from "@opencode/plugin/effect/session"
-import type { Agent } from "@opencode/schema/agent"
-import type { Model } from "@opencode/schema/model"
-import type { Content } from "@opencode/schema/tool"
+} from "@contextcode/plugin/effect/session"
+import type { Agent } from "@contextcode/schema/agent"
+import type { Model } from "@contextcode/schema/model"
+import type { Content } from "@contextcode/schema/tool"
 import { Cause, Context, Effect, Layer, Result, Stream } from "effect"
 import { HttpClientRequest, HttpClientResponse } from "effect/http"
-import { makeLocationNode } from "@opencode/util/effect/app-node"
+import { makeLocationNode } from "@contextcode/util/effect/app-node"
 import { App } from "../app.js"
 import { Permission } from "../permission.js"
 import { PluginHooks } from "../plugin/hooks.js"
@@ -219,7 +219,7 @@ export interface Interface {
   readonly title: (input: Input) => Effect.Effect<Prepared<SessionTitle>>
 }
 
-export class Service extends Context.Service<Service, Interface>()("@opencode/SessionModelRequest") {}
+export class Service extends Context.Service<Service, Interface>()("@contextcode/SessionModelRequest") {}
 
 export const layer = Layer.effect(
   Service,
@@ -279,7 +279,7 @@ export const layer = Layer.effect(
         http: {
           headers: {
             "x-opencode-session-id": session.id,
-            ...(session.parentID ? { "x-opencode-parent-session-id": session.parentID } : {}),
+            ...(session.parentID ? { "x-contextcode-parent-session-id": session.parentID } : {}),
             "x-session-affinity": affinity,
             "X-Session-Id": affinity,
             ...(session.parentID ? { "x-parent-session-id": session.parentID } : {}),

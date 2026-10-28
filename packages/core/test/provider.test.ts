@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import path from "node:path"
 import { Effect } from "effect"
-import { Provider } from "@opencode/core/provider"
+import { Provider } from "@contextcode/core/provider"
 
 describe("Provider", () => {
   test("bundles every native provider entrypoint that exports model()", async () => {
@@ -10,7 +10,7 @@ describe("Provider", () => {
       Object.keys(manifest.exports)
         .filter((key) => key.startsWith("./providers/"))
         .map(async (key) => {
-          const specifier = `@opencode/ai${key.slice(1)}`
+          const specifier = `@contextcode/ai${key.slice(1)}`
           const module = await import(specifier)
           return typeof module.model === "function" ? specifier : undefined
         }),
@@ -27,7 +27,7 @@ describe("Provider", () => {
 
   test("keeps loading the hyphenated provider paths existing configs reference", async () => {
     for (const name of ["google-vertex-messages", "openai-compatible-responses"]) {
-      const specifier = `@opencode/ai/providers/${name}`
+      const specifier = `@contextcode/ai/providers/${name}`
       expect(Provider.builtinPackages.has(specifier)).toBe(true)
       const loaded = await Effect.runPromise(Provider.loadPackage(specifier))
       expect(loaded.model).toBeFunction()

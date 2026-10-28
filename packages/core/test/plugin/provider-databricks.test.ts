@@ -1,9 +1,9 @@
 import { describe, expect } from "bun:test"
 import { Effect } from "effect"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { DatabricksPlugin } from "@opencode/core/plugin/provider/databricks"
-import { Provider } from "@opencode/core/provider"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { DatabricksPlugin } from "@contextcode/core/plugin/provider/databricks"
+import { Provider } from "@contextcode/core/provider"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "./fixture"
 

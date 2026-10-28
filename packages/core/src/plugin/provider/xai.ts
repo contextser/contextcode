@@ -1,5 +1,5 @@
-import type { IntegrationOAuthMethodRegistration } from "@opencode/plugin/effect/integration"
-import { define } from "@opencode/plugin/effect/plugin"
+import type { IntegrationOAuthMethodRegistration } from "@contextcode/plugin/effect/integration"
+import { define } from "@contextcode/plugin/effect/plugin"
 import { Clock, Effect, Option, Schema } from "effect"
 import { App } from "../../app.js"
 import { Credential } from "../../credential.js"
@@ -74,7 +74,7 @@ const device = (app: App.Info) =>
   }) satisfies IntegrationOAuthMethodRegistration
 
 export const XAIPlugin = define({
-  id: "opencode.provider.xai",
+  id: "contextcode.provider.xai",
   effect: Effect.fn(function* (ctx) {
     const credentials = yield* Credential.Service
     yield* Effect.forEach(

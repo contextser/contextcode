@@ -1,13 +1,13 @@
-import { Bus } from "@opencode/core/bus"
-import { Config } from "@opencode/core/config"
-import { Integration } from "@opencode/core/integration"
-import { Model } from "@opencode/core/model"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { LMStudioPlugin, make } from "@opencode/core/plugin/provider/lmstudio"
-import { ProviderPlugins } from "@opencode/core/plugin/provider"
-import { Provider } from "@opencode/core/provider"
-import { Document, Event, Info } from "@opencode/schema/config"
+import { Bus } from "@contextcode/core/bus"
+import { Config } from "@contextcode/core/config"
+import { Integration } from "@contextcode/core/integration"
+import { Model } from "@contextcode/core/model"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { LMStudioPlugin, make } from "@contextcode/core/plugin/provider/lmstudio"
+import { ProviderPlugins } from "@contextcode/core/plugin/provider"
+import { Provider } from "@contextcode/core/provider"
+import { Document, Event, Info } from "@contextcode/schema/config"
 import { describe, expect, test } from "bun:test"
 import { Duration, Effect, Layer, Schema } from "effect"
 import { testEffect } from "../lib/effect"
@@ -38,8 +38,8 @@ function eventually<A>(
 
 describe("LMStudioPlugin", () => {
   test("is registered as a built-in provider plugin", () => {
-    expect(LMStudioPlugin.id).toBe("opencode.provider.lmstudio")
-    expect(ProviderPlugins.map((item) => item.id)).toContain("opencode.provider.lmstudio")
+    expect(LMStudioPlugin.id).toBe("contextcode.provider.lmstudio")
+    expect(ProviderPlugins.map((item) => item.id)).toContain("contextcode.provider.lmstudio")
   })
 
   it.live("discovers local language models with their capabilities and effective context", () =>
@@ -101,7 +101,7 @@ describe("LMStudioPlugin", () => {
             id: providerID,
             name: "LM Studio",
             activation: "enabled",
-            package: "@opencode/ai/providers/openai-compatible",
+            package: "@contextcode/ai/providers/openai-compatible",
             settings: { baseURL: `${server.url.origin}/v1`, provider: "lmstudio", apiKey: "" },
           })
           expect((yield* providers.available()).map((provider) => provider.id)).toContain(providerID)
@@ -311,7 +311,7 @@ describe("LMStudioPlugin", () => {
           yield* providers.transform((editor) => {
             editor.update(providerID, (provider) => {
               provider.name = "LMStudio"
-              provider.package = "@opencode/ai/providers/openai-compatible"
+              provider.package = "@contextcode/ai/providers/openai-compatible"
               provider.integrationID = Integration.ID.make("lmstudio")
             })
             editor.models.update(providerID, Model.ID.make("static-model"), () => {})

@@ -4,7 +4,7 @@ import type { Credential } from "./credential.js"
 
 export const defaultServer = "https://opencode.ai/console"
 
-/** The OpenCode Console a credential signed in to. */
+/** The Context Code Console a credential signed in to. */
 export function server(value: Credential.Value) {
   const server = typeof value.metadata?.server === "string" ? value.metadata.server : defaultServer
   // Credentials saved before August 2026 store the retired console.opencode.ai host, which maps path-for-path onto

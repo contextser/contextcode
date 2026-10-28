@@ -1,10 +1,10 @@
 import { describe, expect } from "bun:test"
 import { Effect } from "effect"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { CloudflareWorkersAIPlugin } from "@opencode/core/plugin/provider/cloudflare-workers-ai"
-import { Provider } from "@opencode/core/provider"
-import { Integration } from "@opencode/core/integration"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { CloudflareWorkersAIPlugin } from "@contextcode/core/plugin/provider/cloudflare-workers-ai"
+import { Provider } from "@contextcode/core/provider"
+import { Integration } from "@contextcode/core/integration"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "./fixture"
 
@@ -76,7 +76,7 @@ describe("CloudflareWorkersAIPlugin", () => {
     withEnv({ CLOUDFLARE_ACCOUNT_ID: "acct", CLOUDFLARE_API_KEY: "key" }, () =>
       Effect.gen(function* () {
         const catalog = yield* seed((provider) => {
-          provider.package = "@opencode/ai/providers/cloudflare-workers-ai"
+          provider.package = "@contextcode/ai/providers/cloudflare-workers-ai"
         })
         yield* addPlugin()
         const integrations = yield* Integration.Service
@@ -85,7 +85,7 @@ describe("CloudflareWorkersAIPlugin", () => {
           label: "API key",
         })
         expect(required(yield* catalog.get(providerID)).package).toBe(
-          "@opencode/ai/providers/cloudflare-workers-ai",
+          "@contextcode/ai/providers/cloudflare-workers-ai",
         )
       }),
     ),
@@ -95,7 +95,7 @@ describe("CloudflareWorkersAIPlugin", () => {
     withEnv({ CLOUDFLARE_ACCOUNT_ID: "acct" }, () =>
       Effect.gen(function* () {
         const catalog = yield* seed((provider) => {
-          provider.package = "@opencode/ai/providers/cloudflare-workers-ai"
+          provider.package = "@contextcode/ai/providers/cloudflare-workers-ai"
         })
         yield* addPlugin()
         expect(required(yield* catalog.get(providerID)).settings).toEqual({ accountId: "acct" })

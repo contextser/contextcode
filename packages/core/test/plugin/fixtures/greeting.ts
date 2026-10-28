@@ -1,4 +1,4 @@
-import { Plugin } from "@opencode/plugin"
+import { Plugin } from "@contextcode/plugin"
 
 export default Plugin.define({
   id: "greeting",

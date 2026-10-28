@@ -1,4 +1,4 @@
-import { Plugin } from "@opencode/plugin/tui"
+import { Plugin } from "@contextcode/plugin/tui"
 import { createMemo, For, Show } from "solid-js"
 import { TodoItem } from "../../component/todo-item"
 import { sessionTodos } from "../../util/todo"
@@ -48,7 +48,7 @@ export function SidebarTodo(props: { context: Plugin.Context; sessionID: string 
 }
 
 export default Plugin.define({
-  id: "opencode.sidebar.todo",
+  id: "contextcode.sidebar.todo",
   setup(context) {
     context.ui.slot({
       append: "sidebar.content",

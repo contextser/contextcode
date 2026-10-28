@@ -1,4 +1,4 @@
-import { base64Encode, checksum } from "@opencode/util/encode"
+import { base64Encode, checksum } from "@contextcode/util/encode"
 import { expect, test, type Page } from "@playwright/test"
 import { sessionHref } from "../utils/app"
 import { mockWorkspace, openSession, type WorkspaceInput } from "../utils/workspace"
@@ -266,7 +266,7 @@ function restoredTerminal(pty: { id: string; title: string }) {
     panes: { ses_terminalinput: { review: true } },
     storage: {
       [legacyTerminalKey()]: { active: pty.id, all: [{ ...pty, titleNumber: 1 }] },
-      "opencode.global.dat:layout": {
+      "contextcode.global.dat:layout": {
         sessionTabs: { [`local\u0000${directory()}/ses_terminalinput`]: { all: [key], active: key } },
       },
     },
@@ -282,12 +282,12 @@ function closeTab(page: Page, id: string) {
 }
 
 function directory() {
-  return base64Encode("C:/OpenCode/TerminalInput")
+  return base64Encode("C:/Context Code/TerminalInput")
 }
 
 function legacyTerminalKey() {
   const dir = directory()
   const head = dir.slice(0, 12).replace(/[^a-zA-Z0-9._-]/g, "-")
 
-  return `opencode.workspace.${head}.${checksum(dir) ?? "0"}.dat:workspace:terminal`
+  return `contextcode.workspace.${head}.${checksum(dir) ?? "0"}.dat:workspace:terminal`
 }

@@ -1,7 +1,7 @@
-import type { SessionMessageInfo } from "@opencode/client/promise"
-import type { SessionDocument } from "@opencode/session-ui/document"
-import { CURRENT_SESSION_ID, STORY_MODEL, STORY_TIME, editThenTestDocument } from "@opencode/session-ui/storybook"
-import { timelinePresets } from "@opencode/session-ui/timeline/detail"
+import type { SessionMessageInfo } from "@contextcode/client/promise"
+import type { SessionDocument } from "@contextcode/session-ui/document"
+import { CURRENT_SESSION_ID, STORY_MODEL, STORY_TIME, editThenTestDocument } from "@contextcode/session-ui/storybook"
+import { timelinePresets } from "@contextcode/session-ui/timeline/detail"
 import { createMemo, onMount } from "solid-js"
 import { SessionPreview } from "@/session/story-model"
 import type { SessionActivityItem } from "./activity-chips"
@@ -101,7 +101,7 @@ function Preview(props: PreviewArgs) {
   return (
     <SessionPreview
       title="Bring back the todo dock"
-      description="opencode · todo pill"
+      description="contextcode · todo pill"
       document={value()}
       timelineDetail={timelineDetail}
       activity={props.activity ? activity : undefined}
@@ -111,7 +111,7 @@ function Preview(props: PreviewArgs) {
 }
 
 export default {
-  title: "OpenCode/Session/Todo pill",
+  title: "Context Code/Session/Todo pill",
   id: "session-todo-pill",
   render: (args: PreviewArgs) => <Preview {...args} />,
   args: { progress: 3, open: false, activity: true },

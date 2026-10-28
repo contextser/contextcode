@@ -1,10 +1,10 @@
 # opencode-pty
 
 Moved from [anomalyco/opencode-pty](https://github.com/anomalyco/opencode-pty)
-(at 443945a, v0.3.1). It lives in the OpenCode monorepo at
+(at 443945a, v0.3.1). It lives in the Context Code monorepo at
 `packages/process-daemon`; run the commands below from that directory.
 
-Experimental threaded PTY service core for OpenCode.
+Experimental threaded PTY service core for Context Code.
 
 It uses `portable-pty` to own terminal child processes and `libghostty-vt` to
 maintain authoritative terminal state and answer terminal protocol queries.
@@ -39,8 +39,8 @@ current owner, stops the daemon even during handoff. No ownership or handoff sta
 is persisted.
 
 Every command requires `--name NAME`, which selects the runtime directory
-`DIR/NAME`. `--runtime-dir DIR` is optional and defaults to OpenCode's state
-directory, `${XDG_STATE_HOME:-~/.local/state}/opencode/pty`. Names are a single
+`DIR/NAME`. `--runtime-dir DIR` is optional and defaults to Context Code's state
+directory, `${XDG_STATE_HOME:-~/.local/state}/contextcode/pty`. Names are a single
 path component of letters, digits, `.`, `_`, or `-`. The registration
 (`service.json`) and lock (`service.lock`) live in that directory. They only
 default to a temporary directory when no home directory exists, because macOS deletes unaccessed regular files
@@ -94,7 +94,7 @@ squatting during cleanup.
 
 On Windows, `opencode-pty daemon --name NAME [--runtime-dir DIR]` uses the same
 `DIR/NAME` runtime directory; the default `DIR` resolves through `XDG_STATE_HOME`
-or the user profile's `.local\state\opencode\pty`, matching OpenCode's state
+or the user profile's `.local\state\contextcode\pty`, matching Context Code's state
 directory. The runtime directory must be absolute. Storage entries must not be
 reparse points or owned by another user; the directory, lock, and registration
 use protected current-user-only ACLs, and clients verify the registration's owner
@@ -349,16 +349,16 @@ forced-exit deadline does not prove that those worker threads were joined.
 The workflow can also be run manually against a branch:
 
 ```sh
-gh workflow run check-process-daemon.yml --repo anomalyco/opencode --ref BRANCH
-gh run list --repo anomalyco/opencode --workflow check-process-daemon.yml --branch BRANCH
-gh run view RUN_ID --repo anomalyco/opencode --log-failed
+gh workflow run check-process-daemon.yml --repo contextser/contextcode --ref BRANCH
+gh run list --repo contextser/contextcode --workflow check-process-daemon.yml --branch BRANCH
+gh run view RUN_ID --repo contextser/contextcode --log-failed
 ```
 
 ## Releases
 
 Releases are built by
 [`.github/workflows/release-process-daemon.yml`](../../.github/workflows/release-process-daemon.yml)
-in anomalyco/opencode. To release version `X.Y.Z`:
+in contextser/contextcode. To release version `X.Y.Z`:
 
 1. Bump `version` in `Cargo.toml` (and `Cargo.lock`), and `version` plus every
    `optionalDependencies` entry in `npm/package.json`, to `X.Y.Z`. The workflow
@@ -373,13 +373,13 @@ git push origin process-daemon-vX.Y.Z
 
 The tag creates an unsigned GitHub release titled `process-daemon vX.Y.Z`. It
 is never marked Latest, because the monorepo's Latest release drives
-OpenCode's own update paths. The release contains x86-64 and arm64 binaries
+Context Code's own update paths. The release contains x86-64 and arm64 binaries
 for Linux GNU, Linux musl, macOS, and Windows (MSVC, statically linked C
 runtime), plus `SHA256SUMS`, a machine-readable `release-manifest.json`, and
 GitHub build-provenance attestations. Release builds force Ghostty's Zig code
 generation to its baseline CPU target so artifacts do not inherit
 instruction-set extensions from CI runners (Windows builds set
-`OPENCODE_ZIG_CPU=baseline`, since the Unix Zig wrapper is a shell script).
+`CONTEXTCODE_ZIG_CPU=baseline`, since the Unix Zig wrapper is a shell script).
 Linux GNU artifacts support glibc 2.30 and newer.
 
 Tagged releases also publish `@opencode-ai/pty` to npm with optional,
@@ -393,7 +393,7 @@ import { binaryPath } from "@opencode-ai/pty"
 
 npm publishing uses trusted publishing with provenance. Each of the nine
 packages (`@opencode-ai/pty` and the eight `@opencode-ai/pty-<platform>`
-packages) must list anomalyco/opencode with workflow
+packages) must list contextser/contextcode with workflow
 `release-process-daemon.yml` as its trusted publisher.
 
 Pull requests that change the release pipeline run the same build and npm
@@ -407,7 +407,7 @@ Platform signing will be added later.
   TerminalClient/play/watch CLI.
 - Ordinary API operations use one framed JSON request per connection;
   subscriptions keep the authenticated connection open for ordered live events.
-- The OpenCode backend proxy and ordered group APIs are implemented, but the
+- The Context Code backend proxy and ordered group APIs are implemented, but the
   OpenTUI client integration is not.
 - Windows uses portable-pty's published ConPTY backend and is not hardened yet.
 - Child process-tree cleanup is not complete beyond portable-pty's root killer.

@@ -1,16 +1,16 @@
 import { expect } from "bun:test"
 import { DateTime, Effect, Layer } from "effect"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Location } from "@opencode/core/location"
-import { Model } from "@opencode/core/model"
-import { ModelResolver } from "@opencode/core/model-resolver"
-import { Project } from "@opencode/core/project"
-import { Provider } from "@opencode/core/provider"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Session } from "@opencode/core/session"
-import { SessionRunnerModel } from "@opencode/core/session/runner/model"
-import { Money } from "@opencode/schema/money"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Location } from "@contextcode/core/location"
+import { Model } from "@contextcode/core/model"
+import { ModelResolver } from "@contextcode/core/model-resolver"
+import { Project } from "@contextcode/core/project"
+import { Provider } from "@contextcode/core/provider"
+import { AbsolutePath } from "@contextcode/core/schema"
+import { Session } from "@contextcode/core/session"
+import { SessionRunnerModel } from "@contextcode/core/session/runner/model"
+import { Money } from "@contextcode/schema/money"
 import { withEnv } from "./fixture/env"
 import { location } from "./fixture/location"
 import { it } from "./lib/effect"
@@ -27,8 +27,8 @@ const other = Provider.ID.make("other")
 
 for (const flag of [undefined, "0", "1", "true"]) {
   for (const providerID of [Provider.ID.opencode, Provider.ID.make("opencode-go")])
-    it.effect(`${providerID} catalog with OPENCODE_DISABLE_FREE_MODELS=${flag}`, () =>
-      withEnv({ OPENCODE_DISABLE_FREE_MODELS: flag }, () =>
+    it.effect(`${providerID} catalog with CONTEXTCODE_DISABLE_FREE_MODELS=${flag}`, () =>
+      withEnv({ CONTEXTCODE_DISABLE_FREE_MODELS: flag }, () =>
         Effect.gen(function* () {
           const providers = yield* Provider.Service
           const models = yield* Model.Service

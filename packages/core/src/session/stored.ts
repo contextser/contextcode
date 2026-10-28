@@ -1,10 +1,10 @@
 export * as SessionStored from "./stored.js"
 
 import { Schema } from "effect"
-import { FileAttachment, MediaRef } from "@opencode/schema/prompt"
-import { optional } from "@opencode/schema/schema"
-import { UserPayload as InboxUserPayload } from "@opencode/schema/session-inbox"
-import { Tool } from "@opencode/schema/tool"
+import { FileAttachment, MediaRef } from "@contextcode/schema/prompt"
+import { optional } from "@contextcode/schema/schema"
+import { UserPayload as InboxUserPayload } from "@contextcode/schema/session-inbox"
+import { Tool } from "@contextcode/schema/tool"
 import { SessionMessage } from "./message.js"
 
 /**

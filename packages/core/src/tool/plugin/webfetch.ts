@@ -1,7 +1,7 @@
 export * as WebFetchTool from "./webfetch.js"
 
-import type { Context } from "@opencode/plugin/effect/plugin"
-import { ToolFailure } from "@opencode/ai/effect"
+import type { Context } from "@contextcode/plugin/effect/plugin"
+import { ToolFailure } from "@contextcode/ai/effect"
 import { Duration, Effect, Schema } from "effect"
 import { FetchHttpClient, HttpClient, HttpClientError, HttpClientRequest, HttpClientResponse } from "effect/http"
 import { Parser } from "htmlparser2"
@@ -56,8 +56,8 @@ const headers = (format: Format, userAgent: string) => ({
   "Accept-Language": "en-US,en;q=0.9",
 })
 
-const openCodeUserAgent =
-  "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; OpenCode-User/1.0; +https://opencode.ai"
+const contextCodeUserAgent =
+  "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko); compatible; ContextCode-User/1.0; +https://contextser.com"
 
 const isCloudflareChallenge = (error: unknown) => {
   if (!HttpClientError.isHttpClientError(error) || error.reason._tag !== "StatusCodeError") return false
@@ -65,7 +65,7 @@ const isCloudflareChallenge = (error: unknown) => {
   return response.status === 403 && response.headers["cf-mitigated"] === "challenge"
 }
 
-const request = (url: string, format: Format, userAgent = openCodeUserAgent) =>
+const request = (url: string, format: Format, userAgent = contextCodeUserAgent) =>
   HttpClientRequest.get(url).pipe(HttpClientRequest.setHeaders(headers(format, userAgent)))
 
 const assertHttpUrl = (url: URL) => {
@@ -81,7 +81,7 @@ const execute = (
   check: (url: string) => Effect.Effect<void, Error>,
   url: string,
   format: Format,
-  userAgent = openCodeUserAgent,
+  userAgent = contextCodeUserAgent,
   redirects = 0,
 ): Effect.Effect<HttpClientResponse.HttpClientResponse, Error> =>
   http.execute(request(url, format, userAgent)).pipe(
@@ -123,7 +123,7 @@ const convert = (content: string, contentType: string, format: Format) => {
 }
 
 export const Plugin = {
-  id: "opencode.tool.webfetch",
+  id: "contextcode.tool.webfetch",
   effect: Effect.fn("WebFetchTool.Plugin")(function* (ctx: Context) {
     const http = yield* HttpClient.HttpClient
     const permission = yield* Permission.Service
@@ -165,7 +165,7 @@ export const Plugin = {
                   })
                 const response = yield* execute(http, check, input.url, input.format).pipe(
                   Effect.catchIf(isCloudflareChallenge, () =>
-                    execute(http, check, input.url, input.format, "opencode"),
+                    execute(http, check, input.url, input.format, "contextcode"),
                   ),
                 )
                 const contentType = response.headers["content-type"] || ""

@@ -11,8 +11,8 @@ import {
   type Signal,
 } from "solid-js"
 import { createStore, produce } from "solid-js/store"
-import { Icon } from "@opencode/ui/icon"
-import { encodeFilePath, getFilename } from "@opencode/util/path"
+import { Icon } from "@contextcode/ui/icon"
+import { encodeFilePath, getFilename } from "@contextcode/util/path"
 import {
   Command,
   createKeyed,
@@ -30,8 +30,8 @@ import {
   type SessionScreen,
   type ServerRef,
   type Plugin,
-} from "@opencode/plugin/gui"
-import { artifactKind } from "@opencode/util/artifact"
+} from "@contextcode/plugin/gui"
+import { artifactKind } from "@contextcode/util/artifact"
 import { resolveArtifactPath } from "./artifact"
 import { FileContext, type FileShared } from "./context"
 import type { OpenApp } from "./apps"
@@ -41,14 +41,14 @@ import {
   type FileListProps,
   type FileTreeProps,
   type OpenInAppProps,
-} from "@opencode/plugin/gui/file"
+} from "@contextcode/plugin/gui/file"
 import type File from "./index"
 import { FileVisual } from "./label"
 import { fileTabId, fileTabPath, isFileTab, workspaceFileUrl } from "./path"
 import tabStyles from "./tabs.css?inline"
-import { onIdle, BuiltinPanel, BuiltinSlot, type BuiltinPanelTab } from "@opencode/plugin/gui/builtin"
-import { Browser } from "@opencode/plugin/gui/browser"
-import { Changes } from "@opencode/plugin/gui/review"
+import { onIdle, BuiltinPanel, BuiltinSlot, type BuiltinPanelTab } from "@contextcode/plugin/gui/builtin"
+import { Browser } from "@contextcode/plugin/gui/browser"
+import { Changes } from "@contextcode/plugin/gui/review"
 
 const OPEN = "open"
 

@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test"
 import { SERVER, holdRoute, seed, sessionHref } from "../utils/app"
 import { openWithDirection } from "../utils/direction"
-import { mockOpenCodeServer } from "../utils/mock-server"
+import { mockContextCodeServer } from "../utils/mock-server"
 import { fixture, installStressSessionTabs, mockStressTimeline, pageMessages } from "../utils/session-fixture"
 import { fileDiff, openSession } from "../utils/workspace"
 
@@ -129,7 +129,7 @@ test("the project menu loads changes on demand and opens review", async ({ page 
     /1 Changed file.*\+7.*-3/,
     "",
     "This computer",
-    "C:/OpenCode/ProjectChanges",
+    "C:/Context Code/ProjectChanges",
     "",
     "Edit project",
   ])
@@ -152,7 +152,7 @@ test("the project menu loads changes on demand and opens review", async ({ page 
 })
 
 test("a session in a worktree subfolder names its worktree and lists cached worktrees at once", async ({ page }) => {
-  const root = "C:/OpenCode/SmokeWorktrees"
+  const root = "C:/Context Code/SmokeWorktrees"
   await mockStressTimeline(page, {
     sessions: fixture.sessions.map((item) =>
       item.id === fixture.targetID ? { ...item, directory: `${root}/feature/packages/app` } : { ...item },
@@ -192,7 +192,7 @@ test("a session in a worktree subfolder names its worktree and lists cached work
 })
 
 test("a subagent shows its details but cannot move to another worktree", async ({ page }) => {
-  const root = "C:/OpenCode/SmokeWorktrees"
+  const root = "C:/Context Code/SmokeWorktrees"
 
   await mockStressTimeline(page, {
     sessions: fixture.sessions.map((item) =>
@@ -219,7 +219,7 @@ test("a subagent shows its details but cannot move to another worktree", async (
 })
 
 test("the details follow the routed session when it moves to another worktree", async ({ page }) => {
-  const root = "C:/OpenCode/SmokeWorktrees"
+  const root = "C:/Context Code/SmokeWorktrees"
 
   const sessions = fixture.sessions.map((item) =>
     item.id === fixture.targetID ? { ...item, directory: `${root}/feature` } : { ...item },
@@ -382,7 +382,7 @@ test("summary catalogs load, refresh while cached, and tell errors from empty", 
               ? [
                   {
                     id: "daytona",
-                    source: { type: "package", target: "opencode-daytona" },
+                    source: { type: "package", target: "contextcode-daytona" },
                     features: {},
                     state: { status: "active" },
                   },
@@ -671,8 +671,8 @@ test("Extensions lists open on hover, hold course into the open list, and follow
 })
 
 test("Extensions lists open config files and skills in a side tab and start setup sessions", async ({ page }) => {
-  const global = "C:/Users/kit/.config/opencode/opencode.jsonc"
-  const skill = `${fixture.directory}/.opencode/skills/release-notes/SKILL.md`
+  const global = "C:/Users/kit/.config/contextcode/contextcode.jsonc"
+  const skill = `${fixture.directory}/.contextcode/skills/release-notes/SKILL.md`
 
   await mockStressTimeline(page, {
     mcp: [{ name: "atlas-search", status: { status: "connected" } }],
@@ -685,7 +685,7 @@ test("Extensions lists open config files and skills in a side tab and start setu
         info: { mcp: { servers: { "atlas-search": { type: "remote", url: "https://atlas.example" } } } },
       },
       // An empty project override used to win, so the servers' own file never opened.
-      { type: "document", path: `${fixture.directory}/.opencode/opencode.jsonc`, info: { mcp: {} } },
+      { type: "document", path: `${fixture.directory}/.contextcode/contextcode.jsonc`, info: { mcp: {} } },
     ],
     fileContent: (path) => ({ type: "text", content: `contents:${path}` }),
   })
@@ -698,12 +698,12 @@ test("Extensions lists open config files and skills in a side tab and start setu
   await trigger.click()
   await row("MCP").hover()
   // A file outside the workspace is read by name from its own directory.
-  const read = page.waitForRequest((request) => new URL(request.url()).pathname.endsWith("/api/fs/read/opencode.jsonc"))
+  const read = page.waitForRequest((request) => new URL(request.url()).pathname.endsWith("/api/fs/read/contextcode.jsonc"))
   await list("MCP").getByRole("button", { name: "Configuration file", exact: true }).click()
-  expect(new URL((await read).url()).searchParams.get("location[directory]")).toBe("C:/Users/kit/.config/opencode/")
+  expect(new URL((await read).url()).searchParams.get("location[directory]")).toBe("C:/Users/kit/.config/contextcode/")
   await expect(summary).toBeHidden()
-  await expect(page.getByRole("tab", { name: "opencode.jsonc", exact: true })).toHaveAttribute("aria-selected", "true")
-  await expect(page.getByText("contents:opencode.jsonc", { exact: true })).toBeVisible()
+  await expect(page.getByRole("tab", { name: "contextcode.jsonc", exact: true })).toHaveAttribute("aria-selected", "true")
+  await expect(page.getByText("contents:contextcode.jsonc", { exact: true })).toBeVisible()
 
   await trigger.click()
   await row("Skills").hover()
@@ -714,10 +714,10 @@ test("Extensions lists open config files and skills in a side tab and start setu
   // An empty list offers a draft session in the global configuration's directory, its prompt filled in.
   await trigger.click()
   await row("Plugins").hover()
-  await list("Plugins").getByRole("button", { name: "Add a plugin with OpenCode", exact: true }).click()
+  await list("Plugins").getByRole("button", { name: "Add a plugin with Context Code", exact: true }).click()
   await expect(page).toHaveURL(/\/new-session\?/)
   await expect(page.locator('[data-component="composer-editor"]')).toContainText(
-    "Help me add a plugin to my global OpenCode config.",
+    "Help me add a plugin to my global Context Code config.",
   )
 })
 
@@ -725,7 +725,7 @@ test("multiple desktop connections show the session's server name", async ({ pag
   await mockStressTimeline(page)
   await page.route("http://secondary.test/**", (route) =>
     route.fulfill({
-      json: { version: "2.0.0", pid: 1, urls: ["http://secondary.test"], paths: { tmp: "/tmp/opencode" } },
+      json: { version: "2.0.0", pid: 1, urls: ["http://secondary.test"], paths: { tmp: "/tmp/contextcode" } },
     }),
   )
   await seed(page, {
@@ -746,18 +746,18 @@ test.describe("remote configuration", () => {
 
   test("remote servers copy each service's configuration path", async ({ page }) => {
     const remote = "http://summary-remote.test:4096"
-    const home = "/home/remote/.config/opencode"
+    const home = "/home/remote/.config/contextcode"
 
     const entries = [
       { type: "document", path: `${home}/mcp.jsonc`, info: { mcp: { servers: {} } } },
       { type: "document", path: `${home}/plugins.json`, info: { plugins: [] } },
       { type: "document", path: `${home}/skills.jsonc`, info: { skills: [] } },
       { type: "document", path: `${home}/lsp.json`, info: { lsp: false } },
-      { type: "document", path: `${fixture.directory}/opencode.json`, info: {} },
-      { type: "document", path: `${fixture.directory}/.opencode/agents/review.md`, info: {} },
+      { type: "document", path: `${fixture.directory}/contextcode.json`, info: {} },
+      { type: "document", path: `${fixture.directory}/.contextcode/agents/review.md`, info: {} },
     ]
 
-    await mockOpenCodeServer(page, {
+    await mockContextCodeServer(page, {
       server: remote,
       sessions: fixture.sessions,
       provider: fixture.provider,

@@ -4,7 +4,7 @@ import type {
   SessionMessageAssistant,
   SessionMessageInfo,
   ShellInfo,
-} from "@opencode/client/promise"
+} from "@contextcode/client/promise"
 import { Option, Schema } from "effect"
 import { createMemo } from "solid-js"
 

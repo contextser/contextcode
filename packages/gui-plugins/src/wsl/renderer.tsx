@@ -1,8 +1,8 @@
-import { showToast } from "@opencode/ui/toast"
+import { showToast } from "@contextcode/ui/toast"
 import { lazy, onCleanup, Suspense } from "solid-js"
 import { createStore } from "solid-js/store"
-import { MenuItem, Server, Style, type ServerEntry, type ServerState, type Plugin } from "@opencode/plugin/gui"
-import { onIdle } from "@opencode/plugin/gui/builtin"
+import { MenuItem, Server, Style, type ServerEntry, type ServerState, type Plugin } from "@contextcode/plugin/gui"
+import { onIdle } from "@contextcode/plugin/gui/builtin"
 import { Wsl, type WslServerItem } from "./contract"
 import type definition from "./index"
 

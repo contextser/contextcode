@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import { model } from "@opencode/ai/providers/openai"
+import { model } from "@contextcode/ai/providers/openai"
 import { LLM } from "../src/effect.js"
 import { Endpoint } from "../src/route/endpoint.js"
 
@@ -9,10 +9,10 @@ const configuration = (provider: string, message: string) =>
 describe("provider package entrypoints", () => {
   test("maps Alibaba API entrypoints onto explicit regional routes", async () => {
     const modules = await Promise.all([
-      import("@opencode/ai/providers/alibaba"),
-      import("@opencode/ai/providers/alibaba/chat"),
-      import("@opencode/ai/providers/alibaba/messages"),
-      import("@opencode/ai/providers/alibaba/responses"),
+      import("@contextcode/ai/providers/alibaba"),
+      import("@contextcode/ai/providers/alibaba/chat"),
+      import("@contextcode/ai/providers/alibaba/messages"),
+      import("@contextcode/ai/providers/alibaba/responses"),
     ])
     const settings = {
       region: "eu-central-1",
@@ -36,10 +36,10 @@ describe("provider package entrypoints", () => {
 
   test("maps Moonshot API entrypoints onto provider-owned routes", async () => {
     const modules = await Promise.all([
-      import("@opencode/ai/providers/moonshot"),
-      import("@opencode/ai/providers/moonshot/chat"),
-      import("@opencode/ai/providers/moonshot/messages"),
-      import("@opencode/ai/providers/moonshot/responses"),
+      import("@contextcode/ai/providers/moonshot"),
+      import("@contextcode/ai/providers/moonshot/chat"),
+      import("@contextcode/ai/providers/moonshot/messages"),
+      import("@contextcode/ai/providers/moonshot/responses"),
     ])
     const settings = {
       apiKey: "fixture",
@@ -60,8 +60,8 @@ describe("provider package entrypoints", () => {
 
   test("maps Cohere entrypoints onto native and compatibility routes", async () => {
     const modules = await Promise.all([
-      import("@opencode/ai/providers/cohere"),
-      import("@opencode/ai/providers/cohere/chat"),
+      import("@contextcode/ai/providers/cohere"),
+      import("@contextcode/ai/providers/cohere/chat"),
     ])
     const settings = { apiKey: "fixture", headers: { "x-test": "fixture" }, body: { future_option: true } }
     const routes = [
@@ -79,10 +79,10 @@ describe("provider package entrypoints", () => {
 
   test("maps MiniMax API entrypoints onto provider-owned routes", async () => {
     const modules = await Promise.all([
-      import("@opencode/ai/providers/minimax"),
-      import("@opencode/ai/providers/minimax/messages"),
-      import("@opencode/ai/providers/minimax/chat"),
-      import("@opencode/ai/providers/minimax/responses"),
+      import("@contextcode/ai/providers/minimax"),
+      import("@contextcode/ai/providers/minimax/messages"),
+      import("@contextcode/ai/providers/minimax/chat"),
+      import("@contextcode/ai/providers/minimax/responses"),
     ])
     const settings = {
       apiKey: "fixture",
@@ -103,12 +103,12 @@ describe("provider package entrypoints", () => {
 
   test("maps ZAI and Coding Plan entrypoints onto distinct provider-owned routes", async () => {
     const modules = await Promise.all([
-      import("@opencode/ai/providers/zai"),
-      import("@opencode/ai/providers/zai/chat"),
-      import("@opencode/ai/providers/zai-coding-plan"),
-      import("@opencode/ai/providers/zai-coding-plan/chat"),
-      import("@opencode/ai/providers/zai-coding-plan/messages"),
-      import("@opencode/ai/providers/zai-coding-plan/responses"),
+      import("@contextcode/ai/providers/zai"),
+      import("@contextcode/ai/providers/zai/chat"),
+      import("@contextcode/ai/providers/zai-coding-plan"),
+      import("@contextcode/ai/providers/zai-coding-plan/chat"),
+      import("@contextcode/ai/providers/zai-coding-plan/messages"),
+      import("@contextcode/ai/providers/zai-coding-plan/responses"),
     ])
     const routes = [
       "zai-chat",
@@ -135,7 +135,7 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps DeepInfra package settings onto its native executable model", async () => {
-    const DeepInfra = await import("@opencode/ai/providers/deepinfra")
+    const DeepInfra = await import("@contextcode/ai/providers/deepinfra")
     const settings = {
       apiKey: "fixture",
       baseURL: "https://provider.example.test/v1/",
@@ -154,8 +154,8 @@ describe("provider package entrypoints", () => {
 
   test("maps Cloudflare package settings onto provider-owned models", async () => {
     const modules = await Promise.all([
-      import("@opencode/ai/providers/cloudflare-ai-gateway"),
-      import("@opencode/ai/providers/cloudflare-workers-ai"),
+      import("@contextcode/ai/providers/cloudflare-ai-gateway"),
+      import("@contextcode/ai/providers/cloudflare-workers-ai"),
     ])
     for (const provider of modules) {
       const selected = provider.model("provider-model", {
@@ -174,8 +174,8 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps OpenRouter and xAI package settings onto executable models", async () => {
-    const OpenRouter = await import("@opencode/ai/providers/openrouter")
-    const XAI = await import("@opencode/ai/providers/xai")
+    const OpenRouter = await import("@contextcode/ai/providers/openrouter")
+    const XAI = await import("@contextcode/ai/providers/xai")
     const settings = {
       apiKey: "fixture",
       baseURL: "https://provider.example.test/v1",
@@ -215,7 +215,7 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps OpenAI-compatible Responses settings onto the executable model", async () => {
-    const OpenAICompatibleResponses = await import("@opencode/ai/providers/openai-compatible/responses")
+    const OpenAICompatibleResponses = await import("@contextcode/ai/providers/openai-compatible/responses")
     const selected = OpenAICompatibleResponses.model("custom-model", {
       apiKey: "fixture",
       baseURL: "https://responses.example.test/v1",
@@ -242,7 +242,7 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps Anthropic-compatible settings onto the executable model", async () => {
-    const AnthropicCompatible = await import("@opencode/ai/providers/anthropic-compatible")
+    const AnthropicCompatible = await import("@contextcode/ai/providers/anthropic-compatible")
     const selected = AnthropicCompatible.model("compatible-model", {
       apiKey: "fixture",
       baseURL: "https://messages.example.test/v1",
@@ -268,7 +268,7 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps Anthropic provider options onto the executable model", async () => {
-    const Anthropic = await import("@opencode/ai/providers/anthropic")
+    const Anthropic = await import("@contextcode/ai/providers/anthropic")
     const selected = Anthropic.model("claude-sonnet-4-6", {
       apiKey: "fixture",
       thinking: { type: "adaptive" },
@@ -279,7 +279,7 @@ describe("provider package entrypoints", () => {
   })
 
   test("requires an Anthropic-compatible base URL at runtime", async () => {
-    const AnthropicCompatible = await import("@opencode/ai/providers/anthropic-compatible")
+    const AnthropicCompatible = await import("@contextcode/ai/providers/anthropic-compatible")
     expect(() =>
       // oxlint-disable-next-line no-restricted-globals -- This test intentionally bypasses static required-option checks.
       Reflect.apply(AnthropicCompatible.model, undefined, ["compatible-model", { apiKey: "fixture" }]),
@@ -287,8 +287,8 @@ describe("provider package entrypoints", () => {
   })
 
   test("rejects conflicting Anthropic-compatible auth settings at runtime", async () => {
-    const Anthropic = await import("@opencode/ai/providers/anthropic")
-    const AnthropicCompatible = await import("@opencode/ai/providers/anthropic-compatible")
+    const Anthropic = await import("@contextcode/ai/providers/anthropic")
+    const AnthropicCompatible = await import("@contextcode/ai/providers/anthropic-compatible")
     expect(() =>
       // oxlint-disable-next-line no-restricted-globals -- This test intentionally passes a statically invalid option combination.
       Reflect.apply(AnthropicCompatible.model, undefined, [
@@ -320,12 +320,12 @@ describe("provider package entrypoints", () => {
   })
 
   test("selects Azure API entrypoints with the same model contract", async () => {
-    const Azure = await import("@opencode/ai/providers/azure")
-    const AzureChat = await import("@opencode/ai/providers/azure/chat")
-    const AzureResponses = await import("@opencode/ai/providers/azure/responses")
+    const Azure = await import("@contextcode/ai/providers/azure")
+    const AzureChat = await import("@contextcode/ai/providers/azure/chat")
+    const AzureResponses = await import("@contextcode/ai/providers/azure/responses")
     const settings = {
       apiKey: "fixture",
-      resourceName: "opencode-test",
+      resourceName: "contextcode-test",
       headers: { "x-application": "opencode" },
       body: { service_tier: "priority" },
     }
@@ -335,17 +335,17 @@ describe("provider package entrypoints", () => {
 
     expect(Azure.model("deployment", settings).route.id).toBe("azure-openai-responses")
     expect(responses.route.id).toBe("azure-openai-responses")
-    expect(responses.route.endpoint.baseURL).toBe("https://opencode-test.openai.azure.com/openai/v1")
+    expect(responses.route.endpoint.baseURL).toBe("https://contextcode-test.openai.azure.com/openai/v1")
     expect(responses.route.defaults.headers).toEqual({ "x-application": "opencode" })
     expect(responses.route.defaults.http?.body).toEqual({ service_tier: "priority" })
     expect(chat.route.id).toBe("azure-openai-chat")
   })
 
   test("constructs Azure deployment URLs and preserves custom gateway URLs", async () => {
-    const Azure = await import("@opencode/ai/providers/azure")
+    const Azure = await import("@contextcode/ai/providers/azure")
     const deployment = Azure.model("custom-deployment", {
       apiKey: "fixture",
-      resourceName: "opencode-test",
+      resourceName: "contextcode-test",
       apiVersion: "2025-01-01-preview",
       useDeploymentBasedUrls: true,
     })
@@ -355,7 +355,7 @@ describe("provider package entrypoints", () => {
     })
 
     expect(deployment.route.endpoint).toMatchObject({
-      baseURL: "https://opencode-test.openai.azure.com/openai/deployments/custom-deployment",
+      baseURL: "https://contextcode-test.openai.azure.com/openai/deployments/custom-deployment",
       query: { "api-version": "2025-01-01-preview" },
     })
     expect(gateway.route.endpoint.baseURL).toBe("https://gateway.example/azure")
@@ -363,8 +363,8 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps Google package settings onto the Gemini model", async () => {
-    const Google = await import("@opencode/ai/providers/google")
-    const GoogleInteractions = await import("@opencode/ai/providers/google/interactions")
+    const Google = await import("@contextcode/ai/providers/google")
+    const GoogleInteractions = await import("@contextcode/ai/providers/google/interactions")
     const selected = Google.model("gemini-2.5-flash", {
       apiKey: "fixture",
       baseURL: "https://generativelanguage.test/v1beta",
@@ -391,10 +391,10 @@ describe("provider package entrypoints", () => {
   })
 
   test("selects Vertex entrypoints with the same model contract", async () => {
-    const GoogleVertex = await import("@opencode/ai/providers/google-vertex")
-    const GoogleVertexChat = await import("@opencode/ai/providers/google-vertex/chat")
-    const GoogleVertexResponses = await import("@opencode/ai/providers/google-vertex/responses")
-    const GoogleVertexMessages = await import("@opencode/ai/providers/google-vertex/messages")
+    const GoogleVertex = await import("@contextcode/ai/providers/google-vertex")
+    const GoogleVertexChat = await import("@contextcode/ai/providers/google-vertex/chat")
+    const GoogleVertexResponses = await import("@contextcode/ai/providers/google-vertex/responses")
+    const GoogleVertexMessages = await import("@contextcode/ai/providers/google-vertex/messages")
     const gemini = GoogleVertex.model("gemini-3.5-flash", {
       apiKey: "fixture",
       headers: { "x-application": "opencode" },
@@ -452,7 +452,7 @@ describe("provider package entrypoints", () => {
   })
 
   test("maps Vertex Interactions package settings onto the shared protocol", async () => {
-    const GoogleVertexInteractions = await import("@opencode/ai/providers/google-vertex/interactions")
+    const GoogleVertexInteractions = await import("@contextcode/ai/providers/google-vertex/interactions")
     const selected = GoogleVertexInteractions.model("gemini-3.8-flash", {
       accessToken: "fixture",
       project: "vertex-project",
@@ -475,11 +475,11 @@ describe("provider package entrypoints", () => {
   })
 
   test("rejects conflicting Vertex auth settings at runtime", async () => {
-    const GoogleVertex = await import("@opencode/ai/providers/google-vertex")
-    const GoogleVertexChat = await import("@opencode/ai/providers/google-vertex/chat")
-    const GoogleVertexMessages = await import("@opencode/ai/providers/google-vertex/messages")
-    const GoogleVertexResponses = await import("@opencode/ai/providers/google-vertex/responses")
-    const Providers = await import("@opencode/ai/providers")
+    const GoogleVertex = await import("@contextcode/ai/providers/google-vertex")
+    const GoogleVertexChat = await import("@contextcode/ai/providers/google-vertex/chat")
+    const GoogleVertexMessages = await import("@contextcode/ai/providers/google-vertex/messages")
+    const GoogleVertexResponses = await import("@contextcode/ai/providers/google-vertex/responses")
+    const Providers = await import("@contextcode/ai/providers")
     expect(() =>
       // oxlint-disable-next-line no-restricted-globals -- This test intentionally passes a statically invalid option combination.
       Reflect.apply(GoogleVertex.model, undefined, [

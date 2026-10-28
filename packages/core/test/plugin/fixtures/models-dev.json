@@ -43,8 +43,8 @@
     "models": {}
   },
   "opencode": {
-    "id": "opencode",
-    "name": "OpenCode",
+    "id": "contextcode",
+    "name": "Context Code",
     "env": [],
     "models": {
       "gpt-5.5": {

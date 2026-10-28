@@ -1,6 +1,6 @@
-import { Session } from "@opencode/schema/session"
-import { SessionMessage } from "@opencode/schema/session-message"
-import { Location } from "@opencode/schema/location"
+import { Session } from "@contextcode/schema/session"
+import { SessionMessage } from "@contextcode/schema/session-message"
+import { Location } from "@contextcode/schema/location"
 import { Schema, Struct } from "effect"
 import { HttpApiEndpoint, HttpApiGroup, OpenApi } from "effect/http-api"
 import { InvalidCursorError, SessionNotFoundError, UnknownError } from "../errors.js"
@@ -66,7 +66,7 @@ export const PublicSessionMessage = Schema.Union([
 ]).annotate({ identifier: "Session.Message.Info" })
 
 /**
- * Experimental: {@link PublicSessionMessage} as sent to clients that opt in with `X-OpenCode-Capabilities:
+ * Experimental: {@link PublicSessionMessage} as sent to clients that opt in with `X-ContextCode-Capabilities:
  * experimental-media-uri` while `experimental.media_blob` is on. User files stored in `blob` stay `media:` refs.
  */
 export const PublicMediaSessionMessage = Schema.Union([

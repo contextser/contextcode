@@ -1,6 +1,6 @@
-import { SdkPlugins } from "@opencode/core/plugin/sdk"
-import { Tool } from "@opencode/core/tool"
-import { Plugin } from "@opencode/plugin/effect"
+import { SdkPlugins } from "@contextcode/core/plugin/sdk"
+import { Tool } from "@contextcode/core/tool"
+import { Plugin } from "@contextcode/plugin/effect"
 import { createHash } from "node:crypto"
 import {
   Cause,
@@ -40,7 +40,7 @@ export interface Interface {
   readonly stream: (request: ProviderRequest) => Stream.Stream<ProviderResponseEvent, ProviderDisconnectedError>
 }
 
-export class Service extends Context.Service<Service, Interface>()("@opencode/simulation/SimulatedProvider") {}
+export class Service extends Context.Service<Service, Interface>()("@contextcode/simulation/SimulatedProvider") {}
 
 interface ProviderInvocation extends ProviderRequest {
   readonly id: string
@@ -272,7 +272,7 @@ export const layerDrive = (options: { readonly endpoint: string; readonly versio
       yield* Effect.addFinalizer(() => tools.shutdown)
       yield* SimulationControlServer.start({
         endpoint: options.endpoint,
-        label: "opencode drive backend websocket",
+        label: "contextcode drive backend websocket",
         data: () => ({}),
         decode: SimulationProtocol.Backend.decodeRequestEffect,
         handle: (socket, request) =>
@@ -282,7 +282,7 @@ export const layerDrive = (options: { readonly endpoint: string; readonly versio
             discard: true,
           }),
       })
-      yield* Effect.sync(() => process.stderr.write(`opencode drive backend websocket: ${options.endpoint}\n`))
+      yield* Effect.sync(() => process.stderr.write(`contextcode drive backend websocket: ${options.endpoint}\n`))
 
       return Service.of({
         stream: (request) =>
@@ -537,7 +537,7 @@ const makeToolDriver = Effect.fn("SimulatedProvider.makeToolDriver")(function* (
 
   yield* plugins.register(
     Plugin.define({
-      id: "opencode.simulation.tools",
+      id: "contextcode.simulation.tools",
       effect: (ctx) =>
         Effect.gen(function* () {
           const scope = yield* Scope.Scope

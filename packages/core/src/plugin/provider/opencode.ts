@@ -1,7 +1,7 @@
 import { Clock, Duration, Effect, Equal, FiberHandle, Option, Schema, Scope, Semaphore, Stream } from "effect"
-import type { IntegrationOAuthMethodRegistration } from "@opencode/plugin/effect/integration"
-import { define } from "@opencode/plugin/effect/plugin"
-import type { SessionHttpResponse } from "@opencode/plugin/effect/session"
+import type { IntegrationOAuthMethodRegistration } from "@contextcode/plugin/effect/integration"
+import { define } from "@contextcode/plugin/effect/plugin"
+import type { SessionHttpResponse } from "@contextcode/plugin/effect/session"
 import { FetchHttpClient, HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http"
 import { App } from "../../app.js"
 import { Bus } from "../../bus.js"
@@ -15,7 +15,7 @@ import { IntegrationConnection } from "../../integration/connection.js"
 import { Provider } from "../../provider.js"
 import { WebSearch } from "../../websearch.js"
 
-const clientID = "opencode-cli"
+const clientID = "contextcode-cli"
 const methodID = Integration.MethodID.make("device")
 const Device = Schema.Struct({
   device_code: Schema.String,
@@ -43,11 +43,11 @@ const SsoRequired = Schema.Struct({
 const InvalidGrant = Schema.Struct({ error: Schema.Literal("invalid_grant") })
 // Console's 401 when the session behind the access token was revoked or expired.
 const Unauthorized = Schema.Struct({ _tag: Schema.Literal("Unauthorized") })
-const signedOutMessage = "Reconnect OpenCode Console to continue"
+const signedOutMessage = "Reconnect Context Code Console to continue"
 const ssoMessage = (organization: string | undefined) =>
-  `Sign in with SSO again to use ${organization ?? "your OpenCode Console organization"}`
+  `Sign in with SSO again to use ${organization ?? "your Context Code Console organization"}`
 
-class SsoRequiredError extends Schema.TaggedError<SsoRequiredError>()("OpencodeConsole.SsoRequired", {
+class SsoRequiredError extends Schema.TaggedError<SsoRequiredError>()("ContextcodeConsole.SsoRequired", {
   organization: Schema.optional(Schema.String),
   url: Schema.String,
 }) {
@@ -57,7 +57,7 @@ class SsoRequiredError extends Schema.TaggedError<SsoRequiredError>()("OpencodeC
 }
 
 // The Console session or refresh token was revoked or expired; only a new device login recovers.
-class SignedOutError extends Schema.TaggedError<SignedOutError>()("OpencodeConsole.SignedOut", {}) {
+class SignedOutError extends Schema.TaggedError<SignedOutError>()("ContextcodeConsole.SignedOut", {}) {
   override get message() {
     return `${signedOutMessage}.`
   }
@@ -69,7 +69,7 @@ function oauth(http: HttpClient.HttpClient) {
     method: {
       id: methodID,
       type: "oauth",
-      label: "OpenCode Console account",
+      label: "Context Code Console account",
       form: [
         {
           key: "server",
@@ -142,13 +142,13 @@ function oauth(http: HttpClient.HttpClient) {
   } satisfies IntegrationOAuthMethodRegistration
 }
 
-export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Config.Service | Scope.Scope>({
-  id: "opencode.provider.opencode",
+export const ContextcodePlugin = define<HttpClient.HttpClient | Bus.Service | Config.Service | Scope.Scope>({
+  id: "contextcode.provider.contextcode",
   effect: Effect.fn(function* (ctx) {
-    const disableFree = ["1", "true"].includes(process.env.OPENCODE_DISABLE_FREE_MODELS?.toLowerCase() ?? "")
+    const disableFree = ["1", "true"].includes(process.env.CONTEXTCODE_DISABLE_FREE_MODELS?.toLowerCase() ?? "")
     const bus = yield* Bus.Service
     const client = yield* HttpClient.HttpClient
-    // Every request here goes to the Console, which reads the User-Agent to tell which OpenCode a member runs
+    // Every request here goes to the Console, which reads the User-Agent to tell which Context Code a member runs
     // and whether it evaluates the policies it is being sent.
     const http = HttpClient.mapRequest(client, HttpClientRequest.setHeader("User-Agent", App.useragent(ctx.app)))
     const config = yield* Config.Service
@@ -156,7 +156,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
     const loading = Semaphore.makeUnsafe(1)
     type ActiveConnection = Effect.Success<ReturnType<typeof ctx.integration.connection.active>>
     let snapshot: {
-      // The Console's regular OpenCode config, merged as an integration config layer.
+      // The Console's regular Context Code config, merged as an integration config layer.
       remote: ConfigIntegration.Remote | undefined
       connection: ActiveConnection
       organization: string | undefined
@@ -167,7 +167,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
     // When the last Console config load started, so rejected inference can reuse a recent status.
     let checked = Number.NEGATIVE_INFINITY
 
-    const load = Effect.fn("OpencodePlugin.load")(function* () {
+    const load = Effect.fn("ContextcodePlugin.load")(function* () {
       checked = yield* Clock.currentTimeMillis
       const connection = yield* ctx.integration.connection.active("opencode")
       if (!connection) {
@@ -196,7 +196,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
             // Only well-formed Console errors change the connection status; anything else may be transient.
             const next = connectionStatus(cause)
             if (next) yield* status(next)
-            yield* Effect.logWarning("failed to load OpenCode provider config", { cause })
+            yield* Effect.logWarning("failed to load Context Code provider config", { cause })
             // A load that fails for the connection already in place keeps its last config: dropping it
             // would lift organization policy while personal credentials keep working.
             return IntegrationConnection.key(connection) === IntegrationConnection.key(snapshot.connection)
@@ -235,7 +235,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
     })
     const search = (providerID: WebSearch.ID, connection: NonNullable<ActiveConnection>) => ({
       id: providerID,
-      name: "OpenCode Web Search",
+      name: "Context Code Web Search",
       execute: (input: WebSearch.ProviderInput) =>
         Effect.gen(function* () {
           const active = yield* ctx.integration.connection.active("opencode")
@@ -245,11 +245,11 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
               ? active.type !== "credential" || active.id !== connection.id
               : active.type !== "env" || active.name !== connection.name)
           ) {
-            return yield* Effect.fail(new Error("OpenCode Console connection changed"))
+            return yield* Effect.fail(new Error("Context Code Console connection changed"))
           }
           const credential = yield* ctx.integration.connection.resolve(active)
           if (!credential || credential.type === "external")
-            return yield* Effect.fail(new Error("OpenCode Console is not connected"))
+            return yield* Effect.fail(new Error("Context Code Console is not connected"))
           const metadata = credential.metadata
           const orgID = typeof metadata?.orgID === "string" ? metadata.orgID : undefined
           const token = credential.type === "oauth" ? credential.access : credential.key
@@ -271,12 +271,12 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
               Effect.scoped,
               Effect.timeoutOrElse({
                 duration: Duration.seconds(25),
-                orElse: () => Effect.fail(new Error("OpenCode web search request timed out")),
+                orElse: () => Effect.fail(new Error("Context Code web search request timed out")),
               }),
             )
           if (response.providerID !== providerID) {
             return yield* Effect.fail(
-              new Error(`OpenCode web search returned provider ${response.providerID} instead of ${providerID}`),
+              new Error(`Context Code web search returned provider ${response.providerID} instead of ${providerID}`),
             )
           }
           return response.results
@@ -285,7 +285,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
 
     yield* ctx.integration.transform((editor) => {
       editor.update("opencode", (integration) => {
-        integration.name = "OpenCode Console"
+        integration.name = "Context Code Console"
       })
       editor.method.update(oauth(http))
       editor.method.update({ integrationID: "opencode", method: { type: "key", label: "API key (service account)" } })
@@ -299,7 +299,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
     yield* ctx.provider.transform((providers) => {
       const item = providers.get(Provider.ID.opencode)
       if (!item) return
-      const hasKey = Boolean(process.env.OPENCODE_API_KEY || snapshot.connection || item.provider.settings?.apiKey)
+      const hasKey = Boolean(process.env.CONTEXTCODE_API_KEY || snapshot.connection || item.provider.settings?.apiKey)
       providers.update(item.provider.id, (provider) => {
         if (!hasKey && !disableFree) {
           provider.activation = "enabled"
@@ -311,7 +311,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
       const item = models.provider.get(Provider.ID.opencode)
       if (!item) return
       const hasKey = Boolean(
-        process.env.OPENCODE_API_KEY ||
+        process.env.CONTEXTCODE_API_KEY ||
           snapshot.connection ||
           (item.provider.settings?.apiKey && item.provider.settings.apiKey !== "public"),
       )
@@ -332,7 +332,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
         editor.add(search(provider, snapshot.connection))
     })
 
-    const apply = Effect.fn("OpencodePlugin.apply")(function* (next: typeof snapshot) {
+    const apply = Effect.fn("ContextcodePlugin.apply")(function* (next: typeof snapshot) {
       snapshot = next
       yield* publish(next)
       yield* guard(next)
@@ -375,7 +375,7 @@ export const OpencodePlugin = define<HttpClient.HttpClient | Bus.Service | Confi
         )
       })
     // Hooks are scoped per provider so requests to unrelated providers skip the HTTP hook path.
-    const guard = Effect.fn("OpencodePlugin.guard")(function* (next: typeof snapshot) {
+    const guard = Effect.fn("ContextcodePlugin.guard")(function* (next: typeof snapshot) {
       yield* Effect.forEach(explainers, (registration) => registration.dispose, { discard: true })
       explainers = yield* Effect.forEach(
         next.connection
@@ -479,7 +479,7 @@ function normalizeServer(input: unknown) {
       return `${url.origin}${url.pathname.replace(/\/+$/, "")}`
     },
     catch: (cause) =>
-      new Error(`Invalid OpenCode server URL: ${cause instanceof Error ? cause.message : String(cause)}`),
+      new Error(`Invalid Context Code server URL: ${cause instanceof Error ? cause.message : String(cause)}`),
   })
 }
 
@@ -522,7 +522,7 @@ function credential(http: HttpClient.HttpClient, server: string, token: typeof T
         ? orgs.toSorted((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id))[0]
         : orgs.find((org) => org.id === token.org_id)
     if (token.org_id != null && !org) {
-      return yield* Effect.fail(new Error(`OpenCode organization not found: ${token.org_id}`))
+      return yield* Effect.fail(new Error(`Context Code organization not found: ${token.org_id}`))
     }
     return Credential.OAuth.make({
       type: "oauth" as const,

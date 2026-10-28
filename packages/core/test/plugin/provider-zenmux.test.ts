@@ -1,10 +1,10 @@
 import { describe, expect, test } from "bun:test"
 import { Effect } from "effect"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { ProviderPlugins } from "@opencode/core/plugin/provider"
-import { ZenmuxPlugin } from "@opencode/core/plugin/provider/zenmux"
-import { Provider } from "@opencode/core/provider"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { ProviderPlugins } from "@contextcode/core/plugin/provider"
+import { ZenmuxPlugin } from "@contextcode/core/plugin/provider/zenmux"
+import { Provider } from "@contextcode/core/provider"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "./fixture"
 
@@ -23,7 +23,7 @@ function required<T>(value: T | undefined): T {
 
 describe("ZenmuxPlugin", () => {
   test("is registered so legacy referer headers can be applied", () => {
-    expect(ProviderPlugins.map((item) => item.id)).toContain("opencode.provider.zenmux")
+    expect(ProviderPlugins.map((item) => item.id)).toContain("contextcode.provider.zenmux")
   })
 
   it.effect("applies the exact legacy Zenmux headers", () =>
@@ -31,7 +31,7 @@ describe("ZenmuxPlugin", () => {
       const catalog = yield* Provider.Service
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("zenmux"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@contextcode/ai/providers/openai-compatible"
           provider.settings = { ...provider.settings, baseURL: "https://zenmux.ai/api/v1" }
         })
       })
@@ -47,7 +47,7 @@ describe("ZenmuxPlugin", () => {
       const catalog = yield* Provider.Service
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("zenmux"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@contextcode/ai/providers/openai-compatible"
           provider.settings = { ...provider.settings, baseURL: "https://zenmux.ai/api/v1" }
           provider.headers = { ...provider.headers, Existing: "value" }
         })
@@ -67,7 +67,7 @@ describe("ZenmuxPlugin", () => {
       const catalog = yield* Provider.Service
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("zenmux"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@contextcode/ai/providers/openai-compatible"
           provider.settings = { ...provider.settings, baseURL: "https://zenmux.ai/api/v1" }
           provider.headers = { "HTTP-Referer": "https://example.com/", "X-Title": "custom-title" }
         })

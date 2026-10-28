@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/protocol",
+  "name": "@contextcode/protocol",
   "version": "2.2.0",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anomalyco/opencode.git",
+    "url": "git+https://github.com/contextser/contextcode.git",
     "directory": "packages/protocol"
   },
   "publishConfig": {
@@ -29,7 +29,7 @@
     "typecheck:tsc": "tsc --noEmit"
   },
   "dependencies": {
-    "@opencode/schema": "workspace:*",
+    "@contextcode/schema": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {

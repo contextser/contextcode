@@ -5,7 +5,7 @@ import type {
   IntegrationInfo,
   IntegrationMethod,
   IntegrationOauthConnectOutput,
-} from "@opencode/client/promise"
+} from "@contextcode/client/promise"
 import { useLanguage } from "@/runtime/i18n/language"
 import { usePlatform } from "@/runtime/platform/platform"
 import { useServerSDK } from "@/runtime/server/client"
@@ -28,7 +28,7 @@ type Polling = {
   attempt?: { type: "oauth"; attemptID: string } | { type: "command"; attemptID: string }
 }
 
-// The OpenCode Console account is the `opencode` integration. OpenCode Go is its own integration
+// The Context Code Console account is the `opencode` integration. OpenCode Go is its own integration
 // and connects with its own methods, the same as the TUI.
 export const CONSOLE_INTEGRATION = "opencode"
 
@@ -484,7 +484,7 @@ export function createProviderConnectionController(options: {
       .then((response) => {
         if (isConsole() && platform.platform === "desktop") {
           const url = new URL(response.data.url)
-          url.searchParams.set("client_id", "opencode-desktop")
+          url.searchParams.set("client_id", "contextcode-desktop")
           // Lets the Console return link focus the window that started the sign-in.
           url.searchParams.set("return_window", platform.windowID)
           response.data.url = url.href
@@ -520,7 +520,7 @@ export function createProviderConnectionController(options: {
 
     polling.attempt = { type: "oauth", attemptID: result.authorization.attemptID }
     dispatch({ type: "auth.waiting", authorization: result.authorization })
-    // Same as `opencode auth login`: hand the user straight to the browser instead of
+    // Same as `contextcode auth login`: hand the user straight to the browser instead of
     // asking them to click a link and retype a code.
     void open()
 

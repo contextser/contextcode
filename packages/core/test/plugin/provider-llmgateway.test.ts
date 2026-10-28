@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test"
 import { Effect } from "effect"
-import { Integration } from "@opencode/core/integration"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { ProviderPlugins } from "@opencode/core/plugin/provider"
-import { LLMGatewayPlugin } from "@opencode/core/plugin/provider/llmgateway"
-import { Provider } from "@opencode/core/provider"
+import { Integration } from "@contextcode/core/integration"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { ProviderPlugins } from "@contextcode/core/plugin/provider"
+import { LLMGatewayPlugin } from "@contextcode/core/plugin/provider/llmgateway"
+import { Provider } from "@contextcode/core/provider"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "./fixture"
 
@@ -19,7 +19,7 @@ const addPlugin = Effect.fn(function* () {
 
 describe("LLMGatewayPlugin", () => {
   test("is registered so legacy referer headers can be applied", () => {
-    expect(ProviderPlugins.map((item) => item.id)).toContain("opencode.provider.llmgateway")
+    expect(ProviderPlugins.map((item) => item.id)).toContain("contextcode.provider.llmgateway")
   })
 
   it.effect("applies legacy referer headers only to enabled llmgateway", () =>
@@ -32,7 +32,7 @@ describe("LLMGatewayPlugin", () => {
       })
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("llmgateway"), (provider) => {
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@contextcode/ai/providers/openai-compatible"
           provider.settings = { baseURL: "https://api.llmgateway.io/v1" }
           provider.headers = { Existing: "value" }
         })
@@ -59,7 +59,7 @@ describe("LLMGatewayPlugin", () => {
       yield* catalog.transform((catalog) => {
         catalog.update(Provider.ID.make("llmgateway"), (provider) => {
           provider.activation = "disabled"
-          provider.package = "@opencode/ai/providers/openai-compatible"
+          provider.package = "@contextcode/ai/providers/openai-compatible"
           provider.settings = { baseURL: "https://api.llmgateway.io/v1" }
         })
       })

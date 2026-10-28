@@ -1,26 +1,26 @@
-import { AISDK } from "@opencode/core/aisdk"
-import { App } from "@opencode/core/app"
-import { Agent } from "@opencode/schema/agent"
-import { Session } from "@opencode/core/session"
-import { Location } from "@opencode/core/location"
+import { AISDK } from "@contextcode/core/aisdk"
+import { App } from "@contextcode/core/app"
+import { Agent } from "@contextcode/schema/agent"
+import { Session } from "@contextcode/core/session"
+import { Location } from "@contextcode/core/location"
 import { describe, expect, test } from "bun:test"
 import { Effect } from "effect"
-import { Model } from "@opencode/core/model"
-import { ModelResolver } from "@opencode/core/model-resolver"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { PluginHooks } from "@opencode/core/plugin/hooks"
+import { Model } from "@contextcode/core/model"
+import { ModelResolver } from "@contextcode/core/model-resolver"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { PluginHooks } from "@contextcode/core/plugin/hooks"
 import {
   copilotBaseURL,
   copilotEntitlementError,
   copilotFetch,
   GithubCopilotPlugin,
   utilityTitle,
-} from "@opencode/core/plugin/provider/github-copilot"
-import { Message, SystemPart } from "@opencode/ai/effect"
-import { Provider } from "@opencode/core/provider"
-import { Integration } from "@opencode/core/integration"
-import type { SessionRequestKind } from "@opencode/plugin/effect/session"
+} from "@contextcode/core/plugin/provider/github-copilot"
+import { Message, SystemPart } from "@contextcode/ai/effect"
+import { Provider } from "@contextcode/core/provider"
+import { Integration } from "@contextcode/core/integration"
+import type { SessionRequestKind } from "@contextcode/plugin/effect/session"
 import { fakeSelectorSdk } from "../fixture/selector"
 import { testEffect } from "../lib/effect"
 import { PluginTestLayer } from "./fixture"
@@ -145,7 +145,7 @@ describe("GithubCopilotPlugin", () => {
       expect(requests[0]?.get("x-initiator")).toBe("user")
       expect(requests[0]?.get("copilot-vision-request")).toBe("true")
       expect(requests[0]?.get("x-github-api-version")).toBe("2026-08-01")
-      expect(requests[0]?.get("user-agent")).toBe("opencode/beta/1.2.3/test")
+      expect(requests[0]?.get("user-agent")).toBe("contextcode/beta/1.2.3/test")
     }),
   )
 

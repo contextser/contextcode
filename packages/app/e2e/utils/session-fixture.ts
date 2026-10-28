@@ -1,9 +1,9 @@
 import type { Page } from "@playwright/test"
-import type { JsonValue, SessionMessageAssistant, SessionMessageInfo } from "@opencode/client/promise"
-import { base64Encode } from "@opencode/util/encode"
+import type { JsonValue, SessionMessageAssistant, SessionMessageInfo } from "@contextcode/client/promise"
+import { base64Encode } from "@contextcode/util/encode"
 import { createTwoFilesPatch } from "diff"
 import { SERVER, pageMessagesFrom } from "./app"
-import { mockOpenCodeServer, type MockServerConfig } from "./mock-server"
+import { mockContextCodeServer, type MockServerConfig } from "./mock-server"
 
 // A long stress transcript: source (12 turns, links a child), target (72 mixed turns), and child (4 turns).
 
@@ -36,7 +36,7 @@ const targetID = "ses_smoke_target"
 
 const childID = "ses_smoke_child"
 
-const directory = "C:/OpenCode/SmokeProject"
+const directory = "C:/Context Code/SmokeProject"
 
 const projectID = "proj_smoke_timeline"
 
@@ -348,7 +348,7 @@ export const fixture = {
     all: [
       {
         id: "opencode",
-        name: "OpenCode",
+        name: "Context Code",
         models: { "claude-opus-4-6": { id: "claude-opus-4-6", name: "Claude Opus 4.6", limit: { context: 200_000 } } },
       },
     ],
@@ -434,7 +434,7 @@ export async function installTimelineSettings(page: Page) {
 
 // Each call serves its own copies of the sessions, so creates and renames never leak into other tests.
 export function mockStressTimeline(page: Page, input: Partial<MockServerConfig> = {}) {
-  return mockOpenCodeServer(page, {
+  return mockContextCodeServer(page, {
     sessions: fixture.sessions.map((item) => ({ ...item })),
     provider: fixture.provider,
     directory: fixture.directory,
@@ -449,7 +449,7 @@ export async function installStressSessionTabs(page: Page, input?: { draftID?: s
   await page.addInitScript(
     ({ directory, sessionIDs, dirBase64, server, draftID }) => {
       localStorage.setItem(
-        "opencode.window.browser.dat:tabs",
+        "contextcode.window.browser.dat:tabs",
         JSON.stringify([
           ...sessionIDs.map((sessionId) => ({
             type: "session",

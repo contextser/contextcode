@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, mock, spyOn, test } from "bun:test"
-import { OpenCode, type SessionMessageUser } from "@opencode/client/promise"
+import { ContextCode, type SessionMessageUser } from "@contextcode/client/promise"
 import {
   createSession,
   resolveCurrentSession,
@@ -200,7 +200,7 @@ describe("run session shared", () => {
   })
 
   test("restores current prompt history from stored text and file references", async () => {
-    const client = OpenCode.make({ baseUrl: "https://opencode.test" })
+    const client = ContextCode.make({ baseUrl: "https://contextcode.test" })
     spyOn(client.message, "list").mockImplementation(() =>
       Promise.resolve({
         data: [

@@ -1,10 +1,10 @@
 import { describe, expect } from "bun:test"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { Config } from "@opencode/core/config"
-import { Document, Info } from "@opencode/schema/config"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { Config } from "@contextcode/core/config"
+import { Document, Info } from "@contextcode/schema/config"
 import { Effect, Layer, Stream } from "effect"
-import { SkillPlugin } from "@opencode/core/plugin/skill"
-import { Skill } from "@opencode/core/skill"
+import { SkillPlugin } from "@contextcode/core/plugin/skill"
+import { Skill } from "@contextcode/core/skill"
 import { testEffect } from "../lib/effect"
 import { host } from "./host"
 
@@ -37,19 +37,19 @@ describe("SkillPlugin.Plugin", () => {
 
       expect(skills).toContainEqual(
         expect.objectContaining({
-          id: "opencode",
-          name: "OpenCode",
-          description: expect.stringContaining("any question about OpenCode itself"),
+          id: "contextcode",
+          name: "Context Code",
+          description: expect.stringContaining("any question about Context Code itself"),
         }),
       )
       expect(skills).toContainEqual(
         expect.objectContaining({
           id: "report",
           name: "Report",
-          description: expect.stringContaining("opencode issue"),
+          description: expect.stringContaining("contextcode issue"),
         }),
       )
-      expect(report?.content).toContain("- opencode version: 1.2.3")
+      expect(report?.content).toContain("- contextcode version: 1.2.3")
       expect(report?.content).toContain("- install/channel: beta")
     }),
   )

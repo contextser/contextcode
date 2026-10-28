@@ -86,19 +86,19 @@ const server = Bun.serve({
   port,
   async fetch(request) {
     const url = new URL(request.url)
-    if (url.pathname === "/.well-known/opencode") {
+    if (url.pathname === "/.well-known/contextcode") {
       return Response.json({
         auth: {
           command: ["bun", "-e", `await Bun.sleep(5000); process.stdout.write(${JSON.stringify(token)})`],
           env: "TOKEN",
         },
         remote_config: {
-          url: `${url.origin}/config/opencode.json`,
+          url: `${url.origin}/config/contextcode.json`,
           headers: { authorization: "Bearer {env:TOKEN}" },
         },
       })
     }
-    if (url.pathname === "/config/opencode.json") {
+    if (url.pathname === "/config/contextcode.json") {
       if (request.headers.get("authorization") !== `Bearer ${token}`) {
         return new Response("Unauthorized", { status: 401 })
       }

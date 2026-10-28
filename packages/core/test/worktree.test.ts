@@ -4,28 +4,28 @@ import fs from "fs/promises"
 import path from "path"
 import { and, eq, isNull } from "drizzle-orm"
 import { Context, Effect, Exit, Fiber, Layer, Queue, Scope, Stream } from "effect"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Git } from "@opencode/core/git"
-import { Database } from "@opencode/core/database/database"
-import { Bus } from "@opencode/core/bus"
-import { Project } from "@opencode/core/project"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { Worktree } from "@opencode/core/worktree"
-import { WorktreeStrategies } from "@opencode/core/worktree/strategies"
-import { WorktreeDirectory } from "@opencode/core/worktree/directory"
-import { WorktreeTable } from "@opencode/core/worktree/sql"
-import { WorktreeGit } from "@opencode/core/worktree/git"
-import { Location } from "@opencode/core/location"
-import { Global } from "@opencode/util/global"
-import { FSUtil } from "@opencode/util/fs-util"
-import { Config } from "@opencode/core/config"
-import { ConfigWorktreePlugin } from "@opencode/core/config/plugin/worktree"
-import { ConfigNormalize } from "@opencode/core/config/normalize"
-import { Document, Event, Info } from "@opencode/schema/config"
-import { EventManifest } from "@opencode/schema/event-manifest"
-import { Workspace } from "@opencode/schema/workspace"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { AbsolutePath } from "@contextcode/core/schema"
+import { Git } from "@contextcode/core/git"
+import { Database } from "@contextcode/core/database/database"
+import { Bus } from "@contextcode/core/bus"
+import { Project } from "@contextcode/core/project"
+import { ProjectTable } from "@contextcode/core/project/sql"
+import { Worktree } from "@contextcode/core/worktree"
+import { WorktreeStrategies } from "@contextcode/core/worktree/strategies"
+import { WorktreeDirectory } from "@contextcode/core/worktree/directory"
+import { WorktreeTable } from "@contextcode/core/worktree/sql"
+import { WorktreeGit } from "@contextcode/core/worktree/git"
+import { Location } from "@contextcode/core/location"
+import { Global } from "@contextcode/util/global"
+import { FSUtil } from "@contextcode/util/fs-util"
+import { Config } from "@contextcode/core/config"
+import { ConfigWorktreePlugin } from "@contextcode/core/config/plugin/worktree"
+import { ConfigNormalize } from "@contextcode/core/config/normalize"
+import { Document, Event, Info } from "@contextcode/schema/config"
+import { EventManifest } from "@contextcode/schema/event-manifest"
+import { Workspace } from "@contextcode/schema/workspace"
 import { host } from "./plugin/host"
 import { initRepo } from "./fixture/git"
 import { tmpdir } from "./fixture/tmpdir"
@@ -285,7 +285,7 @@ describe("Worktree", () => {
         .set({
           commands: {
             start:
-              "bun -e \"await Bun.write('setup.json', JSON.stringify([process.env.OPENCODE_WORKTREE_BASE, process.env.OPENCODE_WORKTREE_PATH, process.cwd()]))\"",
+              "bun -e \"await Bun.write('setup.json', JSON.stringify([process.env.CONTEXTCODE_WORKTREE_BASE, process.env.CONTEXTCODE_WORKTREE_PATH, process.cwd()]))\"",
           },
         })
         .where(eq(ProjectTable.id, input.projectID))
@@ -319,7 +319,7 @@ describe("Worktree", () => {
         await $`git remote add origin git@github.com:owner/repo.git`.cwd(main).quiet()
         await $`git clone --no-hardlinks ${main} ${clone}`.quiet()
         await $`git remote set-url origin https://github.com/owner/repo.git`.cwd(clone).quiet()
-        await $`git -c user.name=Test -c user.email=test@opencode.test -c commit.gpgsign=false commit --allow-empty -m clone`
+        await $`git -c user.name=Test -c user.email=test@contextcode.test -c commit.gpgsign=false commit --allow-empty -m clone`
           .cwd(clone)
           .quiet()
       })
@@ -334,7 +334,7 @@ describe("Worktree", () => {
       yield* config.setEntries([
         new Document({
           type: "document",
-          path: abs(path.join(root.path, "global/opencode.json")),
+          path: abs(path.join(root.path, "global/contextcode.json")),
           info: new Info({ worktree: { directory: ".lane/trees" } }),
         }),
       ])
@@ -343,7 +343,7 @@ describe("Worktree", () => {
         projectID: initial.id,
         commands: {
           start:
-            "bun -e \"await Bun.write('setup.json', JSON.stringify([process.env.OPENCODE_WORKTREE_BASE, process.env.OPENCODE_WORKTREE_PATH, process.cwd()]))\"",
+            "bun -e \"await Bun.write('setup.json', JSON.stringify([process.env.CONTEXTCODE_WORKTREE_BASE, process.env.CONTEXTCODE_WORKTREE_PATH, process.cwd()]))\"",
         },
       })
 
@@ -904,12 +904,12 @@ describe("Worktree", () => {
       const documents = [
         new Document({
           type: "document",
-          path: abs(path.join(input.root.path, "opencode.json")),
+          path: abs(path.join(input.root.path, "contextcode.json")),
           info: new Info({ worktree: { directory: "outer" } }),
         }),
         new Document({
           type: "document",
-          path: abs(path.join(input.root.path, "nested/opencode.json")),
+          path: abs(path.join(input.root.path, "nested/contextcode.json")),
           info: new Info({ worktree: { directory: "copies" } }),
         }),
       ]
@@ -960,7 +960,7 @@ describe("Worktree", () => {
         yield* config.setEntries([
           new Document({
             type: "document",
-            path: abs(path.join(home, ".config/opencode/opencode.json")),
+            path: abs(path.join(home, ".config/contextcode/contextcode.json")),
             info: new Info({ worktree: { directory } }),
           }),
         ])

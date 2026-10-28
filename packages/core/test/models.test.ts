@@ -1,17 +1,17 @@
 import { describe, expect, test } from "bun:test"
-import { Money } from "@opencode/schema/money"
+import { Money } from "@contextcode/schema/money"
 import { Effect, Fiber, Layer, Ref, Scope, Stream } from "effect"
 import { HttpClient, HttpClientResponse } from "effect/http"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNodePlatform } from "@opencode/util/effect/app-node-platform"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { KV } from "@opencode/core/kv"
-import { Location } from "@opencode/core/location"
-import { Model } from "@opencode/core/model"
-import { bodyDigest, ModelsDev } from "@opencode/core/models-dev"
-import { Provider } from "@opencode/core/provider"
-import { AbsolutePath } from "@opencode/core/schema"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNodePlatform } from "@contextcode/util/effect/app-node-platform"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Bus } from "@contextcode/core/bus"
+import { KV } from "@contextcode/core/kv"
+import { Location } from "@contextcode/core/location"
+import { Model } from "@contextcode/core/model"
+import { bodyDigest, ModelsDev } from "@contextcode/core/models-dev"
+import { Provider } from "@contextcode/core/provider"
+import { AbsolutePath } from "@contextcode/core/schema"
 import { location } from "./fixture/location"
 import { it } from "./lib/effect"
 
@@ -38,7 +38,7 @@ const sourceModel = (id: string, input: Record<string, unknown> = {}) => ({
   api: {
     "chat-completions": {
       base_url: "https://api.example.test/v1",
-      sdk: { aisdk: "@ai-sdk/openai-compatible", opencodeai: "@opencode/ai/providers/openai-compatible" },
+      sdk: { aisdk: "@ai-sdk/openai-compatible", contextcodeai: "@contextcode/ai/providers/openai-compatible" },
     },
   },
   ...input,
@@ -55,7 +55,7 @@ const fixture = {
         api: {
           "chat-completions": {
             base_url: "https://api.acme.test/v1",
-            sdk: { aisdk: "@ai-sdk/openai-compatible", opencodeai: "@opencode/ai/providers/openai-compatible" },
+            sdk: { aisdk: "@ai-sdk/openai-compatible", contextcodeai: "@contextcode/ai/providers/openai-compatible" },
             compatibility: { reasoning_field: "vendor_reasoning" },
           },
         },
@@ -78,7 +78,7 @@ const fixtureSnapshot = [
       id: Provider.ID.make("acme"),
       name: "Acme",
       activation: "auto",
-      package: "@opencode/ai/providers/openai-compatible",
+      package: "@contextcode/ai/providers/openai-compatible",
       settings: { baseURL: "https://api.acme.test/v1" },
     },
     models: [
@@ -129,7 +129,7 @@ const fixture2Snapshot = [
       id: Provider.ID.make("beta"),
       name: "Beta",
       activation: "auto",
-      package: "@opencode/ai/providers/openai-compatible",
+      package: "@contextcode/ai/providers/openai-compatible",
       settings: { baseURL: "https://api.example.test/v1" },
     },
     models: [
@@ -262,10 +262,10 @@ describe("ModelsDev Service", () => {
   it.live("takes each model's package from its first API and skips URLs packages build themselves", () =>
     Effect.gen(function* () {
       const cache = makeCache()
-      const azureAPI = (protocol: string, opencodeai: string) => ({
+      const azureAPI = (protocol: string, contextcodeai: string) => ({
         [protocol]: {
           base_url: "https://${AZURE_RESOURCE_NAME}.openai.azure.com/openai/v1",
-          sdk: { aisdk: "@ai-sdk/azure", opencodeai },
+          sdk: { aisdk: "@ai-sdk/azure", contextcodeai },
         },
       })
       writeCache(cache, {
@@ -277,7 +277,7 @@ describe("ModelsDev Service", () => {
               api: {
                 responses: {
                   base_url: "https://api.acme.test/v1",
-                  sdk: { aisdk: "@ai-sdk/openai", opencodeai: "@opencode/ai/providers/openai/responses" },
+                  sdk: { aisdk: "@ai-sdk/openai", contextcodeai: "@contextcode/ai/providers/openai/responses" },
                 },
                 "chat-completions": { base_url: "https://other.acme.test/v1", sdk: { aisdk: "@ai-sdk/openai" } },
               },
@@ -292,15 +292,15 @@ describe("ModelsDev Service", () => {
           name: "Azure",
           env: ["AZURE_RESOURCE_NAME", "AZURE_API_KEY"],
           models: {
-            "gpt-5": sourceModel("gpt-5", { api: azureAPI("responses", "@opencode/ai/providers/azure/responses") }),
+            "gpt-5": sourceModel("gpt-5", { api: azureAPI("responses", "@contextcode/ai/providers/azure/responses") }),
             "custom-chat": sourceModel("custom-chat", {
-              api: azureAPI("chat-completions", "@opencode/ai/providers/azure/chat"),
+              api: azureAPI("chat-completions", "@contextcode/ai/providers/azure/chat"),
             }),
             claude: sourceModel("claude", {
               api: {
                 messages: {
                   base_url: "https://${AZURE_RESOURCE_NAME}.services.ai.azure.com/anthropic/v1",
-                  sdk: { aisdk: "@ai-sdk/anthropic", opencodeai: "@opencode/ai/providers/anthropic-compatible" },
+                  sdk: { aisdk: "@ai-sdk/anthropic", contextcodeai: "@contextcode/ai/providers/anthropic-compatible" },
                 },
               },
             }),
@@ -314,18 +314,18 @@ describe("ModelsDev Service", () => {
         ModelsDev.Service.use((service) => service.get()),
       )
       const acmeModel = (id: string) => acme?.models.find((model) => model.id === id)
-      expect(acmeModel("acme-responses")?.package).toBe("@opencode/ai/providers/openai/responses")
+      expect(acmeModel("acme-responses")?.package).toBe("@contextcode/ai/providers/openai/responses")
       expect(acmeModel("acme-responses")?.settings).toBeUndefined()
-      // Without an opencode package, the AI SDK package maps to the native one as before.
-      expect(acmeModel("acme-fallback")?.package).toBe("@opencode/ai/providers/anthropic")
+      // Without an contextcode package, the AI SDK package maps to the native one as before.
+      expect(acmeModel("acme-fallback")?.package).toBe("@contextcode/ai/providers/anthropic")
       expect(acmeModel("acme-fallback")?.settings).toEqual({ baseURL: "https://claude.acme.test/v1" })
 
       const azureModel = (id: string) => azure?.models.find((model) => model.id === id)
-      expect(azure?.info.package).toBe("@opencode/ai/providers/azure/responses")
+      expect(azure?.info.package).toBe("@contextcode/ai/providers/azure/responses")
       expect(azure?.info.settings).toBeUndefined()
       expect(azureModel("gpt-5")?.package).toBeUndefined()
       expect(azureModel("gpt-5")?.settings).toBeUndefined()
-      expect(azureModel("custom-chat")?.package).toBe("@opencode/ai/providers/azure/chat")
+      expect(azureModel("custom-chat")?.package).toBe("@contextcode/ai/providers/azure/chat")
       expect(azureModel("custom-chat")?.settings).toBeUndefined()
       expect(azureModel("claude")?.settings).toEqual({
         baseURL: "https://${AZURE_RESOURCE_NAME}.services.ai.azure.com/anthropic/v1",
@@ -354,7 +354,7 @@ describe("ModelsDev Service", () => {
                   base_url: "https://api.example.test/v1",
                   sdk: {
                     aisdk: "@acme/ai-sdk-provider",
-                    opencodeai: "@opencode/ai/providers/openai-compatible/images",
+                    contextcodeai: "@contextcode/ai/providers/openai-compatible/images",
                   },
                 },
               },
@@ -381,8 +381,8 @@ describe("ModelsDev Service", () => {
         ["acme-image-fast", "image"],
       ])
       expect(acme?.models[1]?.capabilities).toMatchObject({ input: ["text", "image", "pdf"], output: ["image"] })
-      expect(acme?.models[1]?.package).toBe("@opencode/ai/providers/openai-compatible/images")
-      // Without an opencode package a non-chat model is left out ("acme-sdk-image" above).
+      expect(acme?.models[1]?.package).toBe("@contextcode/ai/providers/openai-compatible/images")
+      // Without an contextcode package a non-chat model is left out ("acme-sdk-image" above).
     }),
   )
 
@@ -439,11 +439,11 @@ describe("ModelsDev Service", () => {
     }),
   )
 
-  it.effect("skips APIs whose opencode entrypoint this build doesn't have", () =>
+  it.effect("skips APIs whose contextcode entrypoint this build doesn't have", () =>
     Effect.gen(function* () {
       const unknown = (path: string) => ({
         base_url: "https://new.acme.test/v1",
-        sdk: { opencodeai: `@opencode/ai/providers/acme/${path}` },
+        sdk: { contextcodeai: `@contextcode/ai/providers/acme/${path}` },
       })
       const image = (id: string, api: Record<string, unknown>) =>
         sourceModel(id, { type: "image", modalities: { input: ["text"], output: ["image/png"] }, api })
@@ -459,7 +459,7 @@ describe("ModelsDev Service", () => {
                 api: {
                   "new-api": {
                     base_url: "https://claude.acme.test/v1",
-                    sdk: { aisdk: "@ai-sdk/anthropic", opencodeai: "@opencode/ai/providers/acme/new-api" },
+                    sdk: { aisdk: "@ai-sdk/anthropic", contextcodeai: "@contextcode/ai/providers/acme/new-api" },
                   },
                 },
               }),
@@ -469,7 +469,7 @@ describe("ModelsDev Service", () => {
                 images: unknown("images"),
                 "openai-images": {
                   base_url: "https://api.acme.test/v1",
-                  sdk: { opencodeai: "@opencode/ai/providers/openai-compatible/images" },
+                  sdk: { contextcodeai: "@contextcode/ai/providers/openai-compatible/images" },
                 },
               }),
             },
@@ -481,26 +481,26 @@ describe("ModelsDev Service", () => {
         ["next", "sdk-fallback", "image-known"].map((id) => Model.ID.make(id)),
       )
       expect(acme?.info).toMatchObject({
-        package: "@opencode/ai/providers/openai-compatible",
+        package: "@contextcode/ai/providers/openai-compatible",
         settings: { baseURL: "https://api.example.test/v1" },
       })
       expect(model("next")).toMatchObject({ package: undefined, settings: { provider: "acme" } })
       expect(model("sdk-fallback")).toMatchObject({
-        package: "@opencode/ai/providers/anthropic",
+        package: "@contextcode/ai/providers/anthropic",
         settings: { baseURL: "https://claude.acme.test/v1" },
       })
       expect(model("image-known")).toMatchObject({
-        package: "@opencode/ai/providers/openai-compatible/images",
+        package: "@contextcode/ai/providers/openai-compatible/images",
         settings: { baseURL: "https://api.acme.test/v1" },
       })
     }),
   )
 
-  it.live("drops model types opencode doesn't keep", () =>
+  it.live("drops model types contextcode doesn't keep", () =>
     Effect.gen(function* () {
       const cache = makeCache()
       const api = {
-        images: { base_url: "https://api.acme.test/v1", sdk: { opencodeai: "@opencode/ai/providers/openai" } },
+        images: { base_url: "https://api.acme.test/v1", sdk: { contextcodeai: "@contextcode/ai/providers/openai" } },
       }
       const model = (id: string, type: string) => ({
         id,
@@ -549,7 +549,7 @@ describe("ModelsDev Service", () => {
                 future: { url: 42 },
                 "chat-completions": {
                   base_url: "https://api.acme.test/v1",
-                  sdk: { opencodeai: "@opencode/ai/providers/openai-compatible" },
+                  sdk: { contextcodeai: "@contextcode/ai/providers/openai-compatible" },
                 },
               },
               experimental: {
@@ -566,7 +566,7 @@ describe("ModelsDev Service", () => {
         ModelsDev.Service.use((service) => service.get()),
       )
       expect(acme?.info).toMatchObject({
-        package: "@opencode/ai/providers/openai-compatible",
+        package: "@contextcode/ai/providers/openai-compatible",
         settings: { baseURL: "https://api.acme.test/v1" },
       })
       expect(acme?.models.map((model) => model.id)).toEqual([Model.ID.make("acme-1"), Model.ID.make("acme-1-fast")])
@@ -610,7 +610,7 @@ describe("ModelsDev Service", () => {
         ModelsDev.Service.use((service) => service.get()),
       )
       expect(acme?.info).toMatchObject({
-        package: "@opencode/ai/providers/openai-compatible",
+        package: "@contextcode/ai/providers/openai-compatible",
         settings: { baseURL: "https://api.acme.test/v1" },
       })
       expect(acme?.models[0]).toMatchObject({
@@ -813,7 +813,7 @@ describe("ModelsDev Service", () => {
       const final = yield* Ref.get(state)
       expect(final.calls.length).toBe(1)
       expect(final.calls[0].url).toContain(ModelsDev.catalogPath)
-      expect(final.calls[0].userAgent).toContain("/opencode")
+      expect(final.calls[0].userAgent).toContain("/contextcode")
     }),
   )
 

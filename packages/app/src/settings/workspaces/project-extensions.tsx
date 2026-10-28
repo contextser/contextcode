@@ -1,7 +1,7 @@
-import { Icon } from "@opencode/ui/icon"
-import { Switch } from "@opencode/ui/switch"
-import { Tabs } from "@opencode/ui/tabs"
-import { Button } from "@opencode/ui/button"
+import { Icon } from "@contextcode/ui/icon"
+import { Switch } from "@contextcode/ui/switch"
+import { Tabs } from "@contextcode/ui/tabs"
+import { Button } from "@contextcode/ui/button"
 import { useQuery } from "@tanstack/solid-query"
 import {
   type Component,
@@ -379,7 +379,7 @@ export const ProjectSettingsExtensions: Component<{
                 kind="skills"
                 empty={projectSkills().length === 0}
                 action={
-                  <ExternalLink class="settings-extension-link" href="https://opencode.ai/v2/docs/skills">
+                  <ExternalLink class="settings-extension-link" href="https://contextser.com/docs/skills">
                     {language.t("settings.extensions.addSkills")}
                   </ExternalLink>
                 }

@@ -11,7 +11,7 @@ import {
 import { createTestRenderer } from "@opentui/core/testing"
 import { testRender } from "@opentui/solid"
 import { createSignal } from "solid-js"
-import type { FormInfo } from "@opencode/client/promise"
+import type { FormInfo } from "@contextcode/client/promise"
 import { Keymap } from "../../src/context/keymap"
 import type { ClipboardContent, ClipboardService } from "../../src/context/clipboard"
 import {
@@ -64,8 +64,8 @@ afterAll(async () => {
 async function nativeLightTheme() {
   await using tmp = await tmpdir()
   await Bun.write(`${tmp.path}/themes/mini-native-light.json`, JSON.stringify({ light: {} }))
-  const previous = process.env.OPENCODE_CONFIG_DIR
-  process.env.OPENCODE_CONFIG_DIR = tmp.path
+  const previous = process.env.CONTEXTCODE_CONFIG_DIR
+  process.env.CONTEXTCODE_CONFIG_DIR = tmp.path
   try {
     return await resolveRunTheme(
       {
@@ -78,8 +78,8 @@ async function nativeLightTheme() {
       { name: "mini-native-light" },
     )
   } finally {
-    if (previous === undefined) delete process.env.OPENCODE_CONFIG_DIR
-    else process.env.OPENCODE_CONFIG_DIR = previous
+    if (previous === undefined) delete process.env.CONTEXTCODE_CONFIG_DIR
+    else process.env.CONTEXTCODE_CONFIG_DIR = previous
   }
 }
 

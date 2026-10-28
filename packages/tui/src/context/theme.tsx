@@ -6,10 +6,10 @@ import {
   themeModes,
   type ResolvedTheme,
   type SurfaceName,
-} from "@opencode/theme/tui"
+} from "@contextcode/theme/tui"
 import {
   allThemes,
-  getOpenCode2Theme,
+  getContextCode2Theme,
   hasTheme,
   parseTheme,
   setCustomThemes,
@@ -113,7 +113,7 @@ type ThemeContextValue = {
 const [store, setStore] = createStore<State>({
   mode: "dark",
   lock: undefined,
-  active: "opencode",
+  active: "contextcode",
   ready: false,
 })
 const [themeSources, setThemeSources] = createSignal(allThemes())
@@ -136,7 +136,7 @@ const themeContext = createSimpleContext({
         const mode = lock ?? renderer.themeMode ?? props.mode
         draft.mode = mode
         draft.lock = lock
-        draft.active = config.theme?.name ?? "opencode"
+        draft.active = config.theme?.name ?? "contextcode"
         draft.ready = false
       }),
     )
@@ -163,7 +163,7 @@ const themeContext = createSimpleContext({
         .then((themes) => {
           setCustomThemes(themes)
         })
-        .catch(() => setStore("active", "opencode"))
+        .catch(() => setStore("active", "contextcode"))
     }
 
     onMount(() => {
@@ -290,21 +290,21 @@ const themeContext = createSimpleContext({
 
     const available = createMemo(
       (): Record<string, ThemeDocumentSource> =>
-        newDesigns() ? { opencode2: getOpenCode2Theme(), ...themeSources() } : themeSources(),
+        newDesigns() ? { contextcode2: getContextCode2Theme(), ...themeSources() } : themeSources(),
     )
     const has = (name: string) => Boolean(name) && available()[name] !== undefined
 
     const initStarted = performance.now()
     const selected = createMemo(() => {
       const sources = available()
-      const name = sources[store.active] ? store.active : "opencode"
+      const name = sources[store.active] ? store.active : "contextcode"
       try {
         return loadTheme(sources[name], name, store.mode)
       } catch (error) {
-        if (name === "opencode") throw error
+        if (name === "contextcode") throw error
         themeErrors.emit(name, error)
-        setStore("active", "opencode")
-        return loadTheme(sources.opencode, "opencode", store.mode)
+        setStore("active", "contextcode")
+        return loadTheme(sources.contextcode, "contextcode", store.mode)
       }
     })
     const modes = () => selected().modes

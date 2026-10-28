@@ -1,5 +1,5 @@
-import type { Browser } from "@opencode/plugin-browser/rpc"
-import type { IpcClient } from "@opencode/plugin/gui"
+import type { Browser } from "@contextcode/plugin-browser/rpc"
+import type { IpcClient } from "@contextcode/plugin/gui"
 import type { BrowserPane, PaneEvent } from "./ipc"
 
 type Client = IpcClient<(typeof BrowserPane)["spec"]>

@@ -1,5 +1,5 @@
-import type { Data } from "@opencode/client/solid"
-import type { OpenCodeEvent, SessionInfo } from "@opencode/client/promise"
+import type { Data } from "@contextcode/client/solid"
+import type { ContextCodeEvent, SessionInfo } from "@contextcode/client/promise"
 import { onCleanup } from "solid-js"
 import { createStore } from "solid-js/store"
 import { uuid } from "@/runtime/persistence/uuid"
@@ -23,7 +23,7 @@ const SESSION_ACTIVITY = [
   "session.revert.staged",
   "session.revert.cleared",
   "session.revert.committed",
-] satisfies OpenCodeEvent["type"][]
+] satisfies ContextCodeEvent["type"][]
 
 export function createDesktopData(input: { data: Data; remove: (sessionID: string) => Promise<void> }) {
   const mutation = createSessionMutations(input.remove)

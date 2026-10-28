@@ -9,11 +9,11 @@ use std::thread;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use base64::Engine;
-use opencode_pty::daemon::Registration;
-use opencode_pty::protocol::{
+use contextcode_pty::daemon::Registration;
+use contextcode_pty::protocol::{
     AttachmentRole, Envelope, Request, Response, read_frame, write_frame,
 };
-use opencode_pty::service::TerminalInfo;
+use contextcode_pty::service::TerminalInfo;
 
 struct Daemon {
     child: Child,
@@ -225,7 +225,7 @@ fn owner_loss_stops_terminals_despite_blocked_clients() {
 
 #[test]
 fn subscription_delivers_final_exit_frame_before_closing() {
-    use opencode_pty::protocol::{SubscriptionEvent, read_subscription_event};
+    use contextcode_pty::protocol::{SubscriptionEvent, read_subscription_event};
 
     let mut daemon = Daemon::start();
     let (owner, response) = daemon.own(None);

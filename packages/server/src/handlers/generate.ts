@@ -1,17 +1,17 @@
-import { Generate } from "@opencode/core/generate"
-import { Location } from "@opencode/core/location"
-import { LocationServiceMap } from "@opencode/core/location-services"
-import { AbsolutePath } from "@opencode/core/schema"
+import { Generate } from "@contextcode/core/generate"
+import { Location } from "@contextcode/core/location"
+import { LocationServiceMap } from "@contextcode/core/location-services"
+import { AbsolutePath } from "@contextcode/core/schema"
 import {
   InvalidRequestError,
   ModelNotFoundError,
   ProviderRequestError,
   ServiceUnavailableError,
   UnsupportedModelError,
-} from "@opencode/protocol/errors"
-import type { DecisionRequest, ImageRequest } from "@opencode/schema/generate"
-import { Global } from "@opencode/util/global"
-import { Model } from "@opencode/schema/model"
+} from "@contextcode/protocol/errors"
+import type { DecisionRequest, ImageRequest } from "@contextcode/schema/generate"
+import { Global } from "@contextcode/util/global"
+import { Model } from "@contextcode/schema/model"
 import { Effect } from "effect"
 import { HttpApiBuilder } from "effect/http-api"
 import { Api } from "../api"

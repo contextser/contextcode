@@ -1,4 +1,4 @@
-import { Resource } from "@opencode/console-resource"
+import { Resource } from "@contextcode/console-resource"
 import { AwsClient } from "aws4fetch"
 
 let client: AwsClient | undefined

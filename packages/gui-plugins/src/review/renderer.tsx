@@ -11,7 +11,7 @@ import {
   untrack,
 } from "solid-js"
 import { createStore } from "solid-js/store"
-import type { FileDiffInfo } from "@opencode/client/promise"
+import type { FileDiffInfo } from "@contextcode/client/promise"
 import {
   Command,
   createKeyed,
@@ -24,9 +24,9 @@ import {
   type MountedSession,
   type Plugin,
   type ClosedPanelTab,
-} from "@opencode/plugin/gui"
-import { BuiltinPanel, onIdle, type BuiltinPanelTab } from "@opencode/plugin/gui/builtin"
-import { Changes, type ChangeKind } from "@opencode/plugin/gui/review"
+} from "@contextcode/plugin/gui"
+import { BuiltinPanel, onIdle, type BuiltinPanelTab } from "@contextcode/plugin/gui/builtin"
+import { Changes, type ChangeKind } from "@contextcode/plugin/gui/review"
 import type Review from "./index"
 import { createReviewModel, type Demand, type ReviewModel } from "./model"
 

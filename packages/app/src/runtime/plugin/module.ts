@@ -4,22 +4,22 @@ import {
   mainOnlyModule,
   type PluginModule,
   type Entry,
-} from "@opencode/plugin/gui/host"
+} from "@contextcode/plugin/gui/host"
 
 // Plugin bundles share the host's module instances, so tokens, contexts and schemas they import are the same objects
 // the host checks against. In a window, the main SDK's name resolves to the window SDK.
 const modules = {
   effect: () => import("effect"),
-  "@opencode/plugin/gui": () => import("@opencode/plugin/gui"),
-  "@opencode/plugin/gui/main": () => import("@opencode/plugin/gui"),
-  "@opencode/plugin/gui/file": () => import("@opencode/plugin/gui/file"),
-  "@opencode/plugin/gui/review": () => import("@opencode/plugin/gui/review"),
-  "@opencode/plugin/gui/browser": () => import("@opencode/plugin/gui/browser"),
-  "@opencode/plugin/rpc": () => import("@opencode/plugin/rpc"),
-  "@opencode/schema/rpc": () => import("@opencode/schema/rpc"),
-  "@opencode/client": () => import("@opencode/client"),
-  "@opencode/client/effect": () => import("@opencode/client/effect"),
-  "@opencode/client/solid": () => import("@opencode/client/solid"),
+  "@contextcode/plugin/gui": () => import("@contextcode/plugin/gui"),
+  "@contextcode/plugin/gui/main": () => import("@contextcode/plugin/gui"),
+  "@contextcode/plugin/gui/file": () => import("@contextcode/plugin/gui/file"),
+  "@contextcode/plugin/gui/review": () => import("@contextcode/plugin/gui/review"),
+  "@contextcode/plugin/gui/browser": () => import("@contextcode/plugin/gui/browser"),
+  "@contextcode/plugin/rpc": () => import("@contextcode/plugin/rpc"),
+  "@contextcode/schema/rpc": () => import("@contextcode/schema/rpc"),
+  "@contextcode/client": () => import("@contextcode/client"),
+  "@contextcode/client/effect": () => import("@contextcode/client/effect"),
+  "@contextcode/client/solid": () => import("@contextcode/client/solid"),
   "solid-js": () => import("solid-js"),
   "solid-js/web": () => import("solid-js/web"),
   "solid-js/store": () => import("solid-js/store"),

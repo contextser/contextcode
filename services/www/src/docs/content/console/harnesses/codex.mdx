@@ -12,12 +12,12 @@ Add Console as a model provider in `~/.codex/config.toml` and make it the defaul
 
 ```toml title="~/.codex/config.toml"
 model = "gpt-6.1-sol"
-model_provider = "opencode"
+model_provider = "contextcode"
 
-[model_providers.opencode]
-name = "OpenCode Console"
+[model_providers.contextcode]
+name = "Context Code Console"
 base_url = "https://opencode.ai/inference/openai/v1"
-env_key = "OPENCODE_API_KEY"
+env_key = "CONTEXTCODE_API_KEY"
 wire_api = "responses"
 ```
 
@@ -25,7 +25,7 @@ Codex appends `/responses` to the base URL and reads the key from `env_key`. Cre
 [personal API key](/console/harnesses#get-an-api-key), then export it.
 
 ```bash
-export OPENCODE_API_KEY="oc_sk_..."
+export CONTEXTCODE_API_KEY="oc_sk_..."
 codex
 ```
 
@@ -44,7 +44,7 @@ model_provider = "opencode-go"
 [model_providers.opencode-go]
 name = "OpenCode Go"
 base_url = "https://opencode.ai/inference/go/openai/v1"
-env_key = "OPENCODE_API_KEY"
+env_key = "CONTEXTCODE_API_KEY"
 wire_api = "responses"
 ```
 
@@ -79,11 +79,11 @@ codex --profile go
 Add the [Console MCP](/console/harnesses#console-mcp) server and sign in from the browser.
 
 ```bash
-codex mcp add opencode-console --url https://opencode.ai/console/mcp
+codex mcp add contextcode-console --url https://opencode.ai/console/mcp
 ```
 
 If the sign-in doesn't start automatically, run it yourself.
 
 ```bash
-codex mcp login opencode-console
+codex mcp login contextcode-console
 ```

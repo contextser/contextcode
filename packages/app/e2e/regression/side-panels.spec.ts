@@ -3,7 +3,7 @@ import { tabKey } from "../utils/app"
 import { fileDiff, openSession } from "../utils/workspace"
 import { openReviewLauncher } from "../utils/side-panel"
 import { expectSessionTitle } from "../utils/waits"
-import { base64Encode } from "@opencode/util/encode"
+import { base64Encode } from "@contextcode/util/encode"
 
 test("review and terminal tabs follow the session tab and the terminal stays mounted", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -68,14 +68,14 @@ test("review and terminal tabs follow the session tab and the terminal stays mou
   expect(pty.created).toHaveLength(1)
   expect(pty.sockets[0]!.url.searchParams.get("location[directory]")).toBe(directory)
   expect(pty.sockets[0]!.url.searchParams.get("ticket")).toBe("e2e-ticket")
-  expect(pty.tokens[0]?.headers["x-opencode-ticket"]).toBe("1")
+  expect(pty.tokens[0]?.headers["x-contextcode-ticket"]).toBe("1")
 
   await terminalTab.click()
   await expect(terminal).toBeVisible()
   await expect
     .poll(() =>
       page.evaluate(
-        (key) => JSON.parse(localStorage.getItem("opencode.window.browser.dat:tabs.panes") ?? "{}")[key]?.review,
+        (key) => JSON.parse(localStorage.getItem("contextcode.window.browser.dat:tabs.panes") ?? "{}")[key]?.review,
         tabKey(a.id),
       ),
     )
@@ -129,7 +129,7 @@ test("review content stays aligned with the side region in both directions", asy
 
 test("new tab selection and closing stay in the focused pane", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  const directory = "C:/OpenCode/PaneNewTabs"
+  const directory = "C:/Context Code/PaneNewTabs"
   const key = `local\u0000${base64Encode(directory)}/ses_panenewtabs`
 
   await openSession(page, {
@@ -139,7 +139,7 @@ test("new tab selection and closing stay in the focused pane", async ({ page }) 
     seed: {
       panes: { ses_panenewtabs: { review: true } },
       storage: {
-        "opencode.global.dat:layout": {
+        "contextcode.global.dat:layout": {
           sessionTabs: {
             [key]: {
               all: ["file://README.md", "file://notes.md"],
@@ -220,7 +220,7 @@ test("the new tab view lists recently closed tabs, expands to the rest, and keep
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  const directory = "C:/OpenCode/RecentlyClosed"
+  const directory = "C:/Context Code/RecentlyClosed"
   const key = `local\u0000${base64Encode(directory)}/ses_recentlyclosed`
 
   // Twelve files closed earlier, newest first, as the app stores them beside the strip.
@@ -237,7 +237,7 @@ test("the new tab view lists recently closed tabs, expands to the rest, and keep
     seed: {
       panes: { ses_recentlyclosed: { review: true } },
       storage: {
-        "opencode.global.dat:layout": {
+        "contextcode.global.dat:layout": {
           sessionTabs: { [key]: { all: ["file://README.md"], active: "file://README.md" } },
           sessionView: { [key]: { scroll: {}, closed } },
         },

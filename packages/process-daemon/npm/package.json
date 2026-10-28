@@ -1,12 +1,12 @@
 {
   "name": "@opencode-ai/pty",
   "version": "0.3.1",
-  "description": "Persistent PTY service for OpenCode",
+  "description": "Persistent PTY service for Context Code",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anomalyco/opencode.git",
+    "url": "git+https://github.com/contextser/contextcode.git",
     "directory": "packages/process-daemon/npm"
   },
   "exports": {

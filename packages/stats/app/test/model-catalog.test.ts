@@ -15,9 +15,9 @@ const listing = (overrides: Record<string, unknown> = {}) => ({
 })
 
 describe("stealth model specs", () => {
-  test("reads public specs for stealth models from OpenCode provider listings", () => {
+  test("reads public specs for stealth models from Context Code provider listings", () => {
     const catalog = buildModelCatalog([], {
-      opencode: {
+      contextcode: {
         id: "opencode",
         models: { "exo-free": listing(), "gpt-5-nano": listing({ id: "gpt-5-nano" }) },
       },
@@ -34,9 +34,9 @@ describe("stealth model specs", () => {
     })
   })
 
-  test("prefers the opencode listing over opencode-go", () => {
+  test("prefers the contextcode listing over opencode-go", () => {
     const catalog = buildModelCatalog([], {
-      opencode: { models: { "exo-free": listing() } },
+      contextcode: { models: { "exo-free": listing() } },
       "opencode-go": { models: { "exo-free": listing({ release_date: "2026-01-01" }) } },
     })
 
@@ -44,7 +44,7 @@ describe("stealth model specs", () => {
   })
 
   test("leaves stealth models out of the lab catalog", () => {
-    const catalog = buildModelCatalog([], { opencode: { models: { "exo-free": listing() } } })
+    const catalog = buildModelCatalog([], { contextcode: { models: { "exo-free": listing() } } })
 
     expect(catalog.models).toEqual([])
     expect(catalog.labs).toEqual([])

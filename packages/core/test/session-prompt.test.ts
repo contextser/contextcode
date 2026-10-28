@@ -1,49 +1,49 @@
 import { describe, expect } from "bun:test"
-import type { FileSystem } from "@opencode/core/filesystem"
+import type { FileSystem } from "@contextcode/core/filesystem"
 import { DateTime, Effect, Fiber, Layer, LayerMap, Schema, Stream } from "effect"
 import path from "path"
 import { pathToFileURL } from "url"
 import { eq } from "drizzle-orm"
-import { Database } from "@opencode/core/database/database"
-import { Agent } from "@opencode/core/agent"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { makeGlobalNode } from "@opencode/util/effect/app-node"
-import { Bus } from "@opencode/core/bus"
-import { EventTable } from "@opencode/core/event/sql"
-import { Location } from "@opencode/schema/location"
-import { SessionEvent } from "@opencode/core/session/event"
-import { Model } from "@opencode/core/model"
-import { Provider } from "@opencode/core/provider"
-import { Project } from "@opencode/core/project"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Session } from "@opencode/core/session"
-import { SessionMessage } from "@opencode/core/session/message"
-import { SessionProjector } from "@opencode/core/session/projector"
-import { SessionExecution } from "@opencode/core/session/execution"
-import { SessionInbox } from "@opencode/core/session/inbox"
+import { Database } from "@contextcode/core/database/database"
+import { Agent } from "@contextcode/core/agent"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { makeGlobalNode } from "@contextcode/util/effect/app-node"
+import { Bus } from "@contextcode/core/bus"
+import { EventTable } from "@contextcode/core/event/sql"
+import { Location } from "@contextcode/schema/location"
+import { SessionEvent } from "@contextcode/core/session/event"
+import { Model } from "@contextcode/core/model"
+import { Provider } from "@contextcode/core/provider"
+import { Project } from "@contextcode/core/project"
+import { ProjectTable } from "@contextcode/core/project/sql"
+import { AbsolutePath } from "@contextcode/core/schema"
+import { Session } from "@contextcode/core/session"
+import { SessionMessage } from "@contextcode/core/session/message"
+import { SessionProjector } from "@contextcode/core/session/projector"
+import { SessionExecution } from "@contextcode/core/session/execution"
+import { SessionInbox } from "@contextcode/core/session/inbox"
 import {
   BlobRefTable,
   BlobTable,
   SessionInboxTable,
   SessionMessageTable,
   SessionTable,
-} from "@opencode/core/session/sql"
-import { SessionStore } from "@opencode/core/session/store"
-import { LocationServiceMap } from "@opencode/core/location-service-map"
-import type { LocationServices } from "@opencode/core/location-services"
-import { Image } from "@opencode/core/image"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHooks } from "@opencode/core/plugin/hooks"
-import { Snapshot } from "@opencode/core/snapshot"
-import { Skill } from "@opencode/core/skill"
+} from "@contextcode/core/session/sql"
+import { SessionStore } from "@contextcode/core/session/store"
+import { LocationServiceMap } from "@contextcode/core/location-service-map"
+import type { LocationServices } from "@contextcode/core/location-services"
+import { Image } from "@contextcode/core/image"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHooks } from "@contextcode/core/plugin/hooks"
+import { Snapshot } from "@contextcode/core/snapshot"
+import { Skill } from "@contextcode/core/skill"
 import { tmpdirScoped } from "./fixture/tmpdir"
 import { testEffect } from "./lib/effect"
-import { Config } from "@opencode/core/config"
-import { Document, Info } from "@opencode/schema/config"
-import { ConfigExperimental } from "@opencode/schema/config/experimental"
-import { SessionStored } from "@opencode/core/session/stored"
+import { Config } from "@contextcode/core/config"
+import { Document, Info } from "@contextcode/schema/config"
+import { ConfigExperimental } from "@contextcode/schema/config/experimental"
+import { SessionStored } from "@contextcode/core/session/stored"
 
 const executionCalls: Session.ID[] = []
 const interruptCalls: Session.ID[] = []
@@ -424,7 +424,7 @@ describe("Session.prompt", () => {
     Effect.gen(function* () {
       yield* setup
       const session = yield* Session.Service
-      const directory = yield* tmpdirScoped("opencode-session-prompt-")
+      const directory = yield* tmpdirScoped("contextcode-session-prompt-")
       const source = path.join(directory.path, "image.png")
       const bytes = Buffer.from(
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",

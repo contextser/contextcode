@@ -2,8 +2,8 @@ import { createStore } from "solid-js/store"
 import { Portal } from "solid-js/web"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
-import { Icon } from "@opencode/ui/icon"
-import { LineCommentEditor } from "@opencode/ui/line-comment"
+import { Icon } from "@contextcode/ui/icon"
+import { LineCommentEditor } from "@contextcode/ui/line-comment"
 import { useLanguage } from "@/runtime/i18n/language"
 
 const GAP = 8

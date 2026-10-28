@@ -1,6 +1,6 @@
-import type { SessionMessageInfo } from "@opencode/client/promise"
+import type { SessionMessageInfo } from "@contextcode/client/promise"
 import { benchmark, expect } from "../benchmark"
-import { mockOpenCodeServer } from "../../utils/mock-server"
+import { mockContextCodeServer } from "../../utils/mock-server"
 import { fixture, installStressSessionTabs, installTimelineSettings } from "../../utils/session-fixture"
 import { sessionHref } from "../../utils/app"
 import { completedAnswer } from "../../../../session-ui/performance/markdown-lifetime/answer"
@@ -45,7 +45,7 @@ for (const size of ["typical", "large"]) {
       ]),
     )
 
-    await mockOpenCodeServer(page, {
+    await mockContextCodeServer(page, {
       sessions: fixture.sessions.filter((session) => session.id !== fixture.childID),
       provider: fixture.provider,
       directory: fixture.directory,

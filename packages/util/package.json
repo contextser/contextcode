@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/util",
+  "name": "@contextcode/util",
   "version": "2.2.0",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anomalyco/opencode.git",
+    "url": "git+https://github.com/contextser/contextcode.git",
     "directory": "packages/util"
   },
   "publishConfig": {

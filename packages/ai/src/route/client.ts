@@ -250,7 +250,7 @@ const unsupportedCompaction = (request: LLMRequest, mechanism: string | undefine
   })
 }
 
-export class LLMClientService extends Context.Service<LLMClientService, Interface>()("@opencode/LLMClient") {}
+export class LLMClientService extends Context.Service<LLMClientService, Interface>()("@contextcode/LLMClient") {}
 export const Service = LLMClientService
 export type Service = LLMClientService
 
@@ -608,7 +608,7 @@ const compile = Effect.fn("LLM.compile")(function* (request: LLMRequest, options
   }
 })
 
-/** Test-only projection of the execution compiler; exported from `@opencode/ai/testing`. */
+/** Test-only projection of the execution compiler; exported from `@contextcode/ai/testing`. */
 export const compileRequest = Effect.fn("LLM.compileRequest")(function* (request: LLMRequest) {
   const compiled = yield* compile(request)
   return {

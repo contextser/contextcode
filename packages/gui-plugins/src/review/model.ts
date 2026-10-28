@@ -1,10 +1,10 @@
-import type { FileDiffInfo } from "@opencode/client/promise"
-import type { SessionReviewLineComment } from "@opencode/session-ui/session-review"
-import { previewSelectedLines } from "@opencode/session-ui/pierre/selection-bridge"
-import { artifactMime } from "@opencode/util/artifact"
-import { bytesToBase64 } from "@opencode/util/base64"
-import { checksum } from "@opencode/util/encode"
-import { showToast } from "@opencode/ui/toast"
+import type { FileDiffInfo } from "@contextcode/client/promise"
+import type { SessionReviewLineComment } from "@contextcode/session-ui/session-review"
+import { previewSelectedLines } from "@contextcode/session-ui/pierre/selection-bridge"
+import { artifactMime } from "@contextcode/util/artifact"
+import { bytesToBase64 } from "@contextcode/util/base64"
+import { checksum } from "@contextcode/util/encode"
+import { showToast } from "@contextcode/ui/toast"
 import { createQuery, useQueries, useQueryClient } from "@tanstack/solid-query"
 import { debounce } from "@solid-primitives/scheduled"
 import { createMemo, createSignal, on, onCleanup, type Accessor } from "solid-js"
@@ -16,7 +16,7 @@ import {
   type MountedSession,
   type SessionScreen,
   type SetupContext,
-} from "@opencode/plugin/gui"
+} from "@contextcode/plugin/gui"
 import type Review from "./index"
 import {
   expandReviewFolders,

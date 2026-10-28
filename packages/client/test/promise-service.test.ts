@@ -65,7 +65,7 @@ test("adds configured environment variables with native promises", async () => {
     file: registration,
     version: "test",
     command: fixture.command("environment"),
-    env: { OPENCODE_SERVICE_ENV_TEST: "configured" },
+    env: { CONTEXTCODE_SERVICE_ENV_TEST: "configured" },
   })
   const info = await Bun.file(registration).json()
   fixture.track(info.pid)

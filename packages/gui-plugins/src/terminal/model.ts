@@ -7,7 +7,7 @@ import {
   type ServerRef,
   type MountedSession,
   type Sessions,
-} from "@opencode/plugin/gui"
+} from "@contextcode/plugin/gui"
 import { MAX_TERMINAL_SESSIONS, numberFromTitle, TerminalState, terminalTab, type LocalPTY } from "./state"
 import { defaultTitle } from "./title"
 

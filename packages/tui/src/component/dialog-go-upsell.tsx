@@ -1,7 +1,7 @@
 import { RGBA, TextAttributes, type Renderable } from "@opentui/core"
 import { useRenderer, useTerminalDimensions } from "@opentui/solid"
-import type { FormAnswer, IntegrationOauthConnectOutput, IntegrationOAuthMethod } from "@opencode/client"
-import * as Open from "@opencode/util/open"
+import type { FormAnswer, IntegrationOauthConnectOutput, IntegrationOAuthMethod } from "@contextcode/client"
+import * as Open from "@contextcode/util/open"
 import { createEffect, createMemo, createSignal, For, onCleanup, Show } from "solid-js"
 import { useConfig, useNewDesigns } from "../config"
 import { useClient } from "../context/client"
@@ -272,7 +272,7 @@ function DialogGoUpsellConnect(props: { canContinue?: () => boolean; onSubscribe
     if (closed || dialog.stack.length === 0) return false
     if (!valid()) return null
     if (announce) {
-      toast.show({ variant: "success", message: `Connected ${integration()?.name ?? "OpenCode Console"}` })
+      toast.show({ variant: "success", message: `Connected ${integration()?.name ?? "Context Code Console"}` })
     }
     finish()
     return true

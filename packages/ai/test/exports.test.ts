@@ -18,8 +18,8 @@ import {
   TranscriptionClient,
   Video,
   VideoClient,
-} from "@opencode/ai/effect"
-import { Route, Protocol, RequestExecutor, WebSocketTransport } from "@opencode/ai/route"
+} from "@contextcode/ai/effect"
+import { Route, Protocol, RequestExecutor, WebSocketTransport } from "@contextcode/ai/route"
 import {
   Alibaba,
   AssemblyAI,
@@ -36,7 +36,7 @@ import {
   Fireworks,
   Google,
   Meta,
-  OpenCode,
+  ContextCode,
   OpenAI,
   OpenAICompatible,
   OpenRouter,
@@ -47,7 +47,7 @@ import {
   VercelAIGateway,
   XAI,
   ZAI,
-} from "@opencode/ai/providers"
+} from "@contextcode/ai/providers"
 import {
   AnthropicMessages,
   OpenAIChat,
@@ -56,8 +56,8 @@ import {
   OpenAIResponses,
   OpenResponses,
   OpenResponsesChannel,
-} from "@opencode/ai/protocols"
-import { TestLLM } from "@opencode/ai/testing"
+} from "@contextcode/ai/protocols"
+import { TestLLM } from "@contextcode/ai/testing"
 
 describe("public exports", () => {
   test("modality, provider, and protocol entrypoints load first in a fresh process", async () => {
@@ -125,7 +125,7 @@ describe("public exports", () => {
   })
 
   test("provider barrels expose user-facing facades", async () => {
-    const { OpenAICompatibleResponses } = await import("@opencode/ai/providers")
+    const { OpenAICompatibleResponses } = await import("@contextcode/ai/providers")
 
     expect(OpenAI.model).toBeFunction()
     expect(OpenAI.provider.responses).toBe(OpenAI.responses)
@@ -147,7 +147,7 @@ describe("public exports", () => {
     expect(OpenRouter.model).toBeFunction()
     expect(OpenRouter.decision).toBeFunction()
     expect(TypeSafeAI.decision).toBeFunction()
-    expect(OpenCode.decision).toBeFunction()
+    expect(ContextCode.decision).toBeFunction()
     expect(VercelAIGateway.decision("typesafe-ai/jev").route.id).toBe("openai-decisions")
     expect(Baseten.decision).toBeFunction()
     expect(DigitalOcean.decision).toBeFunction()

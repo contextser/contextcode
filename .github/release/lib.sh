@@ -2,7 +2,7 @@
 #
 # These scripts run in sign and publish jobs that hold secrets. They must never execute repository code
 # or artifact contents: artifacts are data, and every value that names a destination comes from the
-# environment the workflow sets (OPENCODE_VERSION, OPENCODE_CHANNEL, OPENCODE_DRY_RUN, ...).
+# environment the workflow sets (CONTEXTCODE_VERSION, CONTEXTCODE_CHANNEL, CONTEXTCODE_DRY_RUN, ...).
 
 set -euo pipefail
 
@@ -15,7 +15,7 @@ die() {
 }
 
 dry_run() {
-  [ "${OPENCODE_DRY_RUN:-false}" = true ]
+  [ "${CONTEXTCODE_DRY_RUN:-false}" = true ]
 }
 
 sha256() {
@@ -44,18 +44,18 @@ upload_files() {
       *) type=application/octet-stream ;;
     esac
     if dry_run; then
-      echo "dry-run upload: bin/$OPENCODE_VERSION/$name" >&2
+      echo "dry-run upload: bin/$CONTEXTCODE_VERSION/$name" >&2
     else
       if [ "$credentials" = false ]; then
         r2_credentials
         credentials=true
       fi
-      aws s3 cp "$file" "s3://opencode-production-files/bin/$OPENCODE_VERSION/$name" --only-show-errors \
+      aws s3 cp "$file" "s3://contextcode-production-files/bin/$CONTEXTCODE_VERSION/$name" --only-show-errors \
         --endpoint-url "https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com" \
         --content-type "$type" --content-disposition "attachment; filename=\"$name\"" \
         --cache-control "public, max-age=31536000, immutable" >&2
     fi
-    jq -n --arg name "$name" --arg url "https://opencode.ai/files/bin/$OPENCODE_VERSION/$name" \
+    jq -n --arg name "$name" --arg url "https://contextser.com/files/bin/$OPENCODE_VERSION/$name" \
       --arg sha256 "$(sha256 "$file" | cut -c1-64)" --argjson size "$(size "$file")" \
       '{($name): {url: $url, sha256: $sha256, size: $size}}'
   done | jq -s 'add'
@@ -75,7 +75,7 @@ r2_credentials() {
 # Registers one artifact with the update server: publish_update <name> <distribution> <metadata json>.
 publish_update() {
   local body status token attempt
-  body=$(jq -n --arg channel "$OPENCODE_CHANNEL" --arg version "$OPENCODE_VERSION" --arg name "$1" --arg distribution "$2" \
+  body=$(jq -n --arg channel "$CONTEXTCODE_CHANNEL" --arg version "$CONTEXTCODE_VERSION" --arg name "$1" --arg distribution "$2" \
     --argjson metadata "$3" '{channel: $channel, name: $name, distribution: $distribution, version: $version, metadata: $metadata}')
   echo "$body" | jq .
   if dry_run; then return; fi

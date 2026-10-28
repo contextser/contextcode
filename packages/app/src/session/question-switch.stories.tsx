@@ -1,8 +1,8 @@
-import { activeQuestionRequest, questionPendingDocument } from "@opencode/session-ui/storybook"
+import { activeQuestionRequest, questionPendingDocument } from "@contextcode/session-ui/storybook"
 import { SessionPreview } from "./story-model"
 
 export default {
-  title: "OpenCode/Session/Question switch",
+  title: "Context Code/Session/Question switch",
   id: "session-question-switch",
   component: SessionPreview,
   parameters: {
@@ -23,7 +23,7 @@ export const QuestionSeries = {
   render: () => (
     <SessionPreview
       title="Decide what to build next"
-      description="opencode · modular-session-ui"
+      description="contextcode · modular-session-ui"
       document={questionPendingDocument}
       request={{
         type: "question",
@@ -95,7 +95,7 @@ export const LongList = {
   render: () => (
     <SessionPreview
       title="Polish the docs site"
-      description="opencode · docs"
+      description="contextcode · docs"
       document={questionPendingDocument}
       request={{
         type: "question",

@@ -4,11 +4,11 @@ import os from "node:os"
 import path from "node:path"
 import { expect } from "bun:test"
 import { binaryPath } from "@opencode-ai/pty"
-import { PersistentPty } from "@opencode/schema/persistent-pty"
-import { Session } from "@opencode/schema/session"
+import { PersistentPty } from "@contextcode/schema/persistent-pty"
+import { Session } from "@contextcode/schema/session"
 import { Effect, Exit, Schema, Scope } from "effect"
 import { HttpServer } from "effect/http"
-import { OpenCode } from "../../client/src/promise/index"
+import { ContextCode } from "../../client/src/promise/index"
 import { it } from "../../core/test/lib/effect"
 import { ServerProcess } from "../src/process"
 
@@ -31,14 +31,14 @@ smoke(
         fs: { filewatcher: false },
       })
       const base = HttpServer.formatAddress(server.address)
-      const client = OpenCode.make({ baseUrl: base, headers: { authorization: `Basic ${btoa("opencode:secret")}` } })
+      const client = ContextCode.make({ baseUrl: base, headers: { authorization: `Basic ${btoa("contextcode:secret")}` } })
       const sessionID = "ses_terminal_read"
       expect(yield* Effect.promise(() => client.experimental.persistentPty.read({ sessionID }))).toBeNull()
       expect(existsSync(fixture.directory)).toBeFalse()
       yield* Effect.promise(async () => {
         for (const lines of ["0", "-1", "1.5", "65536", "nope"]) {
           const response = await fetch(`${base}/api/experimental/session/${sessionID}/terminal/read?lines=${lines}`, {
-            headers: { authorization: `Basic ${btoa("opencode:secret")}` },
+            headers: { authorization: `Basic ${btoa("contextcode:secret")}` },
           })
           expect(response.status).toBe(400)
           await response.arrayBuffer()
@@ -132,7 +132,7 @@ smoke(
   20_000,
 )
 
-async function waitForRead(client: ReturnType<typeof OpenCode.make>, sessionID: string, ptyID: string) {
+async function waitForRead(client: ReturnType<typeof ContextCode.make>, sessionID: string, ptyID: string) {
   for (let attempt = 0; attempt < 100; attempt++) {
     const result = await client.experimental.persistentPty.read({ sessionID })
     if (result?.ptyID === ptyID) return result
@@ -246,7 +246,7 @@ smoke(
         `/api/experimental/persistent-pty/${first.id}/connect-token`,
         undefined,
         {
-          "x-opencode-ticket": "1",
+          "x-contextcode-ticket": "1",
         },
       )
       if (!isRecord(ticket.data) || typeof ticket.data.ticket !== "string") throw new Error("Invalid connect ticket")
@@ -473,7 +473,7 @@ function testDirectory() {
       process.env.OPENCODE_PTY_BIN = binary
       process.env.SHELL = "/bin/sh"
       return {
-        database: path.join(root, "opencode.db"),
+        database: path.join(root, "contextcode.db"),
         directory: path.join(root, "runtime"),
         environment,
         root,
@@ -509,7 +509,7 @@ function request(base: string, method: string, pathname: string, body?: unknown,
       const response = await fetch(new URL(pathname, base), {
         method,
         headers: {
-          authorization: `Basic ${btoa("opencode:secret")}`,
+          authorization: `Basic ${btoa("contextcode:secret")}`,
           ...headers,
           ...(body === undefined ? {} : { "content-type": "application/json" }),
         },
@@ -527,7 +527,7 @@ function request(base: string, method: string, pathname: string, body?: unknown,
 
 async function openEventStream(base: string) {
   const response = await fetch(new URL("/api/event", base), {
-    headers: { authorization: `Basic ${btoa("opencode:secret")}` },
+    headers: { authorization: `Basic ${btoa("contextcode:secret")}` },
   })
   if (!response.ok || !response.body) throw new Error(`Persistent PTY event stream failed (${response.status})`)
   const reader = response.body.getReader()
@@ -594,7 +594,7 @@ function attachAndExit(base: string, ptyID: string) {
     try: async () => {
       const response = await Effect.runPromise(
         request(base, "POST", `/api/experimental/persistent-pty/${ptyID}/connect-token`, undefined, {
-          "x-opencode-ticket": "1",
+          "x-contextcode-ticket": "1",
         }),
       )
       if (!isRecord(response.data) || typeof response.data.ticket !== "string")
@@ -697,7 +697,7 @@ async function openTerminalSocket(
 ) {
   const response = await Effect.runPromise(
     request(base, "POST", `/api/experimental/persistent-pty/${ptyID}/connect-token`, undefined, {
-      "x-opencode-ticket": "1",
+      "x-contextcode-ticket": "1",
     }),
   )
   if (!isRecord(response.data) || typeof response.data.ticket !== "string")

@@ -13,7 +13,7 @@ function requireVersion(version: string) {
 
 export function discoverScript() {
   return `cli=""
-if [ -z "$cli" ] && [ -x "$HOME/.opencode/bin/opencode" ]; then cli="$HOME/.opencode/bin/opencode"; fi
+if [ -z "$cli" ] && [ -x "$HOME/.contextcode/bin/contextcode" ]; then cli="$HOME/.contextcode/bin/contextcode"; fi
 if [ -n "$cli" ]; then printf '%s\\n' "$cli"; fi
 `
 }
@@ -43,7 +43,7 @@ export function installScript(input: { version: string; binary?: string }) {
   const version = requireVersion(input.version)
 
   return `set -eu
-curl -fsSL https://raw.githubusercontent.com/anomalyco/opencode/v2/install | bash -s -- ${input.binary ? `--binary ${input.binary}` : `--version ${quote(version)}`}
-test "$("$HOME/.opencode/bin/opencode" --version | awk '{print $NF}' | sed 's/^v//')" = ${quote(version)}
+curl -fsSL https://raw.githubusercontent.com/contextser/contextcode/v2/install | bash -s -- ${input.binary ? `--binary ${input.binary}` : `--version ${quote(version)}`}
+test "$("$HOME/.contextcode/bin/contextcode" --version | awk '{print $NF}' | sed 's/^v//')" = ${quote(version)}
 `
 }

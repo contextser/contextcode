@@ -1,5 +1,5 @@
-import type { OpenCodeEvent, SessionMessageInfo } from "@opencode/client/promise"
-import { timelinePresets } from "@opencode/session-ui/timeline/detail"
+import type { ContextCodeEvent, SessionMessageInfo } from "@contextcode/client/promise"
+import { timelinePresets } from "@contextcode/session-ui/timeline/detail"
 import { expect, test, type Locator, type Page } from "@playwright/test"
 import { expectPath, SERVER, sessionHref } from "../utils/app"
 import { currentSession } from "../utils/mock-server"
@@ -7,7 +7,7 @@ import { assistantMessage, session, sessionID, setupTimeline, textPart, userMess
 import { expectSessionTitle } from "../utils/waits"
 import { mockWorkspace } from "../utils/workspace"
 
-const directory = "C:/OpenCode/SubagentNavigation"
+const directory = "C:/Context Code/SubagentNavigation"
 
 const projectID = "proj_subagentnavigation"
 
@@ -292,7 +292,7 @@ test("keeps the parent tab selected while a loaded child session resolves", asyn
 })
 
 test("shows the not found fallback when the viewed session is deleted", async ({ page }) => {
-  const events: OpenCodeEvent[] = []
+  const events: ContextCodeEvent[] = []
   await setup(page, () => events.splice(0, 1))
   await openChildFromParent(page)
   await expectSessionTitle(page, taskDescription)
@@ -353,7 +353,7 @@ test.describe("session ID links", () => {
   })
 })
 
-async function setup(page: Page, events?: () => OpenCodeEvent[], nestedDepth: 0 | 1 | 2 = 0) {
+async function setup(page: Page, events?: () => ContextCodeEvent[], nestedDepth: 0 | 1 | 2 = 0) {
   await mockWorkspace(page, {
     name: "SubagentNavigation",
     sessions: [

@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
-import { CopilotModels } from "@opencode/core/github-copilot/models"
-import { Model } from "@opencode/core/model"
-import { Provider } from "@opencode/core/provider"
+import { CopilotModels } from "@contextcode/core/github-copilot/models"
+import { Model } from "@contextcode/core/model"
+import { Provider } from "@contextcode/core/provider"
 
 test("defensively syncs advertised Copilot models", async () => {
   const server = Bun.serve({
@@ -105,7 +105,7 @@ test("defensively syncs advertised Copilot models", async () => {
       Model.VariantID.make("high"),
     ])
     expect(model?.capabilities.input).toEqual(["text", "image", "pdf"])
-    expect(models.get(Model.ID.make("claude-sonnet"))?.package).toBe("@opencode/ai/providers/anthropic")
+    expect(models.get(Model.ID.make("claude-sonnet"))?.package).toBe("@contextcode/ai/providers/anthropic")
     expect(models.get(Model.ID.make("claude-sonnet"))?.settings).toMatchObject({
       baseURL: `${server.url.origin}/v1`,
       endpoint: "messages",

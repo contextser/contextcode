@@ -1,34 +1,34 @@
 import { expect, test } from "bun:test"
-import { EnvironmentDriver } from "@opencode/core/environment/driver"
-import { EnvironmentFiles } from "@opencode/core/environment/files"
-import { Location as CoreLocation } from "@opencode/core/location"
-import { WorkspaceDriver } from "@opencode/core/workspace/driver"
-import { SessionInbox as CoreSessionInbox } from "@opencode/core/session/inbox"
-import { SessionMessage as CoreSessionMessage } from "@opencode/core/session/message"
-import { Agent } from "@opencode/schema/agent"
-import { Config } from "@opencode/schema/config"
-import { Event } from "@opencode/schema/event"
-import { Location } from "@opencode/schema/location"
-import { Model } from "@opencode/schema/model"
-import { Project } from "@opencode/schema/project"
-import { Provider } from "@opencode/schema/provider"
-import { WebSearch } from "@opencode/schema/websearch"
-import { Session } from "@opencode/schema/session"
-import { SessionInbox } from "@opencode/schema/session-inbox"
-import { SessionMessage } from "@opencode/schema/session-message"
-import { Workspace } from "@opencode/schema/workspace"
-import { Worktree } from "@opencode/schema/worktree"
-import { Api } from "@opencode/server/api"
-import { ClientApi, groupNames, promiseOmitEndpoints } from "@opencode/protocol/client"
-import { compile, emitPromise } from "@opencode/httpapi-codegen"
+import { EnvironmentDriver } from "@contextcode/core/environment/driver"
+import { EnvironmentFiles } from "@contextcode/core/environment/files"
+import { Location as CoreLocation } from "@contextcode/core/location"
+import { WorkspaceDriver } from "@contextcode/core/workspace/driver"
+import { SessionInbox as CoreSessionInbox } from "@contextcode/core/session/inbox"
+import { SessionMessage as CoreSessionMessage } from "@contextcode/core/session/message"
+import { Agent } from "@contextcode/schema/agent"
+import { Config } from "@contextcode/schema/config"
+import { Event } from "@contextcode/schema/event"
+import { Location } from "@contextcode/schema/location"
+import { Model } from "@contextcode/schema/model"
+import { Project } from "@contextcode/schema/project"
+import { Provider } from "@contextcode/schema/provider"
+import { WebSearch } from "@contextcode/schema/websearch"
+import { Session } from "@contextcode/schema/session"
+import { SessionInbox } from "@contextcode/schema/session-inbox"
+import { SessionMessage } from "@contextcode/schema/session-message"
+import { Workspace } from "@contextcode/schema/workspace"
+import { Worktree } from "@contextcode/schema/worktree"
+import { Api } from "@contextcode/server/api"
+import { ClientApi, groupNames, promiseOmitEndpoints } from "@contextcode/protocol/client"
+import { compile, emitPromise } from "@contextcode/httpapi-codegen"
 
 const SDK = await import("../src/index")
 const SDKEffect = await import("../src/effect")
-const CoreAgent = await import("@opencode/core/agent")
-const CoreModel = await import("@opencode/core/model")
-const CoreProject = await import("@opencode/core/project")
-const CoreSession = await import("@opencode/core/session")
-const CoreWorktree = await import("@opencode/core/worktree")
+const CoreAgent = await import("@contextcode/core/agent")
+const CoreModel = await import("@contextcode/core/model")
+const CoreProject = await import("@contextcode/core/project")
+const CoreSession = await import("@contextcode/core/session")
+const CoreWorktree = await import("@contextcode/core/worktree")
 
 test("re-exports canonical contracts directly from Schema", () => {
   expect(SDK.Agent).toBe(Agent)
@@ -51,7 +51,7 @@ test("re-exports canonical contracts directly from Schema", () => {
     "Integration",
     "Location",
     "Model",
-    "OpenCode",
+    "Context Code",
     "Permission",
     "PermissionSaved",
     "Project",
@@ -103,7 +103,7 @@ test("client and Server contracts generate identically", () => {
   expect(emitPromise(client)).toEqual(emitPromise(server))
 })
 
-test("re-exports workspace and environment driver contracts from @opencode/sdk/effect", () => {
+test("re-exports workspace and environment driver contracts from @contextcode/sdk/effect", () => {
   expect(SDKEffect.WorkspaceDriver).toBe(WorkspaceDriver)
   expect(SDKEffect.EnvironmentDriver).toBe(EnvironmentDriver)
   expect(SDKEffect.EnvironmentFiles).toBe(EnvironmentFiles)

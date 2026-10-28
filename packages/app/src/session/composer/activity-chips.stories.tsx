@@ -1,13 +1,13 @@
-import type { SessionMessageAssistantTool, SessionMessageInfo } from "@opencode/client/promise"
-import type { SessionDocument } from "@opencode/session-ui/document"
+import type { SessionMessageAssistantTool, SessionMessageInfo } from "@contextcode/client/promise"
+import type { SessionDocument } from "@contextcode/session-ui/document"
 import {
   CURRENT_SESSION_ID,
   STORY_MODEL,
   STORY_TIME,
   editThenTestDocument,
   largeCompletedDocument,
-} from "@opencode/session-ui/storybook"
-import { timelinePresets } from "@opencode/session-ui/timeline/detail"
+} from "@contextcode/session-ui/storybook"
+import { timelinePresets } from "@contextcode/session-ui/timeline/detail"
 import { createEffect, createMemo, on, onCleanup, onMount } from "solid-js"
 import { createStore } from "solid-js/store"
 import { SessionPreview } from "@/session/story-model"
@@ -71,7 +71,7 @@ function Preview(props: PreviewArgs) {
   return (
     <SessionPreview
       title="Run background work"
-      description="opencode · activity chips"
+      description="contextcode · activity chips"
       document={value()}
       timelineDetail={timelineDetail}
       activity={{
@@ -192,7 +192,7 @@ function LiveActivity() {
   return (
     <SessionPreview
       title="Audit the activity chips"
-      description="opencode · activity chips"
+      description="contextcode · activity chips"
       document={value()}
       timelineDetail={timelineDetail}
       activity={{
@@ -219,7 +219,7 @@ function LiveActivity() {
 }
 
 export default {
-  title: "OpenCode/Session/Activity chips",
+  title: "Context Code/Session/Activity chips",
   id: "session-activity-chips",
   render: (args: PreviewArgs) => <Preview {...args} />,
   args: { stage: 0, subagents: 0, shells: 0 },

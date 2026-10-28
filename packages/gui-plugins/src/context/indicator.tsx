@@ -1,10 +1,10 @@
 import { Show, createMemo, type ComponentProps, type JSX } from "solid-js"
-import { ProgressCircle } from "@opencode/ui/progress-circle"
-import { Button } from "@opencode/ui/button"
-import { Tooltip } from "@opencode/ui/tooltip"
-import { useI18n } from "@opencode/ui/context/i18n"
-import { lastAssistantWithUsage } from "@opencode/client/solid"
-import { usePlugin, type MountedSession } from "@opencode/plugin/gui"
+import { ProgressCircle } from "@contextcode/ui/progress-circle"
+import { Button } from "@contextcode/ui/button"
+import { Tooltip } from "@contextcode/ui/tooltip"
+import { useI18n } from "@contextcode/ui/context/i18n"
+import { lastAssistantWithUsage } from "@contextcode/client/solid"
+import { usePlugin, type MountedSession } from "@contextcode/plugin/gui"
 import { catalogModel, syncCatalog } from "./catalog"
 
 function ContextTooltipRow(props: { name: JSX.Element; value: JSX.Element }) {

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { SessionInboxInfo } from "@opencode/client/promise"
+import type { SessionInboxInfo } from "@contextcode/client/promise"
 import { queuedPromptAttachments, queuedPromptRows, type SentEdit } from "./queue"
 
 const queued = [

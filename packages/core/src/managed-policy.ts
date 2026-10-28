@@ -1,9 +1,9 @@
 export * as ManagedPolicy from "./managed-policy.js"
 
-import { Document, type Entry } from "@opencode/schema/config"
+import { Document, type Entry } from "@contextcode/schema/config"
 import { ConfigIntegration } from "./config/integration.js"
 import { Wildcard } from "./util/wildcard.js"
-import { ConfigPolicy } from "@opencode/schema/config/policy"
+import { ConfigPolicy } from "@contextcode/schema/config/policy"
 
 /** Every policy statement in config, earliest-loaded first so it wins, each with the message a denial shows. */
 export function statements(entries: readonly Entry[]) {

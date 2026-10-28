@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, setSystemTime, test } from "bun:test"
-import type { UsageLimitsBudget, UsageLimitsInfo } from "@opencode/client"
+import type { UsageLimitsBudget, UsageLimitsInfo } from "@contextcode/client"
 import {
   formatDollars,
   formatReset,
@@ -63,7 +63,7 @@ describe("util.usage-limits", () => {
       ],
     })
     expect(modelUsage(limits, { ...sol, id: "claude-opus-5" }, served)).toMatchObject({ left: 0, reached: true })
-    // Spend on all models covers what OpenCode Console serves, but not OpenCode Go, a direct provider or a free model.
+    // Spend on all models covers what Context Code Console serves, but not OpenCode Go, a direct provider or a free model.
     expect(
       modelUsage(limits, { ...sol, providerID: "opencode-go" }, { id: "opencode-go", integrationID: "opencode" }),
     ).toBeUndefined()

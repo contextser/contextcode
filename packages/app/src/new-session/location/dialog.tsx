@@ -1,19 +1,19 @@
-import { Badge } from "@opencode/ui/badge"
-import { Dialog, DialogBody } from "@opencode/ui/dialog"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { Icon } from "@opencode/ui/icon"
-import { Keybind } from "@opencode/ui/keybind"
+import { Badge } from "@contextcode/ui/badge"
+import { Dialog, DialogBody } from "@contextcode/ui/dialog"
+import { useDialog } from "@contextcode/ui/context/dialog"
+import { Icon } from "@contextcode/ui/icon"
+import { Keybind } from "@contextcode/ui/keybind"
 import {
   displayName,
   getProjectAvatarGenerated,
   getProjectAvatarSource,
   getProjectAvatarVariant,
   ProjectAvatar,
-} from "@opencode/ui/project-avatar"
-import { TextInput } from "@opencode/ui/text-input"
-import { createTypeahead } from "@opencode/ui/typeahead"
+} from "@contextcode/ui/project-avatar"
+import { TextInput } from "@contextcode/ui/text-input"
+import { createTypeahead } from "@contextcode/ui/typeahead"
 import { createEventListener } from "@solid-primitives/event-listener"
-import { getFilename } from "@opencode/util/path"
+import { getFilename } from "@contextcode/util/path"
 import { createEffect, createMemo, createResource, For, Match, onCleanup, Show, Switch } from "solid-js"
 import { createStore } from "solid-js/store"
 import type { PromptProject, PromptProjectController, PromptServer } from "@/new-session/project/selector"

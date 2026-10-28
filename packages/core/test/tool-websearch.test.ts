@@ -1,18 +1,18 @@
 import { describe, expect } from "bun:test"
 import { Context, Effect, Layer } from "effect"
 import type { HttpClientError } from "effect/http"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Permission } from "@opencode/core/permission"
-import { KV } from "@opencode/core/kv"
-import { Form } from "@opencode/core/form"
-import { WebSearch } from "@opencode/core/websearch"
-import { Session } from "@opencode/core/session"
-import { toSessionError } from "@opencode/core/session/to-session-error"
-import { Tool } from "@opencode/core/tool"
-import { WebSearchTool } from "@opencode/core/tool/plugin/websearch"
-import { makeLocationNode } from "@opencode/util/effect/app-node"
-import { Image } from "@opencode/core/image"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Permission } from "@contextcode/core/permission"
+import { KV } from "@contextcode/core/kv"
+import { Form } from "@contextcode/core/form"
+import { WebSearch } from "@contextcode/core/websearch"
+import { Session } from "@contextcode/core/session"
+import { toSessionError } from "@contextcode/core/session/to-session-error"
+import { Tool } from "@contextcode/core/tool"
+import { WebSearchTool } from "@contextcode/core/tool/plugin/websearch"
+import { makeLocationNode } from "@contextcode/util/effect/app-node"
+import { Image } from "@contextcode/core/image"
 import { testEffect } from "./lib/effect"
 import { imagePassthrough } from "./lib/image"
 import { permissionLayer } from "./lib/permission"
@@ -227,7 +227,7 @@ describe("WebSearchTool registration", () => {
           fields: [
             {
               key: "choice",
-              description: "Allow OpenCode to search the web for up-to-date information?",
+              description: "Allow Context Code to search the web for up-to-date information?",
               type: "string",
               required: true,
               custom: false,

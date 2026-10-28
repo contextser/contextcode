@@ -1,5 +1,5 @@
-import { builtinCatalog } from "@opencode/plugin/gui/builtin"
-import { Plugin, Store } from "@opencode/plugin/gui"
+import { builtinCatalog } from "@contextcode/plugin/gui/builtin"
+import { Plugin, Store } from "@contextcode/plugin/gui"
 import { History } from "./history"
 import en from "./i18n/en"
 

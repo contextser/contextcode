@@ -1,5 +1,5 @@
-import type { Plugin } from "@opencode/plugin/tui"
-import type { SessionMessageInfo } from "@opencode/client"
+import type { Plugin } from "@contextcode/plugin/tui"
+import type { SessionMessageInfo } from "@contextcode/client"
 import { useTerminalDimensions } from "@opentui/solid"
 import { createMemo, createSignal, For } from "solid-js"
 import { SidebarTodo } from "../../sidebar/todo"

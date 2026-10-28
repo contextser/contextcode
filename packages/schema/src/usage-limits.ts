@@ -27,7 +27,7 @@ export const Go = Schema.Struct({
   monthly: Meter,
 }).annotate({ identifier: "UsageLimits.Go" })
 
-/** A model a budget covers, by the IDs OpenCode knows it by. */
+/** A model a budget covers, by the IDs Context Code knows it by. */
 export interface BudgetModel extends Schema.Schema.Type<typeof BudgetModel> {}
 export const BudgetModel = Schema.Struct({
   providerID: Provider.ID,
@@ -37,7 +37,7 @@ export const BudgetModel = Schema.Struct({
   spent: Money.USD.pipe(optional),
 }).annotate({ identifier: "UsageLimits.BudgetModel" })
 
-/** A monthly spend limit the OpenCode Console workspace sets on the member. */
+/** A monthly spend limit the Context Code Console workspace sets on the member. */
 export interface Budget extends Schema.Schema.Type<typeof Budget> {}
 export const Budget = Schema.Struct({
   id: Schema.String,
@@ -62,13 +62,13 @@ export const Budget = Schema.Struct({
   resetsAt: Instant,
 }).annotate({ identifier: "UsageLimits.Budget" })
 
-/** The usage limits of the OpenCode Console workspace a location is signed in to. */
+/** The usage limits of the Context Code Console workspace a location is signed in to. */
 export interface Info extends Schema.Schema.Type<typeof Info> {}
 export const Info = Schema.Struct({
   workspace: Schema.Struct({
     id: Schema.String,
     name: Schema.String.pipe(optional),
-    /** The member's usage page in OpenCode Console. */
+    /** The member's usage page in Context Code Console. */
     usageURL: Schema.String,
   }),
   go: Go.pipe(optional),

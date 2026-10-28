@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/plugin",
+  "name": "@contextcode/plugin",
   "version": "2.2.0",
   "type": "module",
   "license": "MIT",
@@ -42,15 +42,15 @@
   ],
   "dependencies": {
     "@ai-sdk/provider": "3.0.8",
-    "@opencode/ai": "workspace:*",
-    "@opencode/client": "workspace:*",
-    "@opencode/protocol": "workspace:*",
-    "@opencode/schema": "workspace:*",
-    "@opencode/util": "workspace:*",
+    "@contextcode/ai": "workspace:*",
+    "@contextcode/client": "workspace:*",
+    "@contextcode/protocol": "workspace:*",
+    "@contextcode/schema": "workspace:*",
+    "@contextcode/util": "workspace:*",
     "effect": "catalog:"
   },
   "peerDependencies": {
-    "@opencode/theme": "workspace:*",
+    "@contextcode/theme": "workspace:*",
     "@opentui/core": "0.7.0",
     "@opentui/solid": "0.7.0",
     "electron": "*",
@@ -59,7 +59,7 @@
     "vite-plugin-solid": ">=2.11"
   },
   "peerDependenciesMeta": {
-    "@opencode/theme": {
+    "@contextcode/theme": {
       "optional": true
     },
     "@opentui/core": {
@@ -82,7 +82,7 @@
     }
   },
   "devDependencies": {
-    "@opencode/theme": "workspace:*",
+    "@contextcode/theme": "workspace:*",
     "@opentui/core": "catalog:",
     "@opentui/solid": "catalog:",
     "@tsconfig/bun": "catalog:",
@@ -97,7 +97,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anomalyco/opencode.git",
+    "url": "git+https://github.com/contextser/contextcode.git",
     "directory": "packages/plugin"
   }
 }

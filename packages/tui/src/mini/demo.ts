@@ -15,7 +15,7 @@
 // Demo mode handles permission and Form replies locally, completing or failing
 // the synthetic tool parts through the same callbacks used by the live footer.
 import path from "path"
-import type { JsonValue, SessionMessageAssistantTool } from "@opencode/client/promise"
+import type { JsonValue, SessionMessageAssistantTool } from "@contextcode/client/promise"
 import { parseSlashHead } from "../prompt/parse"
 import { writeSessionOutput } from "./stream"
 import { toolCommit, toolFinalPhase } from "./stream-v2.subagent"
@@ -649,7 +649,7 @@ function emitPermission(state: State, kind: PermissionKind = "edit"): void {
       patterns: [target],
       always: [target],
       done: {
-        output: ["1: {", '2:   "name": "opencode",', '3:   "private": true', "4: }"].join("\n"),
+        output: ["1: {", '2:   "name": "contextcode",', '3:   "private": true', "4: }"].join("\n"),
         metadata: {},
       },
     })

@@ -1,21 +1,21 @@
-import { Config } from "@opencode/core/config"
-import { ConfigIntegration } from "@opencode/core/config/integration"
-import { ConfigPolicyPlugin } from "@opencode/core/config/plugin/policy"
-import { Integration } from "@opencode/core/integration"
-import { Mcp } from "@opencode/core/mcp/index"
-import { Skill } from "@opencode/core/skill"
-import { Info } from "@opencode/schema/config"
-import { ConfigPolicy } from "@opencode/schema/config/policy"
-import { ID } from "@opencode/schema/event"
+import { Config } from "@contextcode/core/config"
+import { ConfigIntegration } from "@contextcode/core/config/integration"
+import { ConfigPolicyPlugin } from "@contextcode/core/config/plugin/policy"
+import { Integration } from "@contextcode/core/integration"
+import { Mcp } from "@contextcode/core/mcp/index"
+import { Skill } from "@contextcode/core/skill"
+import { Info } from "@contextcode/schema/config"
+import { ConfigPolicy } from "@contextcode/schema/config/policy"
+import { ID } from "@contextcode/schema/event"
 import { Effect, Schema, Stream } from "effect"
 import { host } from "../plugin/host"
 
-/** A connected organization's policy as the OpenCode Console delivers it: an integration config document. */
+/** A connected organization's policy as the Context Code Console delivers it: an integration config document. */
 export function organizationPolicy(policies: ConfigPolicy.Info[], organization?: string) {
   return new ConfigIntegration.Document({
     type: "document",
     integrationID: Integration.ID.make("opencode"),
-    connection: { type: "env", name: "OPENCODE_API_KEY" },
+    connection: { type: "env", name: "CONTEXTCODE_API_KEY" },
     organization,
     info: Schema.decodeUnknownSync(Info)({ policies }),
   })

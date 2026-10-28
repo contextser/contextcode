@@ -7,8 +7,8 @@ export function createWebApp(domain: string) {
     environment:
       $app.stage === "beta"
         ? {
-            OPENCODE_CHANNEL: "beta",
-            VITE_OPENCODE_SERVER_MODE: "none",
+            CONTEXTCODE_CHANNEL: "beta",
+            VITE_CONTEXTCODE_SERVER_MODE: "none",
             VITE_SENTRY_ENVIRONMENT: "beta",
           }
         : undefined,

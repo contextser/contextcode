@@ -2,7 +2,7 @@ import { expect, test } from "bun:test"
 import { authFromToken, authTokenFromCredentials, fileStreamUrl } from "./api"
 
 test.each([
-  [btoa("opencode:secret"), { password: "secret" }],
+  [btoa("contextcode:secret"), { password: "secret" }],
   [btoa("legacy:secret:with:colons"), { password: "secret:with:colons" }],
   [btoa(":secret"), { password: "secret" }],
   ["not base64", undefined],
@@ -13,7 +13,7 @@ test.each([
 
 test("authTokenFromCredentials ignores usernames in legacy saved credentials", () => {
   const credentials = { username: "legacy", password: "secret" }
-  expect(authTokenFromCredentials(credentials)).toBe(btoa("opencode:secret"))
+  expect(authTokenFromCredentials(credentials)).toBe(btoa("contextcode:secret"))
 })
 
 test("fileStreamUrl never puts a credential in a media URL", () => {

@@ -97,7 +97,7 @@ test("shows what the workspace's limits leave and why a refused turn stopped", a
       if (url.pathname === "/api/agent")
         return json({ location, data: [{ id: "build", mode: "primary", hidden: false, permissions: [] }] })
       if (url.pathname === "/api/provider")
-        return json({ location, data: [{ id: "opencode", integrationID: "opencode", name: "OpenCode" }] })
+        return json({ location, data: [{ id: "opencode", integrationID: "opencode", name: "Context Code" }] })
       if (url.pathname === "/api/model")
         return json({
           location,
@@ -109,7 +109,7 @@ test("shows what the workspace's limits leave and why a refused turn stopped", a
           data: [
             {
               id: "opencode",
-              name: "OpenCode Console",
+              name: "Context Code Console",
               methods: [],
               connections: [{ type: "credential", method: "oauth", id: "cred_console", label: "Acme" }],
             },
@@ -127,7 +127,7 @@ test("shows what the workspace's limits leave and why a refused turn stopped", a
     (frame) =>
       frame.includes("GPT 5.6 Sol usage limit reached") &&
       frame.includes("Switch model with") &&
-      /GPT 5\.6 Sol OpenCode +\$6 left/.test(frame) &&
+      /GPT 5\.6 Sol Context Code +\$6 left/.test(frame) &&
       frame.includes("Running low on GPT 5.6 Sol"),
   )
 

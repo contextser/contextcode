@@ -1,10 +1,10 @@
 import { describe, expect } from "bun:test"
 import { Effect, Schema, SchemaTransformation } from "effect"
-import { Bus } from "@opencode/core/bus"
-import { Database } from "@opencode/core/database/database"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { Event } from "@opencode/schema/event"
-import { LayerNode } from "@opencode/util/effect/layer-node"
+import { Bus } from "@contextcode/core/bus"
+import { Database } from "@contextcode/core/database/database"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { Event } from "@contextcode/schema/event"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
 import { testEffect } from "./lib/effect"
 
 // Default Bus configuration: durable payloads are not persisted.

@@ -1,6 +1,6 @@
 import { createMemo, lazy, on, onCleanup, Suspense } from "solid-js"
-import { Icon } from "@opencode/ui/icon"
-import { Menu } from "@opencode/ui/menu"
+import { Icon } from "@contextcode/ui/icon"
+import { Menu } from "@contextcode/ui/menu"
 import {
   Command,
   createKeyed,
@@ -10,7 +10,7 @@ import {
   type MountedSession,
   type PanelTab,
   type Plugin,
-} from "@opencode/plugin/gui"
+} from "@contextcode/plugin/gui"
 import type Terminal from "./index"
 import { terminalToggleCommand } from "./index"
 import { createTerminalModel, type TerminalWorkspace } from "./model"
@@ -18,7 +18,7 @@ import { terminalTab, type LocalPTY } from "./state"
 import { terminalTabLabel } from "./title"
 import { TerminalTabLabel } from "./label"
 import quoteStyles from "./quote.css?inline"
-import { onIdle, BuiltinCommand, BuiltinSlot } from "@opencode/plugin/gui/builtin"
+import { onIdle, BuiltinCommand, BuiltinSlot } from "@contextcode/plugin/gui/builtin"
 
 const setup: Plugin.Setup<typeof Terminal> = (ctx) => {
   const sessions = ctx.sessions

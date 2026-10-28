@@ -61,7 +61,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "openai-compatible",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/openai-compatible/images")
+      const { model } = await import("@contextcode/ai/providers/openai-compatible/images")
       return model("qwen-image", {
         ...shared,
         apiKey: "regolo-key",
@@ -76,7 +76,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "openai",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/openai/images")
+      const { model } = await import("@contextcode/ai/providers/openai/images")
       return model("gpt-image-2", { ...shared, apiKey: "openai-key", organization: "org-1" })
     },
     url: "https://api.openai.com/v1/images/generations",
@@ -86,7 +86,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "openrouter",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/openrouter/images")
+      const { model } = await import("@contextcode/ai/providers/openrouter/images")
       return model("openai/gpt-image-2", { ...shared, apiKey: "openrouter-key" })
     },
     url: "https://openrouter.ai/api/v1/images/generations",
@@ -96,7 +96,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "vercel-ai-gateway",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/vercel-ai-gateway/images")
+      const { model } = await import("@contextcode/ai/providers/vercel-ai-gateway/images")
       return model("openai/gpt-image-2", { ...shared, apiKey: "vercel-key" })
     },
     url: "https://ai-gateway.vercel.sh/v1/images/generations",
@@ -106,7 +106,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "digitalocean",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/digitalocean/images")
+      const { model } = await import("@contextcode/ai/providers/digitalocean/images")
       return model("openai-gpt-image-1", { ...shared, apiKey: "do-key" })
     },
     url: "https://inference.do-ai.run/v1/images/generations",
@@ -116,7 +116,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "azure",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/azure/images")
+      const { model } = await import("@contextcode/ai/providers/azure/images")
       return model("gpt-image-2", { ...shared, apiKey: "azure-key", resourceName: "fixture" })
     },
     url: "https://fixture.openai.azure.com/openai/v1/images/generations?api-version=v1",
@@ -127,7 +127,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "xai",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/xai/images")
+      const { model } = await import("@contextcode/ai/providers/xai/images")
       return model("grok-imagine-image", { ...shared, apiKey: "xai-key" })
     },
     url: "https://api.x.ai/v1/images/generations",
@@ -136,7 +136,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "zai",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/zai/images")
+      const { model } = await import("@contextcode/ai/providers/zai/images")
       return model("glm-image", { ...shared, apiKey: "zai-key", baseURL: "https://open.bigmodel.test/api/paas/v4" })
     },
     url: "https://open.bigmodel.test/api/paas/v4/images/generations",
@@ -145,7 +145,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "alibaba",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/alibaba/images")
+      const { model } = await import("@contextcode/ai/providers/alibaba/images")
       return model("qwen-image-2.0", {
         ...shared,
         apiKey: "dashscope-key",
@@ -158,7 +158,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "google",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/google/images")
+      const { model } = await import("@contextcode/ai/providers/google/images")
       return model("gemini-2.5-flash-image", { ...shared, apiKey: "google-key" })
     },
     url: "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent",
@@ -168,7 +168,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "google-vertex",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/google-vertex/images")
+      const { model } = await import("@contextcode/ai/providers/google-vertex/images")
       return model("gemini-2.5-flash-image", { ...shared, apiKey: "vertex-key" })
     },
     url: "https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash-image:generateContent",
@@ -178,7 +178,7 @@ const images: ReadonlyArray<Case<ImageModel>> = [
   {
     name: "cloudflare-workers-ai",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/cloudflare-workers-ai/images")
+      const { model } = await import("@contextcode/ai/providers/cloudflare-workers-ai/images")
       return model("@cf/leonardo/lucid-origin", { ...shared, apiKey: "cloudflare-key", accountId: "account-1" })
     },
     url: "https://api.cloudflare.com/client/v4/accounts/account-1/ai/run/@cf/leonardo/lucid-origin",
@@ -191,7 +191,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "typesafe-ai",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/typesafe-ai/decisions")
+      const { model } = await import("@contextcode/ai/providers/typesafe-ai/decisions")
       return model("typesafe/jev", {
         ...shared,
         apiKey: "amd-key",
@@ -206,7 +206,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "opencode",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/opencode/decisions")
+      const { model } = await import("@contextcode/ai/providers/opencode/decisions")
       return model("jev", { ...shared, apiKey: "zen-key", baseURL: "https://opencode.ai/inference/systemone/v1" })
     },
     url: "https://opencode.ai/inference/systemone/v1/systemone",
@@ -217,7 +217,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "openrouter",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/openrouter/decisions")
+      const { model } = await import("@contextcode/ai/providers/openrouter/decisions")
       return model("cloudflare/clef-omni", { ...shared, apiKey: "openrouter-key" })
     },
     url: "https://openrouter.ai/api/v1/systemone",
@@ -227,7 +227,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "baseten",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/baseten/decisions")
+      const { model } = await import("@contextcode/ai/providers/baseten/decisions")
       return model("decision-models/baseten-elephant-9b-latest", { ...shared, apiKey: "baseten-key" })
     },
     url: "https://inference.baseten.co/v1/systemone",
@@ -237,7 +237,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "digitalocean",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/digitalocean/decisions")
+      const { model } = await import("@contextcode/ai/providers/digitalocean/decisions")
       return model("typesafe-jev", { ...shared, apiKey: "do-key" })
     },
     url: "https://inference.do-ai.run/v1/systemone",
@@ -247,7 +247,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "vercel-ai-gateway",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/vercel-ai-gateway/decisions")
+      const { model } = await import("@contextcode/ai/providers/vercel-ai-gateway/decisions")
       return model("typesafe/jev", { ...shared, apiKey: "vercel-key" })
     },
     url: "https://ai-gateway.vercel.sh/v1/decisions",
@@ -257,7 +257,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "cloudflare-workers-ai",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/cloudflare-workers-ai/decisions")
+      const { model } = await import("@contextcode/ai/providers/cloudflare-workers-ai/decisions")
       return model("@cf/cloudflare/clef-omni", { ...shared, apiKey: "cloudflare-key", accountId: "account-1" })
     },
     url: "https://api.cloudflare.com/client/v4/accounts/account-1/ai/run",
@@ -268,7 +268,7 @@ const decisions: ReadonlyArray<Case<DecisionModel>> = [
   {
     name: "cloudflare-ai-gateway",
     load: async () => {
-      const { model } = await import("@opencode/ai/providers/cloudflare-ai-gateway/decisions")
+      const { model } = await import("@contextcode/ai/providers/cloudflare-ai-gateway/decisions")
       return model("@cf/cloudflare/clef-omni", {
         ...shared,
         apiKey: "gateway-key",

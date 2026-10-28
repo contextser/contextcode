@@ -2,21 +2,21 @@ import { expect, test } from "bun:test"
 import { mkdir, mkdtemp, rm } from "node:fs/promises"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { Agent } from "@opencode/core/agent"
-import { Config } from "@opencode/core/config"
-import { Database } from "@opencode/core/database/database"
-import { makeGlobalNode } from "@opencode/util/effect/app-node"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { Location } from "@opencode/core/location"
-import { LocationServiceMap } from "@opencode/core/location-services"
-import { Plugin } from "@opencode/core/plugin"
-import { SdkPlugins } from "@opencode/core/plugin/sdk"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Session } from "@opencode/core/session"
-import { SessionMessage } from "@opencode/core/session/message"
-import { Tool } from "@opencode/core/tool"
+import { Agent } from "@contextcode/core/agent"
+import { Config } from "@contextcode/core/config"
+import { Database } from "@contextcode/core/database/database"
+import { makeGlobalNode } from "@contextcode/util/effect/app-node"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Bus } from "@contextcode/core/bus"
+import { Location } from "@contextcode/core/location"
+import { LocationServiceMap } from "@contextcode/core/location-services"
+import { Plugin } from "@contextcode/core/plugin"
+import { SdkPlugins } from "@contextcode/core/plugin/sdk"
+import { AbsolutePath } from "@contextcode/core/schema"
+import { Session } from "@contextcode/core/session"
+import { SessionMessage } from "@contextcode/core/session/message"
+import { Tool } from "@contextcode/core/tool"
 import { Deferred, Effect, Fiber, Layer, Queue, Stream } from "effect"
 import type { Scope } from "effect/Scope"
 import { SimulatedProvider } from "../src/backend/simulated-provider"
@@ -214,7 +214,7 @@ test("fails the provider stream when Drive disconnects the invocation", async ()
 
 test("controls arbitrary tools through scoped SDK overlays", async () => {
   const endpoint = availableEndpoint()
-  const directory = await mkdtemp(join(tmpdir(), "opencode-simulated-tools-"))
+  const directory = await mkdtemp(join(tmpdir(), "contextcode-simulated-tools-"))
   const secondDirectory = join(directory, "second")
   await mkdir(secondDirectory)
   try {

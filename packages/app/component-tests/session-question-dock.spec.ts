@@ -1,5 +1,5 @@
 import type { Locator } from "@playwright/test"
-import type { MotionKnob } from "@opencode/ui/motion-tuning"
+import type { MotionKnob } from "@contextcode/ui/motion-tuning"
 import { expect, sourceURL, story } from "../../stories/playwright/story"
 
 story("resizes the dock to fit different answer counts", async ({ mount }) => {
@@ -454,7 +454,7 @@ const play = (question: Locator, keys: { key: string; after?: number }[]) =>
 // The dock's motion is off unless its knob is on, so these turn it on before the dock loads.
 story.describe("with the question dock's motion on", () => {
   story.beforeEach(({ page }) =>
-    page.addInitScript(() => localStorage.setItem("opencode.motion.v2", JSON.stringify({ "question.motion": 1 }))),
+    page.addInitScript(() => localStorage.setItem("contextcode.motion.v2", JSON.stringify({ "question.motion": 1 }))),
   )
 
   story("keeps a question on screen while switching", async ({ mount }) => {
@@ -1230,7 +1230,7 @@ story("sizes the answers box to each question with the dock's motion off", async
 
 story.describe("a long list with the question dock's motion on", () => {
   story.beforeEach(({ page }) =>
-    page.addInitScript(() => localStorage.setItem("opencode.motion.v2", JSON.stringify({ "question.motion": 1 }))),
+    page.addInitScript(() => localStorage.setItem("contextcode.motion.v2", JSON.stringify({ "question.motion": 1 }))),
   )
 
   story("restores a long list without growing past where it rests", async ({ mount }) => {

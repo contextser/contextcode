@@ -39,7 +39,7 @@ test("mention a session by title, send its stable token, and open its own tab", 
 })
 
 test("a bare @ lists sessions, and a multi-word title matches while file search is slow", async ({ page }) => {
-  const target = "ses_0123456789opencodeconsolex"
+  const target = "ses_0123456789contextcodeconsolex"
   const prompts: Parameters<NonNullable<MockServerConfig["onPrompt"]>>[0]["body"][] = []
 
   const view = await openSession(page, {
@@ -48,7 +48,7 @@ test("a bare @ lists sessions, and a multi-word title matches while file search 
     sessions: [
       { id: "ses_mention_search_source", title: "Review the plan" },
       { id: "ses_0123456789homesessionabcde", title: "HOME" },
-      { id: target, title: "OPENCODE CONSOLE" },
+      { id: target, title: "CONTEXTCODE CONSOLE" },
     ],
     seed: { tabs: ["ses_mention_search_source"] },
     onPrompt: (input) => void prompts.push(input.body),
@@ -59,15 +59,15 @@ test("a bare @ lists sessions, and a multi-word title matches while file search 
 
   await view.editor.pressSequentially("Compare with @")
   await expect(suggestions.getByRole("button", { name: /HOME/ })).toBeVisible()
-  await expect(suggestions.getByRole("button", { name: /OPENCODE CONSOLE/ })).toBeVisible()
+  await expect(suggestions.getByRole("button", { name: /CONTEXTCODE CONSOLE/ })).toBeVisible()
 
   await view.editor.pressSequentially("open")
   await files.arrived
   await view.editor.pressSequentially(" con")
   await expect(suggestions.getByRole("button", { name: /HOME/ })).toHaveCount(0)
-  await expect(suggestions.locator("[data-suggestion-id][data-active]")).toContainText("OPENCODE CONSOLE")
+  await expect(suggestions.locator("[data-suggestion-id][data-active]")).toContainText("CONTEXTCODE CONSOLE")
   await view.editor.press("Enter")
-  await expect(view.editor.locator('[data-mention="session"]')).toHaveText("@OPENCODE CONSOLE")
+  await expect(view.editor.locator('[data-mention="session"]')).toHaveText("@CONTEXTCODE CONSOLE")
   files.release()
 
   // Prose after a completed mention neither reopens the popover nor lets it take Enter.
@@ -105,7 +105,7 @@ test("the free usage limit opens the Go dialog once, leaves a readable notice, a
       all: [
         {
           id: "opencode",
-          name: "OpenCode",
+          name: "Context Code",
           models: {
             "big-pickle": { id: "big-pickle", name: "Big Pickle", cost: { input: 0, output: 0 }, limit: { context: 200_000 } },
           },
@@ -129,8 +129,8 @@ test("the free usage limit opens the Go dialog once, leaves a readable notice, a
     integrations: () => [
       {
         id: "opencode",
-        name: "OpenCode Console",
-        methods: [{ id: "device", type: "oauth", label: "OpenCode Console account" }],
+        name: "Context Code Console",
+        methods: [{ id: "device", type: "oauth", label: "Context Code Console account" }],
         connections: state.authorized ? [{ type: "credential", id: "cred_console", label: "Anomaly", method: "oauth" }] : [],
       },
       {
@@ -278,11 +278,11 @@ test("a catalog refresh cannot replace an existing session's model", async ({ pa
     sessions: [{ id: sessionID, agent: "build", model: { id: "alpha", providerID: "opencode", variant: "high" } }],
     provider: () => catalog.current,
     onPrompt: (input) => void prompts.push(input.body),
-    seed: { storage: { "opencode.global.dat:model": { recent: [{ providerID: "opencode", modelID: "beta" }] } } },
+    seed: { storage: { "contextcode.global.dat:model": { recent: [{ providerID: "opencode", modelID: "beta" }] } } },
   })
 
   const control = page.locator('[data-action="composer-model"]')
-  await expect(control).toHaveText("OpenCode / Alpha")
+  await expect(control).toHaveText("Context Code / Alpha")
   await view.editor.fill("Keep my selected model")
 
   catalog.current = provider(beta)
@@ -295,7 +295,7 @@ test("a catalog refresh cannot replace an existing session's model", async ({ pa
       data: {},
     },
   ])
-  await expect(control).toHaveText("OpenCode / alpha (unavailable)")
+  await expect(control).toHaveText("Context Code / alpha (unavailable)")
   await view.editor.press("Enter")
   await expect(page.getByText("Select an agent and model", { exact: true })).toBeVisible()
   await expect(view.editor).toHaveText("Keep my selected model")
@@ -312,7 +312,7 @@ test("a catalog refresh cannot replace an existing session's model", async ({ pa
       data: {},
     },
   ])
-  await expect(control).toHaveText("OpenCode / Alpha")
+  await expect(control).toHaveText("Context Code / Alpha")
   await expect(page.getByRole("button", { name: "Choose model variant", exact: true })).toHaveText("high")
   await view.editor.press("Enter")
   await expect.poll(() => prompts.length).toBe(1)
@@ -329,13 +329,13 @@ test("a catalog refresh cannot replace an existing session's model", async ({ pa
       data: {},
     },
   ])
-  await expect(control).toHaveText("OpenCode / alpha (unavailable)")
+  await expect(control).toHaveText("Context Code / alpha (unavailable)")
   await control.click()
   await page
     .getByRole("dialog", { name: "Select model" })
     .getByRole("button", { name: "Beta Free", exact: true })
     .click()
-  await expect(control).toHaveText("OpenCode / Beta")
+  await expect(control).toHaveText("Context Code / Beta")
   await view.editor.fill("Use the replacement I chose")
   await view.editor.press("Enter")
   await expect.poll(() => prompts.length).toBe(2)
@@ -348,7 +348,7 @@ test("an existing session's model never shows a fallback while its agent loads",
     name: "AgentPending",
     sessions: [{ id: sessionID, agent: "build", model: { id: "alpha", providerID: "opencode" } }],
     provider: provider({ id: "alpha", name: "Alpha" }, { id: "beta", name: "Beta" }),
-    seed: { storage: { "opencode.global.dat:model": { recent: [{ providerID: "opencode", modelID: "beta" }] } } },
+    seed: { storage: { "contextcode.global.dat:model": { recent: [{ providerID: "opencode", modelID: "beta" }] } } },
   })
   const agents = Promise.withResolvers<void>()
   await page.route(/\/api\/agent(\?|$)/, async (route) => {
@@ -387,8 +387,8 @@ test("an existing session's model never shows a fallback while its agent loads",
   const agentLoaded = page.waitForResponse((response) => new URL(response.url()).pathname === "/api/agent")
   agents.resolve()
   await agentLoaded
-  await expect(control).toHaveText("OpenCode / Alpha")
-  expect(await page.evaluate(() => [...(window.__chipTexts ?? [])])).toEqual(["OpenCode / Alpha"])
+  await expect(control).toHaveText("Context Code / Alpha")
+  expect(await page.evaluate(() => [...(window.__chipTexts ?? [])])).toEqual(["Context Code / Alpha"])
 })
 
 test("a send pressed while the Location's plugins activate waits, Esc cancels it, and it sends once catalogs load", async ({
@@ -439,7 +439,7 @@ test("a send pressed while the Location's plugins activate waits, Esc cancels it
 test("an opened session in another Location names its model from a loaded catalog before its agents load", async ({
   page,
 }) => {
-  const other = "C:/OpenCode/WarmOther"
+  const other = "C:/Context Code/WarmOther"
   await mockWorkspace(page, {
     name: "WarmOpen",
     sessions: [
@@ -459,7 +459,7 @@ test("an opened session in another Location names its model from a loaded catalo
 
   const control = page.locator('[data-action="composer-model"]')
   await page.goto(sessionHref("ses_warm_here"))
-  await expect(control).toHaveText("OpenCode / Alpha")
+  await expect(control).toHaveText("Context Code / Alpha")
 
   const held = await holdRoute(
     page,
@@ -470,7 +470,7 @@ test("an opened session in another Location names its model from a loaded catalo
   try {
     await page.locator(`[data-slot="vertical-tabs"] a[href="${sessionHref("ses_warm_there", SERVER)}"]`).click()
     await held.arrived
-    await expect(control).toHaveText("OpenCode / Beta")
+    await expect(control).toHaveText("Context Code / Beta")
     await expect(page.getByRole("button", { name: "Choose model variant" })).toHaveText("high")
     const painted = await control.elementHandle()
 
@@ -488,7 +488,7 @@ test("an opened session in another Location names its model from a loaded catalo
     await Promise.all(loaded)
     await expect(page.getByRole("dialog")).toBeVisible()
     // The loaded selection keeps the same chip instead of replacing it.
-    await expect(control).toHaveText("OpenCode / Beta")
+    await expect(control).toHaveText("Context Code / Beta")
     expect(await painted?.evaluate((element) => element.isConnected)).toBe(true)
   } finally {
     held.release()
@@ -515,7 +515,7 @@ test("names a Console-managed provider without its workspace unless a direct con
     sessions: sessions.map((session) => ({ ...session, agent: "build" })),
     provider: {
       all: [
-        { ...managed, id: "opencode", name: "Anomaly / OpenCode", models: { alpha: { id: "alpha", name: "Alpha" } } },
+        { ...managed, id: "opencode", name: "Anomaly / Context Code", models: { alpha: { id: "alpha", name: "Alpha" } } },
         { ...managed, id: "console-openai", name: "Anomaly / OpenAI", models: { gpt: { id: "gpt", name: "GPT" } } },
         { id: "openai", name: "OpenAI", models: { gpt: { id: "gpt", name: "GPT" } } },
       ],
@@ -525,7 +525,7 @@ test("names a Console-managed provider without its workspace unless a direct con
   })
 
   const control = page.locator('[data-action="composer-model"]')
-  await expect(control).toHaveText("OpenCode / Alpha")
+  await expect(control).toHaveText("Context Code / Alpha")
   await page.goto(sessionHref(sessions[1]!.id))
   await expect(control).toHaveText("Anomaly / OpenAI / GPT")
 })
@@ -735,7 +735,7 @@ test("shows the dropzone and attaches a dropped file", async ({ page }) => {
     .toEqual([
       {
         path: expect.stringMatching(/\/uploads\/[0-9a-f-]{36}\/dropzone\.txt$/),
-        directory: "C:/OpenCode/ComposerDraft",
+        directory: "C:/Context Code/ComposerDraft",
         body: "Dropzone fixture",
       },
     ])
@@ -882,7 +882,7 @@ test("marks a Console provider with its workspace only when it is also connected
     name: "ComposerConsoleProviders",
     provider: {
       all: [
-        managed("opencode", "opencode", "OpenCode", model("console-model", "Console Model")),
+        managed("opencode", "opencode", "Context Code", model("console-model", "Console Model")),
         managed("console-google", "google", "Google", model("managed-gemini", "Managed Gemini")),
         managed("console-openai", "openai", "OpenAI", model("managed-gpt", "Managed GPT")),
         { id: "google", canonical: "google", name: "Google", models: model("direct-gemini", "Direct Gemini") },
@@ -892,7 +892,7 @@ test("marks a Console provider with its workspace only when it is also connected
     },
     seed: {
       storage: {
-        "opencode.global.dat:model": {
+        "contextcode.global.dat:model": {
           user: [
             ["opencode", "console-model"],
             ["console-google", "managed-gemini"],
@@ -915,7 +915,7 @@ test("marks a Console provider with its workspace only when it is also connected
   await expect(headings.filter({ hasText: /^GoogleAnomaly$/ })).toHaveCount(1)
   await expect(headings.filter({ hasText: /^Google$/ })).toHaveCount(1)
   await expect(headings.filter({ hasText: /^OpenAI$/ })).toHaveCount(1)
-  await expect(headings.filter({ hasText: /^OpenCode$/ })).toHaveCount(1)
+  await expect(headings.filter({ hasText: /^ContextCode$/ })).toHaveCount(1)
   await expect(menu.getByText(/Anomaly \//)).toHaveCount(0)
 })
 

@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test"
-import type { SessionMessageInfo } from "@opencode/client/promise"
-import { timelinePresets } from "@opencode/session-ui/timeline/detail"
+import type { SessionMessageInfo } from "@contextcode/client/promise"
+import { timelinePresets } from "@contextcode/session-ui/timeline/detail"
 import { expected, messages } from "../utils/markdown-sessions"
 import { expectPath, holdRoute, seed, sessionHref, type SeedInput } from "../utils/app"
 import type { MockServerConfig } from "../utils/mock-server"
@@ -170,8 +170,8 @@ test("reloads a transcript only after inline file links have their final styling
 })
 
 test("restores verified inline paths before painting after a workspace tab switch", async ({ page }) => {
-  const directory = "C:/OpenCode/InlinePaths"
-  const other = "C:/OpenCode/OtherInlinePaths"
+  const directory = "C:/Context Code/InlinePaths"
+  const other = "C:/Context Code/OtherInlinePaths"
   const sourceID = "ses_inline_source"
   const targetID = "ses_inline_target"
   const queries: { query: string; directory: string }[] = []
@@ -356,7 +356,7 @@ test("focuses Find in the selected cached timeline", async ({ page }) => {
 })
 
 test("disposes the old workspace's shell while destination history is loading", async ({ page }) => {
-  const destination = "C:/OpenCode/OtherProject"
+  const destination = "C:/Context Code/OtherProject"
   const requested = Promise.withResolvers<void>()
   const release = Promise.withResolvers<void>()
   const reads: string[] = []

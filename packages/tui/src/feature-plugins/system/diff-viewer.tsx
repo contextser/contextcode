@@ -1,8 +1,8 @@
 /** @jsxImportSource @opentui/solid */
-import type { FileDiffInfo, LocationRef } from "@opencode/client"
-import type { Vcs } from "@opencode/schema/vcs"
-import { Plugin } from "@opencode/plugin/tui"
-import type { KeymapCommand, PanelInput, Route } from "@opencode/plugin/tui/context"
+import type { FileDiffInfo, LocationRef } from "@contextcode/client"
+import type { Vcs } from "@contextcode/schema/vcs"
+import { Plugin } from "@contextcode/plugin/tui"
+import type { KeymapCommand, PanelInput, Route } from "@contextcode/plugin/tui/context"
 import {
   MouseButton,
   TextAttributes,
@@ -1361,7 +1361,7 @@ function Commands(props: { context: Plugin.Context }) {
 }
 
 export default Plugin.define({
-  id: "opencode.diffs",
+  id: "contextcode.diffs",
   setup(context) {
     context.ui.slot({
       append: "session.panel",

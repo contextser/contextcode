@@ -1,13 +1,13 @@
 {
-  "name": "@opencode/desktop",
+  "name": "@contextcode/desktop",
   "private": true,
   "version": "2.2.0",
   "type": "module",
   "license": "MIT",
-  "homepage": "https://opencode.ai",
+  "homepage": "https://contextser.com",
   "author": {
-    "name": "OpenCode",
-    "email": "hello@opencode.ai"
+    "name": "Context Code",
+    "email": "hello@contextser.com"
   },
   "scripts": {
     "typecheck": "bun check --no-script -b",
@@ -32,12 +32,12 @@
     "@brendonovich/vite-plugin-opencode": "0.1.3",
     "@effect/platform-node": "catalog:",
     "@lydell/node-pty": "catalog:",
-    "@opencode/app": "workspace:*",
-    "@opencode/gui-plugins": "workspace:*",
-    "@opencode/plugin": "workspace:*",
-    "@opencode/client": "workspace:*",
-    "@opencode/schema": "workspace:*",
-    "@opencode/ui": "workspace:*",
+    "@contextcode/app": "workspace:*",
+    "@contextcode/gui-plugins": "workspace:*",
+    "@contextcode/plugin": "workspace:*",
+    "@contextcode/client": "workspace:*",
+    "@contextcode/schema": "workspace:*",
+    "@contextcode/ui": "workspace:*",
     "@sentry/solid": "catalog:",
     "@solidjs/router": "catalog:",
     "@types/bun": "catalog:",

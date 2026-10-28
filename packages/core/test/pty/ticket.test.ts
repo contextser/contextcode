@@ -1,9 +1,9 @@
 import { describe, expect } from "bun:test"
 import { Effect, Layer } from "effect"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Pty } from "@opencode/core/pty"
-import { PtyTicket } from "@opencode/core/pty/ticket"
-import { Workspace } from "@opencode/core/workspace"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Pty } from "@contextcode/core/pty"
+import { PtyTicket } from "@contextcode/core/pty/ticket"
+import { Workspace } from "@contextcode/core/workspace"
 import { testEffect } from "../lib/effect"
 
 const it = testEffect(LayerNode.compile(PtyTicket.node))

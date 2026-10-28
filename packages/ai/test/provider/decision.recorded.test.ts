@@ -7,7 +7,7 @@ import {
   CloudflareWorkersAI,
   DigitalOcean,
   OpenAI,
-  OpenCode,
+  ContextCode,
   OpenRouter,
   TypeSafeAI,
 } from "../../src/providers.js"
@@ -115,7 +115,7 @@ describe("Decision recorded", () => {
   )
 
   opencode.effect("decides choice score and predicate questions", () =>
-    assertDecision(OpenCode.configure({ apiKey: process.env.OPENCODE_API_KEY ?? "fixture" }).decision("jev-1.13-free")),
+    assertDecision(ContextCode.configure({ apiKey: process.env.OPENCODE_API_KEY ?? "fixture" }).decision("jev-1.13-free")),
   )
 
   openrouter.effect("decides choice score and predicate questions", () =>

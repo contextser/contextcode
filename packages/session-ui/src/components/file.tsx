@@ -1,4 +1,4 @@
-import { sampledChecksum } from "@opencode/util/encode"
+import { sampledChecksum } from "@contextcode/util/encode"
 import {
   areFilesEqual,
   areOptionsEqual,

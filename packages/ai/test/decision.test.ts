@@ -6,7 +6,7 @@ import {
   Baseten,
   CloudflareWorkersAI,
   OpenAI,
-  OpenCode,
+  ContextCode,
   OpenRouter,
   TypeSafeAI,
   VercelAIGateway,
@@ -141,7 +141,7 @@ describe("Decision", () => {
 
   it.effect("sends a lone input object as the System One state and maps boolean choices back", () =>
     Decision.generate({
-      model: OpenCode.configure({ apiKey: "opencode-key", baseURL: "https://opencode.test/v1" }).decision("jev-1.13"),
+      model: ContextCode.configure({ apiKey: "opencode-key", baseURL: "https://opencode.test/v1" }).decision("jev-1.13"),
       input: { ticket: "hello" },
       questions: [
         {

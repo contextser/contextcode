@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { createRoot } from "solid-js"
-import type { ServerRef, Sessions, Storage } from "@opencode/plugin/gui"
+import type { ServerRef, Sessions, Storage } from "@contextcode/plugin/gui"
 import { createTerminalModel } from "./model"
 
 // SAFETY: the workspace model reads only these members when it loads and handles focus.

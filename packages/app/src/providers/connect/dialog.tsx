@@ -1,13 +1,13 @@
-import { Button } from "@opencode/ui/button"
-import { Badge } from "@opencode/ui/badge"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { Icon } from "@opencode/ui/icon"
-import { RadioGroup, RadioItem } from "@opencode/ui/radio"
-import { Checkbox } from "@opencode/ui/checkbox"
-import { Loader } from "@opencode/ui/loader"
-import { TextField } from "@opencode/ui/text-field"
-import { DialogBody, DialogHeader, DialogTitle, Dialog } from "@opencode/ui/dialog"
-import { TextInput } from "@opencode/ui/text-input"
+import { Button } from "@contextcode/ui/button"
+import { Badge } from "@contextcode/ui/badge"
+import { useDialog } from "@contextcode/ui/context/dialog"
+import { Icon } from "@contextcode/ui/icon"
+import { RadioGroup, RadioItem } from "@contextcode/ui/radio"
+import { Checkbox } from "@contextcode/ui/checkbox"
+import { Loader } from "@contextcode/ui/loader"
+import { TextField } from "@contextcode/ui/text-field"
+import { DialogBody, DialogHeader, DialogTitle, Dialog } from "@contextcode/ui/dialog"
+import { TextInput } from "@contextcode/ui/text-input"
 import { showToast } from "@/shell/notifications/toast"
 import {
   type Component,
@@ -40,7 +40,7 @@ import { useTabs } from "@/shell/tabs/tabs"
 import { Persist, persisted } from "@/runtime/persistence/storage"
 import { Persistence } from "@/runtime/persistence/schema"
 import { Schema } from "effect"
-import type { FormAnswer, FormField, FormValue, IntegrationInfo } from "@opencode/client/promise"
+import type { FormAnswer, FormField, FormValue, IntegrationInfo } from "@contextcode/client/promise"
 import {
   CONSOLE_INTEGRATION,
   connectMethods,
@@ -54,8 +54,8 @@ import { authServerName, RemoteAuthNotice } from "./remote"
 import { providerAccounts, type ProviderAccount } from "@/settings/providers/accounts"
 import { AccountNameInput } from "@/settings/providers/account-name"
 import { useProviderAccountActions } from "@/settings/providers/account-actions"
-import { IconButton } from "@opencode/ui/icon-button"
-import { Menu } from "@opencode/ui/menu"
+import { IconButton } from "@contextcode/ui/icon-button"
+import { Menu } from "@contextcode/ui/menu"
 import "./models.css"
 
 export function useProviderConnectController() {

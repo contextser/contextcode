@@ -1,4 +1,4 @@
-import { abort } from "@opencode/util/abort"
+import { abort } from "@contextcode/util/abort"
 import { createMemo, createResource, onCleanup } from "solid-js"
 import { uniqueCommandPaletteEntries, type CommandPaletteEntry } from "./palette"
 

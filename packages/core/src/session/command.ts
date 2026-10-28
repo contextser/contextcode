@@ -1,8 +1,8 @@
 export * as SessionCommand from "./command.js"
 
-import type { PromptInput } from "@opencode/schema/prompt-input"
-import type { Session } from "@opencode/schema/session"
-import type { SessionInbox } from "@opencode/schema/session-inbox"
+import type { PromptInput } from "@contextcode/schema/prompt-input"
+import type { Session } from "@contextcode/schema/session"
+import type { SessionInbox } from "@contextcode/schema/session-inbox"
 import { Effect } from "effect"
 import { Command } from "../command.js"
 import { Instance } from "../instance/service.js"

@@ -1,10 +1,10 @@
 import { expect } from "bun:test"
-import { Credential } from "@opencode/core/credential"
-import { Integration } from "@opencode/core/integration"
-import { UsageLimits } from "@opencode/core/usage-limits"
-import { Model } from "@opencode/schema/model"
-import { Money } from "@opencode/schema/money"
-import { Provider } from "@opencode/schema/provider"
+import { Credential } from "@contextcode/core/credential"
+import { Integration } from "@contextcode/core/integration"
+import { UsageLimits } from "@contextcode/core/usage-limits"
+import { Model } from "@contextcode/schema/model"
+import { Money } from "@contextcode/schema/money"
+import { Provider } from "@contextcode/schema/provider"
 import { Effect, Exit, Layer } from "effect"
 import { HttpClient, type HttpClientRequest, HttpClientResponse } from "effect/http"
 import { testEffect } from "./lib/effect"
@@ -49,7 +49,7 @@ const budget = {
 
 const meter = (status: string, percent: number) => ({ status, percent, resetsAt: "2026-10-24T17:00:00.000Z" })
 
-/** Reads usage limits for a location whose active OpenCode Console connection resolves to `credential`. */
+/** Reads usage limits for a location whose active Context Code Console connection resolves to `credential`. */
 const read = (
   credential: Credential.Value | undefined,
   respond: (url: string) => Response,
@@ -188,7 +188,7 @@ it.effect("has no Go allowance or budgets to show where Console refuses them", (
   }),
 )
 
-it.effect("has nothing to show for a location that isn't signed in to OpenCode Console", () =>
+it.effect("has nothing to show for a location that isn't signed in to Context Code Console", () =>
   Effect.gen(function* () {
     expect(yield* read(undefined, () => Response.json([budget]))).toBeUndefined()
   }),

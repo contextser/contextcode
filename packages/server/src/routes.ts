@@ -1,40 +1,40 @@
-import { Database } from "@opencode/core/database/database"
-import { V1Migration } from "@opencode/core/database/v1-migration"
-import { App } from "@opencode/core/app"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Node } from "@opencode/util/effect/app-node"
-import { httpClient } from "@opencode/util/effect/app-node-platform"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { Bus } from "@opencode/core/bus"
-import { EventLogger } from "@opencode/core/event-logger"
-import { FileSystemSearch } from "@opencode/core/filesystem/search"
-import { Credential } from "@opencode/core/credential"
-import { Config } from "@opencode/core/config"
-import { PermissionSaved } from "@opencode/core/permission/saved"
-import { PtyTicket } from "@opencode/core/pty/ticket"
-import { PersistentPty } from "@opencode/core/persistent-pty"
-import { Project } from "@opencode/core/project"
-import { Worktree } from "@opencode/core/worktree"
-import { Session } from "@opencode/core/session"
-import { Instance } from "@opencode/core/instance/service"
-import { SessionTransfer } from "@opencode/core/session/transfer"
-import { InstructionEntry } from "@opencode/core/session/instruction-entry"
-import { ShellSelect } from "@opencode/core/shell/select"
-import { Job } from "@opencode/core/job"
-import { Mcp } from "@opencode/core/mcp/index"
-import { Global } from "@opencode/util/global"
-import { FSUtil } from "@opencode/util/fs-util"
-import { InstructionDiscovery } from "@opencode/core/instruction-discovery"
-import { LocationServiceMap } from "@opencode/core/location-service-map"
-import { LocationActivity } from "@opencode/core/location-activity"
-import { ModelsDev } from "@opencode/core/models-dev"
-import { SessionRestart } from "@opencode/core/session/execution/restart"
-import { PluginUpdate } from "@opencode/core/plugin/update"
-import { SdkPlugins } from "@opencode/core/plugin/sdk"
-import { WellKnown } from "@opencode/core/wellknown"
-import { Workspace } from "@opencode/core/workspace"
-import { Watcher } from "@opencode/core/filesystem/watcher"
-import { FileWatch } from "@opencode/core/filesystem/file-watch"
+import { Database } from "@contextcode/core/database/database"
+import { V1Migration } from "@contextcode/core/database/v1-migration"
+import { App } from "@contextcode/core/app"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Node } from "@contextcode/util/effect/app-node"
+import { httpClient } from "@contextcode/util/effect/app-node-platform"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { Bus } from "@contextcode/core/bus"
+import { EventLogger } from "@contextcode/core/event-logger"
+import { FileSystemSearch } from "@contextcode/core/filesystem/search"
+import { Credential } from "@contextcode/core/credential"
+import { Config } from "@contextcode/core/config"
+import { PermissionSaved } from "@contextcode/core/permission/saved"
+import { PtyTicket } from "@contextcode/core/pty/ticket"
+import { PersistentPty } from "@contextcode/core/persistent-pty"
+import { Project } from "@contextcode/core/project"
+import { Worktree } from "@contextcode/core/worktree"
+import { Session } from "@contextcode/core/session"
+import { Instance } from "@contextcode/core/instance/service"
+import { SessionTransfer } from "@contextcode/core/session/transfer"
+import { InstructionEntry } from "@contextcode/core/session/instruction-entry"
+import { ShellSelect } from "@contextcode/core/shell/select"
+import { Job } from "@contextcode/core/job"
+import { Mcp } from "@contextcode/core/mcp/index"
+import { Global } from "@contextcode/util/global"
+import { FSUtil } from "@contextcode/util/fs-util"
+import { InstructionDiscovery } from "@contextcode/core/instruction-discovery"
+import { LocationServiceMap } from "@contextcode/core/location-service-map"
+import { LocationActivity } from "@contextcode/core/location-activity"
+import { ModelsDev } from "@contextcode/core/models-dev"
+import { SessionRestart } from "@contextcode/core/session/execution/restart"
+import { PluginUpdate } from "@contextcode/core/plugin/update"
+import { SdkPlugins } from "@contextcode/core/plugin/sdk"
+import { WellKnown } from "@contextcode/core/wellknown"
+import { Workspace } from "@contextcode/core/workspace"
+import { Watcher } from "@contextcode/core/filesystem/watcher"
+import { FileWatch } from "@contextcode/core/filesystem/file-watch"
 import { HttpRouter } from "effect/http"
 import { HttpApiBuilder } from "effect/http-api"
 import { Context, Effect, Layer, Option } from "effect"
@@ -140,7 +140,7 @@ function makeRoutes<AuthError, AuthServices>(
     Mcp.node.replace(
       Mcp.configured({
         clientInfo: {
-          name: "opencode",
+          name: "contextcode",
           version: options.app?.version ?? "unknown",
         },
       }),
@@ -158,7 +158,7 @@ function makeRoutes<AuthError, AuthServices>(
   const serviceLayer = options.simulation
     ? Layer.unwrap(
         Effect.gen(function* () {
-          const { simulationReplacements } = yield* Effect.promise(() => import("@opencode/simulation/backend"))
+          const { simulationReplacements } = yield* Effect.promise(() => import("@contextcode/simulation/backend"))
           const simulation = yield* simulationReplacements({ version: App.make(options.app).version })
           return build([...overrides, ...simulation])
         }),

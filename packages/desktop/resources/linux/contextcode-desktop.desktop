@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Context Code
+Exec=/opt/Context Code/ai.contextcode %U
+Terminal=false
+Type=Application
+Icon=ai.contextcode
+StartupWMClass=ai.contextcode.desktop
+NoDisplay=true
+Comment=Open source AI coding agent
+Categories=Development;

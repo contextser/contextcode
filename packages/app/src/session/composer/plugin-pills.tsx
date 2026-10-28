@@ -1,5 +1,5 @@
-import { Icon } from "@opencode/ui/icon"
-import { Menu } from "@opencode/ui/menu"
+import { Icon } from "@contextcode/ui/icon"
+import { Menu } from "@contextcode/ui/menu"
 import { createMemo, For, Show, type Accessor, type JSX } from "solid-js"
 import {
   ComposerPill,
@@ -9,7 +9,7 @@ import {
   type IconName,
   type MountedSession,
   type SessionScreen,
-} from "@opencode/plugin/gui"
+} from "@contextcode/plugin/gui"
 import { usePluginHost } from "@/runtime/plugin/host"
 import { Contribution } from "@/runtime/plugin/render"
 import type { useComposerLaneAlignment } from "./composer-lane"

@@ -1,13 +1,13 @@
 import type { FileAttachmentPart, ImageAttachmentPart, PathAttachmentPart, Prompt } from "@/composer/state"
 import { createLegacyBlobReference } from "@/runtime/persistence/drafts"
-import type { SessionMessageUser } from "@opencode/client/promise"
+import type { SessionMessageUser } from "@contextcode/client/promise"
 import { commentContextItem, readPromptPresentation } from "./comment-note"
 import { buildPromptRequest } from "./request"
 import { contextItemKey, type FileContextItem } from "./schema"
 import { createPathHelpers, decodeFilePath, stripFileProtocol, stripQueryAndHash } from "@/workspaces/files/path"
-import { Skill } from "@opencode/schema/skill"
-import { Session } from "@opencode/schema/session"
-import { sessionMentions } from "@opencode/util/session-mention"
+import { Skill } from "@contextcode/schema/skill"
+import { Session } from "@contextcode/schema/session"
+import { sessionMentions } from "@contextcode/util/session-mention"
 
 type Inline =
   | { type: "session"; start: number; end: number; value: string; id: Session.ID; title?: string }

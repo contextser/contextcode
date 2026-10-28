@@ -1,10 +1,10 @@
-import { DialogBody, DialogHeader, DialogTitle, Dialog } from "@opencode/ui/dialog"
-import { Badge } from "@opencode/ui/badge"
-import { Icon } from "@opencode/ui/icon"
+import { DialogBody, DialogHeader, DialogTitle, Dialog } from "@contextcode/ui/dialog"
+import { Badge } from "@contextcode/ui/badge"
+import { Icon } from "@contextcode/ui/icon"
 import { ProviderModelIcon } from "@/providers/models/provider-group"
-import { Tooltip } from "@opencode/ui/tooltip"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { useTheme } from "@opencode/ui/theme"
+import { Tooltip } from "@contextcode/ui/tooltip"
+import { useDialog } from "@contextcode/ui/context/dialog"
+import { useTheme } from "@contextcode/ui/theme"
 import { createMemo, onCleanup, onMount, type Component, For, Show } from "solid-js"
 import { useLocal, type ModelSelection } from "@/providers/models/selection"
 import { isFreeModel } from "@/providers/models/models"
@@ -169,7 +169,7 @@ export const DialogSelectModelUnpaid: Component<{ model?: ModelState }> = (props
                             {language.t(
                               provider.id === "opencode"
                                 ? "dialog.provider.opencode.tagline"
-                                : "dialog.provider.opencodeGo.tagline",
+                                : "dialog.provider.contextcodeGo.tagline",
                             )}
                           </span>
                         </Show>

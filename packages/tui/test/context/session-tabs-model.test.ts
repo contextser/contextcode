@@ -18,11 +18,11 @@ import {
 
 describe("session tabs", () => {
   test("appends the branch to the project detail", () => {
-    expect(sessionTabDetail("opencode", "feature/sidebar", "main", true)).toBe("opencode ⎇ feature/sidebar")
-    expect(sessionTabDetail("opencode", "feature/sidebar", undefined, true)).toBe("opencode ⎇ feature/sidebar")
-    expect(sessionTabDetail("opencode", "feature/sidebar", "main", false)).toBe("opencode")
-    expect(sessionTabDetail("opencode", "main", "main", true)).toBe("opencode")
-    expect(sessionTabDetail("opencode", undefined, "main", true)).toBe("opencode")
+    expect(sessionTabDetail("contextcode", "feature/sidebar", "main", true)).toBe("contextcode ⎇ feature/sidebar")
+    expect(sessionTabDetail("contextcode", "feature/sidebar", undefined, true)).toBe("contextcode ⎇ feature/sidebar")
+    expect(sessionTabDetail("contextcode", "feature/sidebar", "main", false)).toBe("contextcode")
+    expect(sessionTabDetail("contextcode", "main", "main", true)).toBe("contextcode")
+    expect(sessionTabDetail("contextcode", undefined, "main", true)).toBe("contextcode")
   })
 
   test("labels tabs by ordinal", () => {

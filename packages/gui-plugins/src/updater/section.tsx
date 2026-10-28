@@ -1,9 +1,9 @@
 import { createMemo, type JSX } from "solid-js"
-import { Button } from "@opencode/ui/button"
-import { Switch } from "@opencode/ui/switch"
-import { usePlugin } from "@opencode/plugin/gui"
+import { Button } from "@contextcode/ui/button"
+import { Switch } from "@contextcode/ui/switch"
+import { usePlugin } from "@contextcode/plugin/gui"
 import { updaterAction } from "./action"
-import type { UpdaterState } from "@opencode/plugin/gui/updater"
+import type { UpdaterState } from "@contextcode/plugin/gui/updater"
 import type definition from "./index"
 
 export default function UpdatesSection(props: { state: () => UpdaterState | undefined; run: () => void }) {

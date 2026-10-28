@@ -1,5 +1,5 @@
-import { Switch } from "@opencode/ui/switch"
-import { usePlugin } from "@opencode/plugin/gui"
+import { Switch } from "@contextcode/ui/switch"
+import { usePlugin } from "@contextcode/plugin/gui"
 import type Review from "./index"
 
 /** The narrow-screen diff wrap row of the host's General settings section, in the host's settings row markup. */

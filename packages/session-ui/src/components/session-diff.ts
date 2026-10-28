@@ -1,6 +1,6 @@
 import { parseDiffFromFile, parsePatchFiles, processFile, type FileDiffMetadata } from "@pierre/diffs"
-import { checksum } from "@opencode/util/encode"
-import type { FileDiffInfo } from "@opencode/client/promise"
+import { checksum } from "@contextcode/util/encode"
+import type { FileDiffInfo } from "@contextcode/client/promise"
 import type { PresentationFileDiff } from "../file-presentation"
 
 type LegacyDiff = {

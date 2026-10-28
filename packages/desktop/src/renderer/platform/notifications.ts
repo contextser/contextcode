@@ -1,4 +1,4 @@
-import type { Platform } from "@opencode/app/desktop"
+import type { Platform } from "@contextcode/app/desktop"
 import type { ElectronAPI } from "../api-types"
 
 type DesktopNotifyAPI = Pick<ElectronAPI, "getWindowFocused" | "showWindow" | "setWindowFocus">

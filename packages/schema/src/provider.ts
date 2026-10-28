@@ -64,7 +64,7 @@ export type Encoding = typeof Encoding.Type
 
 const Timeout = Schema.Union([Schema.Finite, Schema.Literal(false)]).pipe(optional)
 
-// The named fields are the settings OpenCode reads itself; every other key is a provider option for the provider package.
+// The named fields are the settings Context Code reads itself; every other key is a provider option for the provider package.
 export const Settings = Schema.StructWithRest(
   Schema.Struct({
     timeout: Timeout,

@@ -1,3 +1,3 @@
-export { RegistrationError } from "@opencode/core/tool"
-export { Error } from "@opencode/schema/tool"
-export type { ToolContext as Context, Info } from "@opencode/plugin/promise/tool"
+export { RegistrationError } from "@contextcode/core/tool"
+export { Error } from "@contextcode/schema/tool"
+export type { ToolContext as Context, Info } from "@contextcode/plugin/promise/tool"

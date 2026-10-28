@@ -16,7 +16,7 @@ pub struct Registration {
     pub token: String,
 }
 
-/// Shared parent of runtime directories, inside OpenCode's state directory.
+/// Shared parent of runtime directories, inside Context Code's state directory.
 /// Registration files must not live in temporary directories, which macOS purges
 /// while daemons run.
 pub fn default_runtime_root() -> PathBuf {
@@ -31,7 +31,7 @@ fn resolve_runtime_root(state: Option<PathBuf>, home: Option<PathBuf>) -> PathBu
         .filter(|path| path.is_absolute())
         .or_else(|| home.map(|home| home.join(".local").join("state")))
         .unwrap_or_else(std::env::temp_dir)
-        .join("opencode")
+        .join("contextcode")
         .join("pty")
 }
 
@@ -105,15 +105,15 @@ mod tests {
         let home = Some(PathBuf::from("/home/user"));
         assert_eq!(
             resolve_runtime_root(Some("/state".into()), home.clone()),
-            PathBuf::from("/state/opencode/pty")
+            PathBuf::from("/state/contextcode/pty")
         );
         assert_eq!(
             resolve_runtime_root(Some("relative".into()), home.clone()),
-            PathBuf::from("/home/user/.local/state/opencode/pty")
+            PathBuf::from("/home/user/.local/state/contextcode/pty")
         );
         assert_eq!(
             resolve_runtime_root(None, home),
-            PathBuf::from("/home/user/.local/state/opencode/pty")
+            PathBuf::from("/home/user/.local/state/contextcode/pty")
         );
     }
 

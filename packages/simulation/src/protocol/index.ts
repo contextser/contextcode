@@ -6,5 +6,5 @@ export {
   JsonRpc,
   SimulationRequestError,
   UiRpcs,
-} from "@opencode/protocol/simulation"
-export * as SimulationProtocol from "@opencode/protocol/simulation"
+} from "@contextcode/protocol/simulation"
+export * as SimulationProtocol from "@contextcode/protocol/simulation"

@@ -1,8 +1,8 @@
-import type { OpenCodeClient } from "@opencode/client/promise"
+import type { ContextCodeClient } from "@contextcode/client/promise"
 
 export async function fetchSessionExport(input: {
   sessionID: string
-  api: Pick<OpenCodeClient, "session" | "message">
+  api: Pick<ContextCodeClient, "session" | "message">
 }) {
   const [info, first] = await Promise.all([
     input.api.session.get({ sessionID: input.sessionID }),

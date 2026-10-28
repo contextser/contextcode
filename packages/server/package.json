@@ -1,12 +1,12 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode/server",
+  "name": "@contextcode/server",
   "version": "2.2.0",
   "type": "module",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anomalyco/opencode.git",
+    "url": "git+https://github.com/contextser/contextcode.git",
     "directory": "packages/server"
   },
   "publishConfig": {
@@ -29,17 +29,17 @@
   "dependencies": {
     "@effect/platform-node": "catalog:",
     "@effect/platform-node-shared": "catalog:",
-    "@opencode/core": "workspace:*",
-    "@opencode/protocol": "workspace:*",
-    "@opencode/schema": "workspace:*",
-    "@opencode/simulation": "workspace:*",
-    "@opencode/util": "workspace:*",
+    "@contextcode/core": "workspace:*",
+    "@contextcode/protocol": "workspace:*",
+    "@contextcode/schema": "workspace:*",
+    "@contextcode/simulation": "workspace:*",
+    "@contextcode/util": "workspace:*",
     "effect": "catalog:"
   },
   "devDependencies": {
     "@opencode-ai/pty": "0.3.1",
-    "@opencode/client": "workspace:*",
-    "@opencode/plugin": "workspace:*",
+    "@contextcode/client": "workspace:*",
+    "@contextcode/plugin": "workspace:*",
     "@tsconfig/bun": "catalog:",
     "@types/bun": "catalog:",
     "@typescript/native": "catalog:",

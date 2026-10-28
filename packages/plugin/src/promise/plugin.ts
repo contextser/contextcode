@@ -1,6 +1,6 @@
-import type { OpenCodeClient } from "@opencode/client"
-import type { CredentialApi, GenerateApi, PluginApi } from "@opencode/client/promise/api"
-import type { Location } from "@opencode/schema/location"
+import type { ContextCodeClient } from "@contextcode/client"
+import type { CredentialApi, GenerateApi, PluginApi } from "@contextcode/client/promise/api"
+import type { Location } from "@contextcode/schema/location"
 import type { PluginOptions } from "../options.js"
 import type { App } from "../app.js"
 import type { AgentDomain } from "./agent.js"
@@ -33,7 +33,7 @@ export interface Context {
   readonly credential: Pick<CredentialApi, "activate">
   readonly event: EventDomain
   readonly experimental: {
-    readonly terminal: Pick<OpenCodeClient["experimental"]["persistentPty"], "read">
+    readonly terminal: Pick<ContextCodeClient["experimental"]["persistentPty"], "read">
     /** Stateless generation with a model and a prompt: no session, history or tools. */
     readonly generate: GenerateApi
   }

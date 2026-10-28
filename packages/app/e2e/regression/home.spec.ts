@@ -1,7 +1,7 @@
-import type { OpenCodeEvent } from "@opencode/client/promise"
+import type { ContextCodeEvent } from "@contextcode/client/promise"
 import { expect, test, type Page } from "@playwright/test"
 import { expectPath, holdRoute, NO_PROVIDER, project, REMOTE_SERVER, seed, sessionHref, T0 } from "../utils/app"
-import { mockOpenCodeServer } from "../utils/mock-server"
+import { mockContextCodeServer } from "../utils/mock-server"
 import { fixture, mockStressTimeline } from "../utils/session-fixture"
 import { mockRemoteServer, mockWorkspace, newSessionLocation } from "../utils/workspace"
 import { APP_READY_TIMEOUT, expectAppVisible } from "../utils/waits"
@@ -126,15 +126,15 @@ test("the Home shortcut focuses session search, and the Home button leaves focus
 const entry = (name: string, active: number, id = `proj_${name}`) =>
   project({
     id,
-    directory: `C:/OpenCode/${name}`,
+    directory: `C:/Context Code/${name}`,
     name,
     time: { created: T0, updated: T0, active: T0 + active },
   })
 
 async function homeProjects(page: Page, projects: unknown[]) {
-  const directory = "C:/OpenCode/home"
+  const directory = "C:/Context Code/home"
 
-  const server = await mockOpenCodeServer(page, {
+  const server = await mockContextCodeServer(page, {
     directory,
     project: project({ id: "proj_home", directory }),
     projects: () => projects,
@@ -164,7 +164,7 @@ test("Home lists the used server projects by recent activity, hides them, and li
   listed.splice(0, listed.length, fresh, active, listed[0]!, listed[1]!, listed[4]!)
   await view.server.push(
     [active, archived, fresh].map(
-      (data, index): OpenCodeEvent => ({
+      (data, index): ContextCodeEvent => ({
         id: `evt_home_project_${index}`,
         created: T0 + index,
         type: "project.updated",
@@ -191,7 +191,7 @@ test("Home lists the used server projects by recent activity, hides them, and li
   await expect(options.locator(".command-palette-title")).toHaveText(["oldest", "Other projects", "Add project"])
   await options.filter({ hasText: "Other projects" }).click()
   await expect(options.locator(".command-palette-title")).toHaveText(["fresh", "unused", "recent"])
-  await options.filter({ hasText: "C:/OpenCode/recent" }).click()
+  await options.filter({ hasText: "C:/Context Code/recent" }).click()
   await expect(newSessionLocation(page)).toContainText("recent")
   await page.getByRole("button", { name: "Home", exact: true }).click()
   await expect(view.rows).toHaveText(["oldest", "recent"])
@@ -208,16 +208,16 @@ test("Home migrates the directories an older build listed to the server's curren
   await seed(page, {
     legacyProjects: {
       local: [
-        { worktree: "C:/OpenCode/api", expanded: true },
-        { worktree: "C:/OpenCode/web/packages/app" },
-        { worktree: "C:/OpenCode/gone" },
+        { worktree: "C:/Context Code/api", expanded: true },
+        { worktree: "C:/Context Code/web/packages/app" },
+        { worktree: "C:/Context Code/gone" },
       ],
     },
   })
   await page.goto("/")
   await expect(view.rows).toHaveText(["api", "web"])
   await expect
-    .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("opencode.global.dat:server") ?? "{}")))
+    .poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("contextcode.global.dat:server") ?? "{}")))
     .toMatchObject({ usedProjectIDs: { local: ["proj_api", "proj_web"] }, projects: {} })
 })
 
@@ -254,7 +254,7 @@ test("adding a project to a signed-out server re-pairs it, then continues at the
   // The saved address rejects the new token, so saving moves the server to the link's address.
   const paired = "http://127.0.0.1:4098"
   await mockRemoteServer(page, { name: "Remote", password: "old-password" })
-  await mockOpenCodeServer(page, {
+  await mockContextCodeServer(page, {
     server: paired,
     directory: "/remote/paired",
     project: project({ id: "proj_paired", directory: "/remote/paired" }),
@@ -282,7 +282,7 @@ test("adding a project to a signed-out server re-pairs it, then continues at the
 
 test("a server whose saved password changes works with the new password", async ({ page }) => {
   const accepted = { password: "old-password" }
-  await mockOpenCodeServer(page, {
+  await mockContextCodeServer(page, {
     server: REMOTE_SERVER,
     directory: "/remote/project",
     project: project({ id: "proj_remote", directory: "/remote/project" }),
@@ -295,7 +295,7 @@ test("a server whose saved password changes works with the new password", async 
   // Saved with the password the server accepts until the test changes it.
   await seed(page, {
     storage: {
-      "opencode.global.dat:server": {
+      "contextcode.global.dat:server": {
         list: [{ type: "http", displayName: "Remote", http: { url: REMOTE_SERVER, password: "old-password" } }],
       },
     },
@@ -314,7 +314,7 @@ test("a server whose saved password changes works with the new password", async 
   await page.getByRole("menuitem", { name: "Edit", exact: true }).click()
   const editor = page.getByRole("dialog", { name: "Edit server" })
   await editor.getByPlaceholder("password").fill("new-password")
-  // The server now rejects the old password, as after `opencode service set password`.
+  // The server now rejects the old password, as after `contextcode service set password`.
   accepted.password = "new-password"
   await editor.getByRole("button", { name: "Save", exact: true }).click()
   await expect(editor).toHaveCount(0)
@@ -325,10 +325,10 @@ test("a server whose saved password changes works with the new password", async 
   await expect(picker.getByText("Unable to read this folder")).toHaveCount(0)
 })
 
-const recovery = "C:/OpenCode/Worktrees/project-menu-recovery"
+const recovery = "C:/Context Code/Worktrees/project-menu-recovery"
 
 const worktree =
-  "C:/OpenCode/Worktrees/project-42/long-folder-name-for-checking-wrapped-worktree-paths/another-long-folder-name"
+  "C:/Context Code/Worktrees/project-42/long-folder-name-for-checking-wrapped-worktree-paths/another-long-folder-name"
 
 for (const state of [
   { name: "local", directory: fixture.directory },

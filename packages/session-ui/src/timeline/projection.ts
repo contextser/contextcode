@@ -6,7 +6,7 @@ import type {
   SessionMessageShell,
   SessionMessageUser,
   SessionStatus,
-} from "@opencode/client/promise"
+} from "@contextcode/client/promise"
 import { Effect, Option, Predicate, Schema } from "effect"
 import { createMemo, mapArray, type Accessor } from "solid-js"
 import {
@@ -671,7 +671,7 @@ function freeLimit(
   }
 }
 
-// OpenCode Console says when the budget resets in its refusal's metadata, which every protocol's envelope names `resetsAt`.
+// Context Code Console says when the budget resets in its refusal's metadata, which every protocol's envelope names `resetsAt`.
 function budgetLimit(message: Pick<SessionMessageAssistant, "error">) {
   const type = message.error?.type
   if (type !== "provider.budget-limit" && type !== "provider.model-budget-limit") return {}

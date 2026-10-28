@@ -8,32 +8,32 @@ import {
   SystemPart,
   TransportError,
   type LLMRequest,
-} from "@opencode/ai/effect"
-import { OpenAIChat } from "@opencode/ai/protocols"
-import { Agent } from "@opencode/core/agent"
-import { Database } from "@opencode/core/database/database"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { llmClient } from "@opencode/core/effect/app-node-platform"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { Bus } from "@opencode/core/bus"
-import { SessionEvent } from "@opencode/core/session/event"
-import { SessionMessage } from "@opencode/core/session/message"
-import { SessionProjector } from "@opencode/core/session/projector"
-import { SessionRunnerModel } from "@opencode/core/session/runner/model"
-import { SessionTable } from "@opencode/core/session/sql"
-import { SessionStore } from "@opencode/core/session/store"
-import { SessionTitle } from "@opencode/core/session/title"
-import { PluginHooks } from "@opencode/core/plugin/hooks"
-import { PluginSupervisor } from "@opencode/core/plugin/supervisor"
-import { Location } from "@opencode/core/location"
-import { Session } from "@opencode/core/session"
-import { Project } from "@opencode/core/project"
-import { ProjectTable } from "@opencode/core/project/sql"
-import { App } from "@opencode/core/app"
-import { Model } from "@opencode/core/model"
-import { Provider } from "@opencode/core/provider"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Money } from "@opencode/schema/money"
+} from "@contextcode/ai/effect"
+import { OpenAIChat } from "@contextcode/ai/protocols"
+import { Agent } from "@contextcode/core/agent"
+import { Database } from "@contextcode/core/database/database"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { llmClient } from "@contextcode/core/effect/app-node-platform"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { Bus } from "@contextcode/core/bus"
+import { SessionEvent } from "@contextcode/core/session/event"
+import { SessionMessage } from "@contextcode/core/session/message"
+import { SessionProjector } from "@contextcode/core/session/projector"
+import { SessionRunnerModel } from "@contextcode/core/session/runner/model"
+import { SessionTable } from "@contextcode/core/session/sql"
+import { SessionStore } from "@contextcode/core/session/store"
+import { SessionTitle } from "@contextcode/core/session/title"
+import { PluginHooks } from "@contextcode/core/plugin/hooks"
+import { PluginSupervisor } from "@contextcode/core/plugin/supervisor"
+import { Location } from "@contextcode/core/location"
+import { Session } from "@contextcode/core/session"
+import { Project } from "@contextcode/core/project"
+import { ProjectTable } from "@contextcode/core/project/sql"
+import { App } from "@contextcode/core/app"
+import { Model } from "@contextcode/core/model"
+import { Provider } from "@contextcode/core/provider"
+import { AbsolutePath } from "@contextcode/core/schema"
+import { Money } from "@contextcode/schema/money"
 import { Deferred, Effect, Fiber, Layer, Stream } from "effect"
 import { testEffect } from "./lib/effect"
 
@@ -220,7 +220,7 @@ it.effect("generates a title from the sole user message and renames the session"
       "User-Agent": App.useragent(App.make()),
       "x-opencode-project": Project.ID.global,
       "x-opencode-session": sessionID,
-      "x-opencode-client": "opencode",
+      "x-opencode-client": "contextcode",
     })
     expect(requests[0]?.promptCacheKey).toBe(sessionID)
     expect(requests[0]?.tools).toEqual([])

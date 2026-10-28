@@ -1,8 +1,8 @@
-import type { RpcApi, RpcCallOptions } from "@opencode/client/promise/api"
-import type { Rpc } from "@opencode/schema/rpc"
+import type { RpcApi, RpcCallOptions } from "@contextcode/client/promise/api"
+import type { Rpc } from "@contextcode/schema/rpc"
 import type { Registration } from "./registration.js"
 
-export type { RpcEventPayload } from "@opencode/client/promise/api"
+export type { RpcEventPayload } from "@contextcode/client/promise/api"
 
 export interface RpcCallContext<M extends Rpc.Method> {
   readonly signal: AbortSignal

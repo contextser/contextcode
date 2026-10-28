@@ -1,4 +1,4 @@
-import type { SessionMessageAssistant, SessionMessageInfo } from "@opencode/client/promise"
+import type { SessionMessageAssistant, SessionMessageInfo } from "@contextcode/client/promise"
 import { expect, test, type Page } from "@playwright/test"
 import { sessionHref } from "../utils/app"
 import { trackPageErrors } from "../utils/errors"
@@ -38,7 +38,7 @@ test.describe("timeline history", () => {
     await page.clock.install()
     await openSession(page, {
       name: "HistoryRestore",
-      sessions: [{ id }, { id: other, directory: "C:/OpenCode/HistoryOther" }],
+      sessions: [{ id }, { id: other, directory: "C:/Context Code/HistoryOther" }],
       pageMessages: (session, _limit, before) => {
         if (session === other)
           return { items: [userMessage([textPart("prt_other", "Other session")], { id: "msg_other" })] }

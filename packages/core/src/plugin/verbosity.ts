@@ -1,26 +1,26 @@
 export * as VerbosityPlugin from "./verbosity.js"
 
-import { define } from "@opencode/plugin/effect/plugin"
-import type { SessionRequest } from "@opencode/plugin/effect/session"
+import { define } from "@contextcode/plugin/effect/plugin"
+import type { SessionRequest } from "@contextcode/plugin/effect/session"
 import { Effect } from "effect"
 import { Model } from "../model.js"
 import { Provider } from "../provider.js"
 import type { PluginInternal } from "./internal.js"
 
 const direct = new Set([
-  "@opencode/ai/providers/openai",
-  "@opencode/ai/providers/openai/responses",
-  "@opencode/ai/providers/azure",
-  "@opencode/ai/providers/azure/responses",
+  "@contextcode/ai/providers/openai",
+  "@contextcode/ai/providers/openai/responses",
+  "@contextcode/ai/providers/azure",
+  "@contextcode/ai/providers/azure/responses",
 ])
 const gateways = new Set([
-  "@opencode/ai/providers/cloudflare-ai-gateway",
-  "@opencode/ai/providers/vercel-ai-gateway",
+  "@contextcode/ai/providers/cloudflare-ai-gateway",
+  "@contextcode/ai/providers/vercel-ai-gateway",
   Provider.aisdk("@ai-sdk/gateway"),
 ])
 
 export const Plugin = define({
-  id: "opencode.prompt.verbosity",
+  id: "contextcode.prompt.verbosity",
   effect: Effect.fn("VerbosityPlugin")(function* (ctx) {
     const models = yield* Model.Service
     const hook = (event: SessionRequest) =>
@@ -52,7 +52,7 @@ function supportsVerbosity(id: string) {
 function openAIModelID(model: Model.Info) {
   const id = model.modelID.toLowerCase()
   if (direct.has(model.package ?? "")) return id
-  if (model.package === "@opencode/ai/providers/amazon-bedrock/mantle/responses" && id.startsWith("openai."))
+  if (model.package === "@contextcode/ai/providers/amazon-bedrock/mantle/responses" && id.startsWith("openai."))
     return id.slice("openai.".length)
   if (gateways.has(model.package ?? "") && id.startsWith("openai/")) return id.slice("openai/".length)
 }

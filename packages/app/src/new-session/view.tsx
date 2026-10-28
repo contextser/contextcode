@@ -1,20 +1,20 @@
-import { useDialog } from "@opencode/ui/context/dialog"
-import { Tooltip } from "@opencode/ui/tooltip"
-import { Icon } from "@opencode/ui/icon"
-import { Slash } from "@opencode/ui/slash"
-import { Keybind } from "@opencode/ui/keybind"
+import { useDialog } from "@contextcode/ui/context/dialog"
+import { Tooltip } from "@contextcode/ui/tooltip"
+import { Icon } from "@contextcode/ui/icon"
+import { Slash } from "@contextcode/ui/slash"
+import { Keybind } from "@contextcode/ui/keybind"
 import { useCommand } from "@/shell/commands/command"
 import { Show, createMemo, createSignal, type JSX } from "solid-js"
 import { createStore } from "solid-js/store"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
-import { getFilename } from "@opencode/util/path"
+import { getFilename } from "@contextcode/util/path"
 import {
   displayName,
   getProjectAvatarGenerated,
   getProjectAvatarSource,
   getProjectAvatarVariant,
   ProjectAvatar,
-} from "@opencode/ui/project-avatar"
+} from "@contextcode/ui/project-avatar"
 import { Schema } from "effect"
 import { createPresence } from "@/runtime/presence"
 import { Composer } from "@/composer/composer"

@@ -2,16 +2,16 @@
 title: "Plugins"
 ---
 
-Add published packages, versioned packages, scoped packages, or local plugin directories to `opencode.json(c)`.
+Add published packages, versioned packages, scoped packages, or local plugin directories to `contextcode.json(c)`.
 
 ## Configure
 
-```jsonc title="opencode.jsonc"
+```jsonc title="contextcode.jsonc"
 {
   "$schema": "https://opencode.ai/config.json",
   "plugins": [
-    "opencode-acme-plugin",
-    "opencode-acme-plugin@1.2.0",
+    "contextcode-acme-plugin",
+    "contextcode-acme-plugin@1.2.0",
     "@acme/opencode-plugin",
     "./plugins/local",
     "../shared/plugin",
@@ -31,40 +31,40 @@ Add published packages, versioned packages, scoped packages, or local plugin dir
 Relative paths resolve from the config file containing the entry.
 
 Configured local paths must be directories. A path to a single file is skipped. See [Load](/build/plugins#load) for
-how OpenCode finds each part in a directory.
+how Context Code finds each part in a directory.
 
 Plugin arrays from applicable config files are applied from lowest to highest precedence instead of replacing one
 another.
 
 ```text
-~/.config/opencode/opencode.jsonc
-./opencode.jsonc
-./.opencode/opencode.jsonc
+~/.config/contextcode/contextcode.jsonc
+./contextcode.jsonc
+./.contextcode/contextcode.jsonc
 ```
 
 ## Discover
 
-OpenCode also loads direct `.ts` and `.js` files and immediate plugin package directories from every discovered
-`.opencode/plugins/` directory.
+Context Code also loads direct `.ts` and `.js` files and immediate plugin package directories from every discovered
+`.contextcode/plugins/` directory.
 
 ```text
-.opencode/
+.contextcode/
 └── plugins/
     ├── concise.ts
     ├── reviewer.js
     └── acme-package/
 ```
 
-Global plugins use the same discovery layout under the OpenCode config directory.
+Global plugins use the same discovery layout under the Context Code config directory.
 
 ```text
-~/.config/opencode/plugins/
+~/.config/contextcode/plugins/
 ```
 
-A `plugins/` directory beside a project-root `opencode.json(c)` is not discovered automatically; configure its plugin
-directories explicitly or move it under `.opencode/`.
+A `plugins/` directory beside a project-root `contextcode.json(c)` is not discovered automatically; configure its plugin
+directories explicitly or move it under `.contextcode/`.
 
-```jsonc title="opencode.jsonc"
+```jsonc title="contextcode.jsonc"
 {
   "plugins": ["./plugins/local"]
 }
@@ -75,15 +75,15 @@ directories explicitly or move it under `.opencode/`.
 Plugin entries are processed in order. Prefix an ID or wildcard with `-` to disable it, use `*` for every plugin, and
 use `.*` to match an ID prefix. A later ID re-enables a plugin.
 
-```jsonc title="opencode.jsonc"
+```jsonc title="contextcode.jsonc"
 {
-  "plugins": ["*", "-opencode.provider.*", "opencode.provider.openai", "-acme.reviewer"]
+  "plugins": ["*", "-contextcode.provider.*", "contextcode.provider.openai", "-acme.reviewer"]
 }
 ```
 
 Two built-in plugins ignore removals so that a repository cannot switch off
-[policy](/policies) enforcement: `opencode.config.policy` and
-`opencode.provider.opencode`, the Console connection that delivers organization
+[policy](/policies) enforcement: `contextcode.config.policy` and
+`contextcode.provider.contextcode`, the Console connection that delivers organization
 policy.
 
 ## Manage
@@ -91,13 +91,13 @@ policy.
 Install, list, check, update, or remove global package plugins with the CLI.
 
 ```sh
-opencode plugin add opencode-acme-plugin@1.2.0
-opencode plugin list
-opencode plugin list --builtin
-opencode plugin check
-opencode plugin update
-opencode plugin update opencode-acme-plugin
-opencode plugin remove opencode-acme-plugin@1.2.0
+contextcode plugin add contextcode-acme-plugin@1.2.0
+contextcode plugin list
+contextcode plugin list --builtin
+contextcode plugin check
+contextcode plugin update
+contextcode plugin update contextcode-acme-plugin
+contextcode plugin remove contextcode-acme-plugin@1.2.0
 ```
 
 `plugin check` checks server, GUI-only, and TUI-only package plugins for updates. `plugin update` updates every outdated package;
@@ -109,10 +109,10 @@ Git repositories can use hosted shortcuts, HTTPS, or SSH, including private repo
 Git credentials.
 
 ```sh
-opencode plugin add @acme/opencode-plugin@latest
-opencode plugin add github:acme/opencode-plugin
-opencode plugin add git+ssh://git@github.com/acme/opencode-plugin.git#main
-opencode plugin add 'github:acme/plugins#main::path:packages/opencode-plugin'
+contextcode plugin add @acme/opencode-plugin@latest
+contextcode plugin add github:acme/opencode-plugin
+contextcode plugin add git+ssh://git@github.com/acme/opencode-plugin.git#main
+contextcode plugin add 'github:acme/plugins#main::path:packages/opencode-plugin'
 ```
 
 Branches, tags, complete commit hashes, and npm's `::path:` repository-subdirectory selectors are supported. Configure
@@ -123,21 +123,21 @@ local paths directly; tarball and npm alias targets are not accepted by `plugin 
 Changes under watched config directories reload automatically. Server startup loads cached package plugins immediately,
 installs missing packages in the background, and checks unpinned npm and Git plugins for updates without changing the
 installed package. Exact npm versions and full Git commit hashes stay pinned. Changes to unwatched local dependencies
-may still require restarting OpenCode.
+may still require restarting Context Code.
 
 ```sh
-touch .opencode/plugins/concise/index.ts
-opencode service restart
+touch .contextcode/plugins/concise/index.ts
+contextcode service restart
 ```
 
 ## Desktop
 
-A plugin that exports `./gui-experimental` also adds panels, commands, or settings to OpenCode Desktop. The app loads
-plugins from the server it runs, so configure the plugin in your global `opencode.json(c)` to use it in every window.
+A plugin that exports `./gui-experimental` also adds panels, commands, or settings to Context Code Desktop. The app loads
+plugins from the server it runs, so configure the plugin in your global `contextcode.json(c)` to use it in every window.
 
-```jsonc title="~/.config/opencode/opencode.jsonc"
+```jsonc title="~/.config/contextcode/contextcode.jsonc"
 {
-  "plugins": ["opencode-acme-plugin"],
+  "plugins": ["contextcode-acme-plugin"],
 }
 ```
 
@@ -151,7 +151,7 @@ TUI-only plugins are configured separately and remain active when connected to a
 
 ```json title="cli.json"
 {
-  "plugins": ["opencode-acme-cli"]
+  "plugins": ["contextcode-acme-cli"]
 }
 ```
 

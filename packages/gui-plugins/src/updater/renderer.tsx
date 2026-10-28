@@ -1,8 +1,8 @@
-import { showToast } from "@opencode/ui/toast"
+import { showToast } from "@contextcode/ui/toast"
 import { lazy, onCleanup, Suspense } from "solid-js"
-import { Command, SettingsPage, TitlebarItem, type SetupContext, type Plugin } from "@opencode/plugin/gui"
-import { onIdle } from "@opencode/plugin/gui/builtin"
-import { Updater } from "@opencode/plugin/gui/updater"
+import { Command, SettingsPage, TitlebarItem, type SetupContext, type Plugin } from "@contextcode/plugin/gui"
+import { onIdle } from "@contextcode/plugin/gui/builtin"
+import { Updater } from "@contextcode/plugin/gui/updater"
 import { updaterAction } from "./action"
 import type definition from "./index"
 
@@ -80,7 +80,7 @@ const setup: Plugin.Setup<typeof definition> = (ctx) => {
  * have it: beta builds and the desktop dev server.
  */
 function betaNotes(ctx: SetupContext<typeof definition>) {
-  if (!import.meta.env.OPENCODE_BETA_NOTES) return
+  if (!import.meta.env.CONTEXTCODE_BETA_NOTES) return
 
   const Page = lazy(() => import("./beta-page"))
 
@@ -113,7 +113,7 @@ function whatsNew(ctx: SetupContext<typeof definition>) {
 
   if (!version || previous === version) return
 
-  const commit = import.meta.env.OPENCODE_COMMIT
+  const commit = import.meta.env.CONTEXTCODE_COMMIT
   const previousCommit = seen.value.commit
 
   const markSeen = () =>

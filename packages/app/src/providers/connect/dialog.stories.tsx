@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { Button } from "@opencode/ui/button"
-import { useDialog } from "@opencode/ui/context/dialog"
+import { Button } from "@contextcode/ui/button"
+import { useDialog } from "@contextcode/ui/context/dialog"
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
 import { onMount } from "solid-js"
 import { DialogConnectProvider, useProviderConnectController } from "./dialog"
@@ -59,7 +59,7 @@ export const ApiKey = {
   render: renderConnection("openrouter"),
 }
 
-export const OpenCodeZen = {
+export const ContextCodeZen = {
   render: renderConnection("opencode"),
 }
 

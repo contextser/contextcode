@@ -1,7 +1,7 @@
-import type { SessionUserActions } from "@opencode/session-ui/message"
-import { getFilename, sameDirectory } from "@opencode/util/path"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { isScrollKeyTarget, scrollKey, scrollKeyOwner } from "@opencode/ui/scroll-view"
+import type { SessionUserActions } from "@contextcode/session-ui/message"
+import { getFilename, sameDirectory } from "@contextcode/util/path"
+import { useDialog } from "@contextcode/ui/context/dialog"
+import { isScrollKeyTarget, scrollKey, scrollKeyOwner } from "@contextcode/ui/scroll-view"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { useNavigate } from "@solidjs/router"
 import { createEffect, createMemo, on, onCleanup, onMount, Show, type Accessor } from "solid-js"
@@ -48,7 +48,7 @@ import { createSessionRequestModel } from "../requests/model"
 import type { Region } from "@/runtime/plugin/panels"
 import { SessionLocationMissing } from "./location-missing"
 import { SessionPluginPills } from "./plugin-pills"
-import type { MountedSession, SessionScreen } from "@opencode/plugin/gui"
+import type { MountedSession, SessionScreen } from "@contextcode/plugin/gui"
 
 export function createActiveSessionRegion(input: {
   session: SessionModel

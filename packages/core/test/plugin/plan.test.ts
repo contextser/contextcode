@@ -1,21 +1,21 @@
 import { describe, expect } from "bun:test"
-import { Message, ToolFailure } from "@opencode/ai/effect"
+import { Message, ToolFailure } from "@contextcode/ai/effect"
 import { DateTime, Effect, Option, Stream, Types } from "effect"
-import type { SessionContext } from "@opencode/plugin/effect/session"
-import type { ToolHooks } from "@opencode/plugin/effect/tool"
-import { Agent } from "@opencode/core/agent"
-import { Environment } from "@opencode/core/environment/index"
-import { Event } from "@opencode/schema/event"
-import { Model } from "@opencode/core/model"
-import { PlanPlugin } from "@opencode/core/plugin/plan"
-import { Permission } from "@opencode/core/permission"
-import { Provider } from "@opencode/core/provider"
-import { Session } from "@opencode/core/session"
-import { SessionEvent } from "@opencode/core/session/event"
-import { SessionInbox } from "@opencode/core/session/inbox"
-import { SessionMessage } from "@opencode/core/session/message"
-import { Tool } from "@opencode/schema/tool"
-import { Global } from "@opencode/util/global"
+import type { SessionContext } from "@contextcode/plugin/effect/session"
+import type { ToolHooks } from "@contextcode/plugin/effect/tool"
+import { Agent } from "@contextcode/core/agent"
+import { Environment } from "@contextcode/core/environment/index"
+import { Event } from "@contextcode/schema/event"
+import { Model } from "@contextcode/core/model"
+import { PlanPlugin } from "@contextcode/core/plugin/plan"
+import { Permission } from "@contextcode/core/permission"
+import { Provider } from "@contextcode/core/provider"
+import { Session } from "@contextcode/core/session"
+import { SessionEvent } from "@contextcode/core/session/event"
+import { SessionInbox } from "@contextcode/core/session/inbox"
+import { SessionMessage } from "@contextcode/core/session/message"
+import { Tool } from "@contextcode/schema/tool"
+import { Global } from "@contextcode/util/global"
 import path from "path"
 import { it } from "../lib/effect"
 import { host } from "./host"
@@ -24,7 +24,7 @@ const sessionID = Session.ID.make("ses_plan_test")
 const plan = Agent.ID.make("plan")
 const build = Agent.ID.make("build")
 const home = "/home/plan-test"
-const planDirectory = path.join(home, ".opencode", "plan")
+const planDirectory = path.join(home, ".contextcode", "plan")
 
 const agentSelected = (agent: Agent.ID, previous: Agent.ID): SessionEvent.AgentSelected => ({
   id: Event.ID.create(),

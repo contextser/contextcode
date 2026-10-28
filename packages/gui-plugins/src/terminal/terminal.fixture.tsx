@@ -1,8 +1,8 @@
-import { ThemeProvider } from "@opencode/ui/theme/context"
+import { ThemeProvider } from "@contextcode/ui/theme/context"
 import { createSignal } from "solid-js"
 import { render } from "solid-js/web"
-import type { Context, ServerRef } from "@opencode/plugin/gui"
-import { PluginContext } from "@opencode/plugin/gui/host"
+import type { Context, ServerRef } from "@contextcode/plugin/gui"
+import { PluginContext } from "@contextcode/plugin/gui/host"
 import { Terminal } from "./terminal"
 
 /**

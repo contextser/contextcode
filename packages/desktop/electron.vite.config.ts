@@ -5,7 +5,7 @@ import { pickerPlugin } from "./script/picker"
 import { nodePtyPackage } from "./script/utils"
 
 function resolveChannel() {
-  const raw = process.env.OPENCODE_CHANNEL
+  const raw = process.env.CONTEXTCODE_CHANNEL
 
   if (raw === "local" || raw === "dev" || raw === "beta" || raw === "prod") return raw
 
@@ -14,7 +14,7 @@ function resolveChannel() {
   return "dev"
 }
 
-const appPlugin = (await import("@opencode/app/vite")).default
+const appPlugin = (await import("@contextcode/app/vite")).default
 
 // Every module the entry reaches through static imports lands in one chunk. Automatic splitting
 // otherwise fragments the initial graph into ~50 files shared with lazy routes, and each file costs
@@ -23,7 +23,7 @@ const appPlugin = (await import("@opencode/app/vite")).default
 const initialGraph = new Set<string>()
 
 const initialChunk: Plugin = {
-  name: "opencode-desktop:initial-chunk",
+  name: "contextcode-desktop:initial-chunk",
   renderStart() {
     const entries = [...this.getModuleIds()].filter((id) => this.getModuleInfo(id)?.isEntry)
     initialGraph.clear()
@@ -54,7 +54,7 @@ export default defineConfig(async ({ command }) => {
       },
       define: {
         // Local renderer/server mode still uses the dev application identity and updater policy.
-        "import.meta.env.OPENCODE_CHANNEL": JSON.stringify(channel === "local" ? "dev" : channel),
+        "import.meta.env.CONTEXTCODE_CHANNEL": JSON.stringify(channel === "local" ? "dev" : channel),
       },
       build: {
         minify: command === "build",
@@ -84,7 +84,7 @@ const require = __cjs_mod__.createRequire(import.meta.url);
       },
       plugins: [
         {
-          name: "opencode:node-pty-narrower",
+          name: "contextcode:node-pty-narrower",
           enforce: "pre",
           resolveId(s) {
             if (s === "@lydell/node-pty") return nodePtyPkg
@@ -114,12 +114,12 @@ const require = __cjs_mod__.createRequire(import.meta.url);
         bundledDev: true,
       },
       define: {
-        "import.meta.env.OPENCODE_VERSION": JSON.stringify(process.env.OPENCODE_VERSION),
-        "import.meta.env.VITE_OPENCODE_CHANNEL": JSON.stringify(channel),
-        "import.meta.env.OPENCODE_COMMIT": betaNotes ? JSON.stringify(betaNotes.sha) : "undefined",
-        "import.meta.env.OPENCODE_BETA_NOTES": betaNotes ? JSON.stringify(JSON.stringify(betaNotes)) : "undefined",
-        "import.meta.env.OPENCODE_TEST_ONBOARDING": JSON.stringify(
-          command === "serve" && process.env.OPENCODE_TEST_ONBOARDING === "1",
+        "import.meta.env.CONTEXTCODE_VERSION": JSON.stringify(process.env.CONTEXTCODE_VERSION),
+        "import.meta.env.VITE_CONTEXTCODE_CHANNEL": JSON.stringify(channel),
+        "import.meta.env.CONTEXTCODE_COMMIT": betaNotes ? JSON.stringify(betaNotes.sha) : "undefined",
+        "import.meta.env.CONTEXTCODE_BETA_NOTES": betaNotes ? JSON.stringify(JSON.stringify(betaNotes)) : "undefined",
+        "import.meta.env.CONTEXTCODE_TEST_ONBOARDING": JSON.stringify(
+          command === "serve" && process.env.CONTEXTCODE_TEST_ONBOARDING === "1",
         ),
       },
       plugins: [pickerPlugin(), appPlugin, initialChunk],

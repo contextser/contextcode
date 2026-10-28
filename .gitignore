@@ -22,7 +22,7 @@ ts-dist
 /result
 refs
 Session.vim
-/opencode.json
+/contextcode.json
 a.out
 target
 .scripts
@@ -30,7 +30,7 @@ target
 .direnv/
 
 # Local dev files
-opencode-dev
+contextcode-dev
 UPCOMING_CHANGELOG.md
 RELEASE_REVIEW.md
 logs/

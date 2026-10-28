@@ -4,40 +4,40 @@ import os from "os"
 import path from "path"
 import { describe, expect } from "bun:test"
 import { Cause, Deferred, Duration, Effect, Exit, Fiber, Layer, Queue, Scope, Stream } from "effect"
-import { Money } from "@opencode/schema/money"
-import { AppNodeBuilder } from "@opencode/core/effect/app-node-builder"
-import { LayerNode } from "@opencode/util/effect/layer-node"
-import { makeGlobalNode, makeLocationNode } from "@opencode/util/effect/app-node"
-import { filesystem } from "@opencode/util/effect/app-node-platform"
-import { Database } from "@opencode/core/database/database"
-import { Bus } from "@opencode/core/bus"
-import { Config } from "@opencode/core/config"
-import { Environment } from "@opencode/core/environment/index"
-import { FSUtil } from "@opencode/util/fs-util"
-import { Global } from "@opencode/util/global"
-import { Location } from "@opencode/core/location"
-import { FileAccess } from "@opencode/core/file-access"
-import { LocationServiceMap } from "@opencode/core/location-service-map"
-import { Model } from "@opencode/core/model"
-import { Provider } from "@opencode/core/provider"
-import { AbsolutePath } from "@opencode/core/schema"
-import { Agent } from "@opencode/core/agent"
-import { Job } from "@opencode/core/job"
-import { Session } from "@opencode/core/session"
-import { SessionEvent } from "@opencode/core/session/event"
-import { SessionExecution } from "@opencode/core/session/execution"
-import { SessionMessage } from "@opencode/core/session/message"
-import { SessionStore } from "@opencode/core/session/store"
-import { Permission } from "@opencode/core/permission"
-import { PermissionSaved } from "@opencode/core/permission/saved"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginSupervisor } from "@opencode/core/plugin/supervisor"
-import { Shell } from "@opencode/core/shell"
-import { ShellSelect } from "@opencode/core/shell/select"
-import { ID } from "@opencode/schema/shell"
-import { ShellTool } from "@opencode/core/tool/plugin/shell"
-import { ToolOutput } from "@opencode/core/tool-output"
-import { Tool } from "@opencode/core/tool"
+import { Money } from "@contextcode/schema/money"
+import { AppNodeBuilder } from "@contextcode/core/effect/app-node-builder"
+import { LayerNode } from "@contextcode/util/effect/layer-node"
+import { makeGlobalNode, makeLocationNode } from "@contextcode/util/effect/app-node"
+import { filesystem } from "@contextcode/util/effect/app-node-platform"
+import { Database } from "@contextcode/core/database/database"
+import { Bus } from "@contextcode/core/bus"
+import { Config } from "@contextcode/core/config"
+import { Environment } from "@contextcode/core/environment/index"
+import { FSUtil } from "@contextcode/util/fs-util"
+import { Global } from "@contextcode/util/global"
+import { Location } from "@contextcode/core/location"
+import { FileAccess } from "@contextcode/core/file-access"
+import { LocationServiceMap } from "@contextcode/core/location-service-map"
+import { Model } from "@contextcode/core/model"
+import { Provider } from "@contextcode/core/provider"
+import { AbsolutePath } from "@contextcode/core/schema"
+import { Agent } from "@contextcode/core/agent"
+import { Job } from "@contextcode/core/job"
+import { Session } from "@contextcode/core/session"
+import { SessionEvent } from "@contextcode/core/session/event"
+import { SessionExecution } from "@contextcode/core/session/execution"
+import { SessionMessage } from "@contextcode/core/session/message"
+import { SessionStore } from "@contextcode/core/session/store"
+import { Permission } from "@contextcode/core/permission"
+import { PermissionSaved } from "@contextcode/core/permission/saved"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginSupervisor } from "@contextcode/core/plugin/supervisor"
+import { Shell } from "@contextcode/core/shell"
+import { ShellSelect } from "@contextcode/core/shell/select"
+import { ID } from "@contextcode/schema/shell"
+import { ShellTool } from "@contextcode/core/tool/plugin/shell"
+import { ToolOutput } from "@contextcode/core/tool-output"
+import { Tool } from "@contextcode/core/tool"
 import { tmpdir, tmpdirScoped } from "./fixture/tmpdir"
 import { tempGlobalLayer } from "./fixture/global"
 import { offlineModels } from "./fixture/models"
@@ -236,7 +236,7 @@ const withScanner = <A, E, R>(
         yield* Effect.promise(() => Promise.all([fs.mkdir(fixture.active), fs.mkdir(fixture.outside)]))
         yield* Effect.promise(() =>
           Bun.write(
-            path.join(fixture.active, "opencode.json"),
+            path.join(fixture.active, "contextcode.json"),
             JSON.stringify({ experimental: { portable_shell_scanner: portable } }),
           ),
         )
@@ -939,11 +939,11 @@ describe("ShellTool", () => {
               const sessions = yield* Session.Service
               yield* sessions.environment({
                 sessionID,
-                variables: { OPENCODE_SESSION_ENV_TEST: "from-session" },
+                variables: { CONTEXTCODE_SESSION_ENV_TEST: "from-session" },
               })
               const command = isWindows
-                ? "[Console]::Out.Write($env:OPENCODE_SESSION_ENV_TEST)"
-                : 'printf %s "$OPENCODE_SESSION_ENV_TEST"'
+                ? "[Console]::Out.Write($env:CONTEXTCODE_SESSION_ENV_TEST)"
+                : 'printf %s "$CONTEXTCODE_SESSION_ENV_TEST"'
 
               const settled = yield* executeTool(registry, call({ command }))
 
@@ -969,15 +969,15 @@ describe("ShellTool", () => {
               const sessions = yield* Session.Service
               yield* sessions.environment({
                 sessionID,
-                variables: { AGENT: "0", OPENCODE: "0", AI_AGENT: "", OPENCODE_SESSION_ID: "stale" },
+                variables: { AGENT: "0", CONTEXTCODE: "0", AI_AGENT: "", CONTEXTCODE_SESSION_ID: "stale" },
               })
               const command = isWindows
-                ? '[Console]::Out.Write("$env:AGENT|$env:OPENCODE|$env:AI_AGENT|$env:OPENCODE_SESSION_ID")'
-                : 'printf %s "$AGENT|$OPENCODE|$AI_AGENT|$OPENCODE_SESSION_ID"'
+                ? '[Console]::Out.Write("$env:AGENT|$env:CONTEXTCODE|$env:AI_AGENT|$env:CONTEXTCODE_SESSION_ID")'
+                : 'printf %s "$AGENT|$CONTEXTCODE|$AI_AGENT|$CONTEXTCODE_SESSION_ID"'
               const settled = yield* executeTool(registry, call({ command }))
 
               expect(settled.status).toBe("completed")
-              expect(settled.content?.[0]).toEqual({ type: "text", text: `1|1|opencode|${sessionID}` })
+              expect(settled.content?.[0]).toEqual({ type: "text", text: `1|1|contextcode|${sessionID}` })
             }),
           )
         },
@@ -1260,7 +1260,7 @@ describe("ShellTool", () => {
               reset()
               yield* Effect.promise(() =>
                 Bun.write(
-                  path.join(tmp.path, "opencode.json"),
+                  path.join(tmp.path, "contextcode.json"),
                   JSON.stringify({ experimental: { portable_shell_scanner: portable } }),
                 ),
               )
@@ -1308,7 +1308,7 @@ describe("ShellTool", () => {
           name: `test/shell-plugins-${channel}`,
           layer: Layer.effectDiscard(
             registerToolPlugin(ShellTool.Plugin, {
-              app: { name: "opencode", version: "test", channel },
+              app: { name: "contextcode", version: "test", channel },
             }),
           ),
           deps: [
@@ -1331,7 +1331,7 @@ describe("ShellTool", () => {
               if (configured !== undefined)
                 yield* Effect.promise(() =>
                   Bun.write(
-                    path.join(tmp.path, "opencode.json"),
+                    path.join(tmp.path, "contextcode.json"),
                     JSON.stringify({ experimental: { portable_shell_scanner: configured } }),
                   ),
                 )
@@ -1380,7 +1380,7 @@ describe("ShellTool", () => {
                   reset()
                   yield* Effect.promise(() =>
                     Bun.write(
-                      path.join(tmp.path, "opencode.json"),
+                      path.join(tmp.path, "contextcode.json"),
                       JSON.stringify({ experimental: { portable_shell_scanner: portable } }),
                     ),
                   )
@@ -1480,7 +1480,7 @@ describe("ShellTool", () => {
         return Effect.gen(function* () {
           yield* Effect.promise(() =>
             Bun.write(
-              path.join(tmp.path, "opencode.json"),
+              path.join(tmp.path, "contextcode.json"),
               JSON.stringify({ tool_output: { max_lines: 2, max_bytes: 1_000 } }),
             ),
           )

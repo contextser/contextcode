@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test"
-import type { AgentListOutput, ModelListOutput, Project, ProviderListOutput } from "@opencode/client/promise"
+import type { AgentListOutput, ModelListOutput, Project, ProviderListOutput } from "@contextcode/client/promise"
 import { directoryKey, normalizeAgentList, normalizeProjectInfo, normalizeProviderList } from "./utils"
 
 describe("normalizeAgentList", () => {
@@ -95,10 +95,10 @@ describe("normalizeProjectInfo", () => {
 })
 
 test.each([
-  ["C:\\Repos\\sst\\opencode", "C:/Repos/sst/opencode"],
-  ["C:/Repos/sst/opencode", "C:/Repos/sst/opencode"],
+  ["C:\\Repos\\sst\\contextcode", "C:/Repos/sst/contextcode"],
+  ["C:/Repos/sst/contextcode", "C:/Repos/sst/contextcode"],
   ["/tmp/foo\\bar", "/tmp/foo\\bar"],
-  ["C:/Repos/sst/opencode/", "C:/Repos/sst/opencode"],
+  ["C:/Repos/sst/contextcode/", "C:/Repos/sst/contextcode"],
   ["C:/", "C:/"],
   ["/", "/"],
 ])("directoryKey(%p) is %p", (input, expected) => {

@@ -1,4 +1,4 @@
-import { abort } from "@opencode/util/abort"
+import { abort } from "@contextcode/util/abort"
 import {
   batch,
   catchError,
@@ -21,11 +21,11 @@ import {
   type ParentProps,
 } from "solid-js"
 import { createStore } from "solid-js/store"
-import { LifetimeContext, liveAccessor, PluginContext, type Entry } from "@opencode/plugin/gui/host"
-import type { BuiltinCatalog, BuiltinContext } from "@opencode/plugin/gui/builtin"
+import { LifetimeContext, liveAccessor, PluginContext, type Entry } from "@contextcode/plugin/gui/host"
+import type { BuiltinCatalog, BuiltinContext } from "@contextcode/plugin/gui/builtin"
 import { Predicate } from "effect"
-import { useDialog } from "@opencode/ui/context/dialog"
-import { pluralCategory, resolveTemplate } from "@opencode/ui/context/i18n"
+import { useDialog } from "@contextcode/ui/context/dialog"
+import { pluralCategory, resolveTemplate } from "@contextcode/ui/context/i18n"
 import {
   LinkHandler,
   type BaseContext,
@@ -48,8 +48,8 @@ import {
   type SessionRef,
   type SetupContext,
   type Token,
-} from "@opencode/plugin/gui"
-import { OpenCode, type OpenCodeClient } from "@opencode/client/promise"
+} from "@contextcode/plugin/gui"
+import { ContextCode, type ContextCodeClient } from "@contextcode/client/promise"
 import { useLanguage } from "@/runtime/i18n/language"
 import { PluginAlertDialog, PluginConfirmDialog, PluginPromptDialog, PluginSelectDialog } from "./dialogs"
 import { createSessionStore, whenLoaded } from "./stores"
@@ -77,7 +77,7 @@ type Instance = {
 }
 
 /** What a plugin's GUI reads of its plugin: its options, and the client of the server that runs it, read each time. */
-export type PluginInput = { readonly options: PluginOptions; readonly client: () => OpenCodeClient | undefined }
+export type PluginInput = { readonly options: PluginOptions; readonly client: () => ContextCodeClient | undefined }
 
 /** The APIs a window context exposes as properties. */
 type HostApis = Omit<BuiltinContext, keyof BaseContext | "provide" | "use" | "main">
@@ -993,13 +993,13 @@ function windowStores(definition: Entry) {
 }
 
 /** The client `unavailableClient` made, once a plugin first read it. */
-type Unavailable = { client?: OpenCodeClient }
+type Unavailable = { client?: ContextCodeClient }
 
 const unavailable: Unavailable = {}
 
 /** The client a plugin reads while the server that runs it is unreachable: every call rejects. */
 function unavailableClient() {
-  return (unavailable.client ??= OpenCode.make({
+  return (unavailable.client ??= ContextCode.make({
     baseUrl: "http://unavailable.invalid/",
     fetch: Object.assign(() => Promise.reject(new Error("The server that runs this plugin is unavailable")), {
       preconnect() {},

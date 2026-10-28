@@ -1,16 +1,16 @@
 import { describe, expect } from "bun:test"
-import { Document, Event, Info, type Entry } from "@opencode/schema/config"
-import { ConfigPolicy } from "@opencode/schema/config/policy"
-import { Permission } from "@opencode/schema/permission"
-import { Config } from "@opencode/core/config"
-import { Integration } from "@opencode/core/integration"
-import { ConfigPolicyPlugin } from "@opencode/core/config/plugin/policy"
-import { Bus } from "@opencode/core/bus"
-import { Plugin } from "@opencode/core/plugin"
-import { PluginHooks } from "@opencode/core/plugin/hooks"
-import { PluginHost } from "@opencode/core/plugin/host"
-import { Provider } from "@opencode/core/provider"
-import { Session } from "@opencode/core/session"
+import { Document, Event, Info, type Entry } from "@contextcode/schema/config"
+import { ConfigPolicy } from "@contextcode/schema/config/policy"
+import { Permission } from "@contextcode/schema/permission"
+import { Config } from "@contextcode/core/config"
+import { Integration } from "@contextcode/core/integration"
+import { ConfigPolicyPlugin } from "@contextcode/core/config/plugin/policy"
+import { Bus } from "@contextcode/core/bus"
+import { Plugin } from "@contextcode/core/plugin"
+import { PluginHooks } from "@contextcode/core/plugin/hooks"
+import { PluginHost } from "@contextcode/core/plugin/host"
+import { Provider } from "@contextcode/core/provider"
+import { Session } from "@contextcode/core/session"
 import { Effect, Schema } from "effect"
 import { testEffect } from "../lib/effect"
 import { organizationPolicy } from "../fixture/policy"
@@ -211,16 +211,16 @@ describe("ConfigPolicyPlugin.Plugin", () => {
       const bus = yield* Bus.Service
       const test = yield* Config.Test
       const host = yield* PluginHost.make(yield* Plugin.Service)
-      const opencode = Integration.ID.make("opencode")
+      const contextcode = Integration.ID.make("opencode")
       yield* catalog.transform((catalog) => catalog.update(Provider.ID.openai, () => {}))
       yield* ConfigPolicyPlugin.Plugin.effect(host)
       expect(yield* catalog.get(Provider.ID.openai)).toBeDefined()
 
-      yield* test.integration?.(opencode, organizationPolicy([provider("deny", "openai")])) ?? Effect.void
+      yield* test.integration?.(contextcode, organizationPolicy([provider("deny", "openai")])) ?? Effect.void
       yield* bus.publish(Event.Updated, {})
       yield* waitUntil(catalog.get(Provider.ID.openai).pipe(Effect.map((provider) => provider === undefined)))
 
-      yield* test.integration?.(opencode, undefined) ?? Effect.void
+      yield* test.integration?.(contextcode, undefined) ?? Effect.void
       yield* bus.publish(Event.Updated, {})
       yield* waitUntil(catalog.get(Provider.ID.openai).pipe(Effect.map((provider) => provider !== undefined)))
     }).pipe(Effect.provide(Config.testLayer())),

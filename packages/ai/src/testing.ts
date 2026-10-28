@@ -46,7 +46,7 @@ export interface TestInterface extends ClientInterface {
   readonly gate: () => Effect.Effect<Gate, never, Scope.Scope>
 }
 
-export class Test extends Context.Service<Test, TestInterface>()("@opencode/ai/TestLLM/Test") {}
+export class Test extends Context.Service<Test, TestInterface>()("@contextcode/ai/TestLLM/Test") {}
 
 export interface LayerOptions {
   readonly transformRequest?: (request: LLMRequest) => LLMRequest

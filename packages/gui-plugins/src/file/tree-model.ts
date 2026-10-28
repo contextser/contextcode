@@ -1,5 +1,5 @@
-import type { ChangeKind } from "@opencode/plugin/gui/review"
-import type { FileNode } from "@opencode/plugin/gui"
+import type { ChangeKind } from "@contextcode/plugin/gui/review"
+import type { FileNode } from "@contextcode/plugin/gui"
 
 export type TreeGitStatus = "added" | "deleted" | "modified" | "ignored"
 

@@ -1,6 +1,6 @@
-import { Browser } from "@opencode/plugin-browser/rpc"
+import { Browser } from "@contextcode/plugin-browser/rpc"
 import { Schema } from "effect"
-import { Ipc } from "@opencode/plugin/gui"
+import { Ipc } from "@contextcode/plugin/gui"
 
 const text = (maximum: number) => Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(maximum))
 

@@ -1,6 +1,6 @@
 import { Popover } from "@kobalte/core/popover"
-import { AnimatedNumber } from "@opencode/ui/animated-number"
-import { ProgressCircle } from "@opencode/ui/progress-circle"
+import { AnimatedNumber } from "@contextcode/ui/animated-number"
+import { ProgressCircle } from "@contextcode/ui/progress-circle"
 import { createEffect, createMemo, For, on, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useLanguage } from "@/runtime/i18n/language"
