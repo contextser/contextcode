@@ -300,6 +300,16 @@
   font-size: 13px;
   font-weight: 600;
   line-height: 1;
+  object-fit: cover;
+}
+
+[data-slot="account-menu-email"] {
+  overflow: hidden;
+  color: var(--v2-text-text-faint);
+  font-size: 12.5px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Roomier than other menus: it is the person's own corner of the app. */

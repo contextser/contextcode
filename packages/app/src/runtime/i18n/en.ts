@@ -743,6 +743,13 @@ export const dict = {
 
   "sidebar.settings": "Settings",
   "sidebar.help": "Help",
+  "account.signIn.title": "Sign in to Context Code",
+  "account.signIn.subtitle": "Use your Contextser account to continue.",
+  "account.signIn.button": "Continue with Contextser",
+  "account.signIn.waiting": "Finish signing in in your browser",
+  "account.signIn.cancel": "Cancel",
+  "account.signIn.failed": "Sign-in didn't finish: {{reason}}",
+  "account.signOut": "Log out",
   "sidebar.newChat": "New chat",
   "sidebar.projects": "Projects",
   "sidebar.recents": "Recents",

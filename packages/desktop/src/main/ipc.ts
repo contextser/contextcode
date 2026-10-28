@@ -7,6 +7,7 @@ import { DesktopRpcs } from "../shared/ipc-rpc"
 import { DragCancelEvent, IpcTransportPort } from "../shared/ipc-transport"
 import { Plugins } from "./plugin"
 import { DesktopFiles, openExternalURL } from "./files"
+import { accountHandlers } from "./ipc-handlers/account"
 import { appHandlers } from "./ipc-handlers/app"
 import { eventHandlers } from "./ipc-handlers/events"
 import { pluginHandlers } from "./ipc-handlers/plugins"
@@ -24,6 +25,7 @@ import { getLastFocusedWindow } from "./windows"
 const services = Layer.mergeAll(DesktopFiles.layer, Plugins.layer)
 
 const handlers = Layer.mergeAll(
+  accountHandlers,
   appHandlers,
   storageHandlers,
   fileHandlers,

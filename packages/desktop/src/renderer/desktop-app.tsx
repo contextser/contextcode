@@ -19,6 +19,7 @@ import type { BaseRouterProps } from "@solidjs/router"
 import { createEffect, createMemo, createResource, lazy, Show, Suspense } from "solid-js"
 import { createStore } from "solid-js/store"
 import type { ElectronAPI } from "./api-types"
+import { DesktopSignIn } from "./account/sign-in"
 import { DesktopFirstLaunchOnboarding } from "./onboarding"
 import { createDesktopPlatform } from "./platform"
 import { bindDesktopMenu } from "./platform/menu"
@@ -59,6 +60,12 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
         }),
   )
 
+  // Signing in comes before everything else. A build without a registered client, or a failed check, opens as before.
+  const [account, { mutate: setAccount }] = createResource(() =>
+    props.api.accountSession().catch(() => ({ required: false, profile: null })),
+  )
+  const gated = () => account()?.required === true && !account()?.profile
+
   const platform = createDesktopPlatform(props.api, windowState)
   const [sidecar, { mutate: setSidecar }] = createResource(() => props.api.awaitInitialization())
 
@@ -72,8 +79,11 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
   const router = (routerProps: BaseRouterProps) => <DesktopMemoryRouter {...routerProps} windowID={windowState.id} />
 
   const readyToReveal = () =>
-    startup.ready &&
-    (!import.meta.env.CONTEXTCODE_TEST_ONBOARDING || !firstLaunch() || initialUrl !== "/" || startup.drawingReady)
+    // The sign-in screen needs only the theme; the app behind it has not started.
+    gated()
+      ? startup.themeReady
+      : startup.ready &&
+        (!import.meta.env.CONTEXTCODE_TEST_ONBOARDING || !firstLaunch() || initialUrl !== "/" || startup.drawingReady)
 
   // Reveal only after the theme and the first-launch splash choice are both resolved.
   createEffect(() => {
@@ -138,8 +148,17 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
           setStartup("themeReady", true)
         }}
       >
-        <Show when={true}>{(_) => <ReadyApp />}</Show>
-        <Show when={!firstLaunch.loading && startup.visible}>
+        <Show when={account.state === "ready"}>
+          <Show
+            when={!gated()}
+            fallback={
+              <DesktopSignIn api={props.api} onSignedIn={(profile) => setAccount({ required: true, profile })} />
+            }
+          >
+            <ReadyApp />
+          </Show>
+        </Show>
+        <Show when={!firstLaunch.loading && !account.loading && startup.visible}>
           <div
             data-component="startup-overlay"
             class="fixed inset-0 z-[100] transition-opacity duration-300 ease-out"

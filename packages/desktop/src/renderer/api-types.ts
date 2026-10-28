@@ -12,7 +12,13 @@ import type {
   TitlebarTheme,
 } from "../shared/ipc-contract"
 
+export type AccountProfile = { sub: string; name?: string; email?: string; picture?: string }
+
 export type ElectronAPI = {
+  accountSession(): Promise<{ required: boolean; profile: AccountProfile | null }>
+  accountSignIn(): Promise<{ profile: AccountProfile | null; error?: string }>
+  accountCancelSignIn(): Promise<void>
+  accountSignOut(): Promise<void>
   awaitInitialization(): Promise<ServerReadyData>
   reconnectService(): Promise<ServerReadyData>
   consumeInitialDeepLinks(): Promise<string[]>

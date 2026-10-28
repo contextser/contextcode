@@ -28,6 +28,11 @@ export function createDesktopPlatform(api: ElectronAPI, windowState: DesktopWind
     setForceFocus: (enabled) => api.setForceFocus(enabled),
     recordFatalRendererError: (error) => api.recordFatalRendererError(error),
     restart: async () => api.relaunch(),
+    account: {
+      profile: () => api.accountSession().then((session) => session.profile),
+      // Reloading drops back to the sign-in gate, which reads the now empty session.
+      signOut: () => api.accountSignOut().then(() => window.location.reload()),
+    },
     notify: createDesktopNotify(api),
     fetch: (input, init) => {
       if (input instanceof Request) return fetch(input)

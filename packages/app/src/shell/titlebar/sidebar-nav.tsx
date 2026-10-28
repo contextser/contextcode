@@ -1,5 +1,5 @@
 import { Schema } from "effect"
-import { createMemo, For, Show } from "solid-js"
+import { createMemo, createResource, For, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import { Button } from "@contextcode/ui/button"
 import { useDialog } from "@contextcode/ui/context/dialog"
@@ -78,9 +78,13 @@ function AccountMenu() {
   const global = useGlobal()
   const surface = useSettingsSurface()
 
-  // There is no account, so the name is the local user's, read from the current server's home folder. The path query
-  // may not have loaded yet, so a known project's folder stands in for it.
+  // The signed-in Contextser account where there is one. Otherwise the name is the local user's, read from the current
+  // server's home folder; the path query may not have loaded yet, so a known project's folder stands in for it.
+  const [account] = createResource(() => platform.account?.profile() ?? Promise.resolve(null))
   const name = createMemo(() => {
+    const profile = account.latest
+
+    if (profile?.name || profile?.email) return (profile.name || profile.email)!
     const conn = servers.visible.find((item) => servers.current(item)) ?? servers.visible[0]
     const ctx = conn ? global.ensureServerCtx(conn) : undefined
     const home = ctx?.sync.data.path.home || inferHomeDirectory(ctx?.projects.list()[0]?.worktree ?? "")
@@ -89,7 +93,11 @@ function AccountMenu() {
     return user ? user[0]!.toUpperCase() + user.slice(1) : language.t("sidebar.settings")
   })
 
-  const avatar = () => <span data-slot="account-avatar">{name()[0]}</span>
+  const avatar = () => (
+    <Show when={account.latest?.picture} fallback={<span data-slot="account-avatar">{name()[0]}</span>}>
+      {(picture) => <img data-slot="account-avatar" src={picture()} alt="" referrerPolicy="no-referrer" />}
+    </Show>
+  )
 
   return (
     <Menu placement="right-end" gutter={10}>
@@ -100,7 +108,12 @@ function AccountMenu() {
         <Menu.Content class="account-menu">
           <div data-slot="account-menu-header">
             {avatar()}
-            <span>{name()}</span>
+            <span class="flex min-w-0 flex-col">
+              <span class="truncate">{name()}</span>
+              <Show when={account.latest?.email && account.latest.email !== name() ? account.latest.email : undefined}>
+                {(email) => <span data-slot="account-menu-email">{email()}</span>}
+              </Show>
+            </span>
           </div>
           <Menu.Separator />
           <Menu.Item onSelect={() => command.trigger("usage.view")}>
@@ -131,6 +144,17 @@ function AccountMenu() {
               </Menu.SubContent>
             </Menu.Portal>
           </Menu.Sub>
+          <Show when={account.latest && platform.account}>
+            {(signedIn) => (
+              <>
+                <Menu.Separator />
+                <Menu.Item onSelect={() => void signedIn().signOut()}>
+                  <Icon name="arrow-left" />
+                  {language.t("account.signOut")}
+                </Menu.Item>
+              </>
+            )}
+          </Show>
         </Menu.Content>
       </Menu.Portal>
     </Menu>
