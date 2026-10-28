@@ -368,3 +368,28 @@
     margin-block: 5px;
   }
 }
+
+/* Codex-style frame: the sidebar tile and the main card meet as one card under the window's chrome row, with a single
+   hairline between them. The main card is painted after the tile, so its ring is the divider; the tile's own ring is
+   clipped on that side so the line does not double. */
+[data-shell-joined] {
+  [data-slot="vertical-tabs-mount"] {
+    padding-inline-end: 0;
+    padding-bottom: var(--shell-bottom-inset, 8px) !important;
+  }
+
+  [data-slot="sidebar-header"] {
+    margin-bottom: 0;
+  }
+
+  [data-component="sidebar-panel"] {
+    border-radius: 10px 0 0 10px;
+    background: color-mix(in srgb, var(--v2-background-bg-base) 55%, var(--v2-background-bg-deep));
+    clip-path: inset(-4px 0 -4px -4px);
+  }
+
+  [data-shell-card] {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+}

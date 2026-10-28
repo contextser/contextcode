@@ -36,6 +36,9 @@ type SidebarPose = { closed: number; peek: number | undefined }
 
 export const sidebarToggleCommand = { id: "sidebar.toggle", keybind: "mod+shift+b" }
 
+// The chrome row's height: the sidebar header's 48px under the shell's 8px top inset.
+const joinedTop = 56
+
 export default function Layout(props: ParentProps) {
   const platform = usePlatform()
   const settings = useSettingsSurface()
@@ -202,6 +205,8 @@ export default function Layout(props: ParentProps) {
     },
   ])
   const bottomTitlebar = () => mobile() && preferences.general.mobileTitlebarPosition() === "bottom"
+  // Sidebar and main card read as one card under the window's chrome row, as in Codex.
+  const joined = () => verticalTabs() && preferences.appearance.sidebarOpen() && !settings.active()
   const dragInset = () => windowDragEnabled(platform) && !mobile()
 
   return (
@@ -223,7 +228,7 @@ export default function Layout(props: ParentProps) {
       }}
     >
       <Titlebar verticalTabs={verticalTabs() ? { mount: state.tabsMount } : undefined} />
-      <div class="relative flex flex-1 min-h-0 min-w-0 flex-row">
+      <div class="relative flex flex-1 min-h-0 min-w-0 flex-row" data-shell-joined={joined() ? "" : undefined}>
         {/* The empty inset above the panels moves the window, as the titlebar does. */}
         <Show when={dragInset()}>
           <div
@@ -297,6 +302,8 @@ export default function Layout(props: ParentProps) {
         <main
           class="flex-1 min-h-0 min-w-0 overflow-x-hidden flex flex-col items-start contain-content"
           style={{
+            // Joined to the sidebar, the main card starts on the sidebar tile's line and meets its edge.
+            ...(joined() ? { "--shell-top-inset": `${joinedTop}px`, "margin-inline-start": "-8px" } : {}),
             "padding-top": bottomTitlebar() ? "env(safe-area-inset-top, 0px)" : "0px",
             "padding-bottom":
               bottomTitlebar() || settings.active()
@@ -307,6 +314,15 @@ export default function Layout(props: ParentProps) {
               : "var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))",
           }}
         >
+          <Show when={joined() && dragInset()}>
+            {/* The band above the joined card moves the window, as the titlebar does. */}
+            <div
+              aria-hidden="true"
+              class="absolute inset-x-0 top-0"
+              style={{ height: `${joinedTop}px` }}
+              data-tauri-drag-region
+            />
+          </Show>
           <PluginServerCover>
             <Suspense>{props.children}</Suspense>
           </PluginServerCover>
