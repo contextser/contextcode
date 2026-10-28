@@ -82,7 +82,7 @@ export function LoadingSplash(props: {
             <MarkGlyph outline class="size-10 shrink-0 text-v2-icon-icon-faint" />
             <div class="h-9" />
           </div>
-          <div class="h-[152px] shrink-0" />
+          <div class="h-[184px] shrink-0" />
         </div>
       </div>
     </Show>

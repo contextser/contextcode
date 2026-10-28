@@ -98,3 +98,56 @@
   background: transparent !important;
   box-shadow: none !important;
 }
+
+/* The new session screen's docked composer: a roomier, rounder card with a round accent send button. */
+[data-component="composer"][data-appearance="hero"] {
+  border-radius: 22px;
+  box-shadow:
+    var(--v2-elevation-raised),
+    0 12px 40px -18px rgb(0 0 0 / 0.16);
+
+  [data-component="composer-editor"],
+  [data-slot="composer-placeholder"] {
+    padding-inline-start: 20px;
+    padding-top: 18px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  [data-component="composer-editor"] {
+    min-height: 62px;
+  }
+
+  [data-slot="composer-footer"] {
+    height: 56px;
+    padding-inline: 12px 10px;
+  }
+
+  [data-action="composer-submit"] {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    color: white;
+    background-image:
+      linear-gradient(180deg, var(--v2-alpha-light-20) 0%, var(--v2-alpha-light-0) 100%),
+      linear-gradient(90deg, var(--v2-background-bg-accent) 0%, var(--v2-background-bg-accent) 100%);
+  }
+
+  @media (hover: hover) {
+    /* The effort sits beside the model as part of its label, so it stays visible here. */
+    &:not(:hover) .composer-variant-default:not(:focus-visible, [data-expanded]) {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    [data-action="composer-submit"]:is(:hover, [data-state="hover"]):not(:disabled) {
+      background-image:
+        linear-gradient(
+          90deg,
+          var(--v2-overlay-simple-overlay-contrast-hover) 0%,
+          var(--v2-overlay-simple-overlay-contrast-hover) 100%
+        ),
+        linear-gradient(90deg, var(--v2-background-bg-accent) 0%, var(--v2-background-bg-accent) 100%);
+    }
+  }
+}

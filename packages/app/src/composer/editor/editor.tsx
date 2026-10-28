@@ -77,6 +77,11 @@ export type ComposerEditorProps = {
   class?: string
   modelControl?: JSX.Element
   modelControlsVisible?: boolean
+  /** "hero" is the new session screen's docked composer: larger text, model controls beside the send button. */
+  appearance?: "default" | "hero"
+  placeholder?: string
+  /** Controls placed after the add menu, before the agent and model controls. */
+  leading?: JSX.Element
   attachKeybind?: string[]
   attachShortcut?: string
   alternateKeybind?: string[]
@@ -97,6 +102,25 @@ export function ComposerEditor(props: ComposerEditorProps) {
   let controlsContent!: HTMLDivElement
   const [overflow, setOverflow] = createStore({ start: false, end: false })
   const [historyLayout, setHistoryLayout] = createStore<{ height?: number }>({})
+  const hero = () => props.appearance === "hero"
+  const modelControls = () => (
+    <Show when={props.modelControlsVisible ?? true}>
+      {props.modelControl}
+      <Show when={view.variant} keyed>
+        {(control) => (
+          <Show when={control.options().length > 1}>
+            <ComposerEditorConfiguredSelect
+              mobileDrawer
+              title={i18n.t("ui.promptInput.chooseVariant")}
+              keybind={["Shift", "Mod", "D"]}
+              control={control}
+              class={control.current() === "default" ? "composer-variant-default" : undefined}
+            />
+          </Show>
+        )}
+      </Show>
+    </Show>
+  )
 
   createEffect(() => {
     if (state.popover.type !== "history") setHistoryLayout("height", undefined)
@@ -225,6 +249,7 @@ export function ComposerEditor(props: ComposerEditorProps) {
         ref={composer}
         data-component="composer"
         data-dock-border-underlay={props.borderUnderlay ? "true" : undefined}
+        data-appearance={props.appearance ?? "default"}
         class="group/composer relative w-full overflow-clip rounded-xl bg-v2-background-bg-base"
         style={{ height: historyLayout.height === undefined ? undefined : `${historyLayout.height}px` }}
         classList={{
@@ -369,12 +394,14 @@ export function ComposerEditor(props: ComposerEditorProps) {
             />
             <Show when={!props.controller.value()}>
               <div
+                data-slot="composer-placeholder"
                 dir={state.mode === "normal" ? "auto" : "ltr"}
                 class="pointer-events-none absolute inset-x-0 top-0 ps-4 pe-[var(--composer-scroll-end)] pt-4 text-[13px] font-[440] leading-5 text-v2-text-text-faint"
                 classList={{ "font-mono! tracking-[-0.04px]": state.mode === "shell" }}
                 style={{ "unicode-bidi": state.mode === "normal" ? "plaintext" : undefined, "text-align": "start" }}
               >
-                {view.placeholder?.() ??
+                {(state.mode === "normal" ? props.placeholder : undefined) ??
+                  view.placeholder?.() ??
                   (state.mode === "shell"
                     ? i18n.t("ui.promptInput.placeholder.shell")
                     : i18n.t("ui.promptInput.placeholder.normal", { slash: "/", at: "@" }))}
@@ -383,7 +410,7 @@ export function ComposerEditor(props: ComposerEditorProps) {
           </div>
         </div>
 
-        <div class="flex h-11 shrink-0 items-center px-2">
+        <div data-slot="composer-footer" class="flex h-11 shrink-0 items-center px-2">
           <div
             class="flex shrink-0 items-center"
             aria-hidden={state.mode === "shell"}
@@ -428,25 +455,21 @@ export function ComposerEditor(props: ComposerEditorProps) {
                   />
                 )}
               </Show>
-              <Show when={props.modelControlsVisible ?? true}>
-                {props.modelControl}
-                <Show when={view.variant} keyed>
-                  {(control) => (
-                    <Show when={control.options().length > 1}>
-                      <ComposerEditorConfiguredSelect
-                        mobileDrawer
-                        title={i18n.t("ui.promptInput.chooseVariant")}
-                        keybind={["Shift", "Mod", "D"]}
-                        control={control}
-                        class={control.current() === "default" ? "composer-variant-default" : undefined}
-                      />
-                    </Show>
-                  )}
-                </Show>
-              </Show>
+              {props.leading}
+              <Show when={!hero()}>{modelControls()}</Show>
             </div>
           </div>
           <div data-slot="composer-actions" class="flex shrink-0 items-center">
+            <Show when={hero()}>
+              <div
+                data-slot="composer-model-controls"
+                class="me-1.5 flex min-w-0 items-center gap-0.5"
+                aria-hidden={state.mode === "shell"}
+                inert={state.mode === "shell" ? true : undefined}
+              >
+                {modelControls()}
+              </div>
+            </Show>
             <Show when={state.mode === "normal"}>
               <ComposerEditorAlternateDelivery
                 controller={props.controller}

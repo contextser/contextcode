@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal } from "solid-js"
+import { Show, createEffect, createMemo, createSignal, type JSX } from "solid-js"
 import { Dynamic } from "solid-js/web"
 import { createMediaQuery } from "@solid-primitives/media"
 import { Button } from "@contextcode/ui/button"
@@ -22,6 +22,9 @@ export function Composer(props: {
   borderUnderlay?: boolean
   readOnly?: boolean
   suggestionBoundary?: () => HTMLElement | undefined
+  appearance?: "default" | "hero"
+  placeholder?: string
+  leading?: JSX.Element
 }) {
   const dialog = useDialog()
   const command = useCommand()
@@ -55,6 +58,9 @@ export function Composer(props: {
         alternateKeybind={[formatKeybind("mod", language.t), "↵"]}
         exitShellKeybind={[formatKeybind("esc", language.t)]}
         suggestionBoundary={props.suggestionBoundary}
+        appearance={props.appearance}
+        placeholder={props.placeholder}
+        leading={props.leading}
         modelControl={
           <ComposerModelControl
             loading={props.model.model.loading}

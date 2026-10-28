@@ -31,6 +31,8 @@ import { useLanguage } from "@/runtime/i18n/language"
 import { useWorkspaceLocation } from "@/workspaces/location"
 import { useProviders } from "@/providers/catalog/providers"
 import { NEW_SESSION_CONTENT_WIDTH } from "@/new-session/layout"
+import { useServerSDK } from "@/runtime/server/client"
+import { projectSettingsKey, useSettings } from "@/settings/model"
 import { Persist, persisted } from "@/runtime/persistence/storage"
 import { Persistence } from "@/runtime/persistence/schema"
 import type { NewSessionWorkspaceController } from "./workspace/controller"
@@ -45,7 +47,6 @@ export const WorkspaceOnboardingSchema = Persistence.struct({
 export const ProviderTipSchema = Persistence.struct({
   dismissedAt: Schema.Finite,
 })
-
 
 export function NewSessionView(props: {
   composer: ComposerModel
@@ -80,7 +81,7 @@ export function NewSessionView(props: {
         <div class="flex shrink-0 justify-center px-6 pb-6">
           <div data-slot="new-session-composer" class={NEW_SESSION_CONTENT_WIDTH}>
             {/* The location tray sits behind the composer's top edge, like a tab the composer is docked into. */}
-            <div class="mx-3 -mb-3 rounded-t-[14px] bg-v2-background-bg-layer-02 px-1 pb-3">
+            <div class="mx-6 -mb-4 rounded-t-[22px] bg-v2-background-bg-layer-02 px-2 pt-0.5 pb-4">
               <Show when={props.project.selected()}>
                 {(project) => (
                   <NewSessionLocation
@@ -100,13 +101,18 @@ export function NewSessionView(props: {
                 )}
               </Show>
               <Show when={props.project.empty()}>
-                <div class="flex min-h-9 items-center ps-2">
+                <div class="flex min-h-10 items-center ps-1">
                   <PromptProjectAddButton controller={props.project} />
                 </div>
               </Show>
             </div>
             <div class="relative z-10">
-              <Composer model={props.composer} />
+              <Composer
+                model={props.composer}
+                appearance="hero"
+                placeholder={language.t("session.new.placeholder")}
+                leading={<NewSessionPermissions project={props.project.selected()} />}
+              />
             </div>
           </div>
         </div>
@@ -199,6 +205,56 @@ function NewSessionTips(props: { selection: ComposerModel["model"]["selection"];
   )
 }
 
+/** Shows whether this project's permission requests are approved automatically, and toggles it. */
+function NewSessionPermissions(props: { project?: PromptProject }) {
+  const language = useLanguage()
+  const settings = useSettings()
+  const sdk = useServerSDK()
+  const key = () => projectSettingsKey(sdk.scope, props.project?.id)
+  const full = () => settings.permissions.autoApproves(key())
+
+  // Like the session command: set this project's choice, falling back to the default when they match.
+  const toggle = () => {
+    const project = key()
+    const active = !full()
+
+    if (!project) return settings.permissions.setAutoApproveDefault(active)
+    settings.permissions.setAutoApproveOverride(
+      project,
+      active === settings.permissions.autoApproveDefault() ? undefined : active,
+    )
+  }
+
+  return (
+    <Tooltip
+      placement="top"
+      openDelay={800}
+      value={
+        full()
+          ? language.t("command.permissions.autoaccept.disable")
+          : key()
+            ? language.t("command.permissions.autoaccept.project")
+            : language.t("command.permissions.autoaccept.enable")
+      }
+    >
+      <button
+        type="button"
+        data-action="new-session-permissions"
+        aria-pressed={full()}
+        class="flex h-8 shrink-0 items-center gap-1.5 rounded-full ps-2 pe-2.5 text-[14px] font-[440] leading-5 tracking-[-0.1px] transition-colors hover:bg-v2-overlay-simple-overlay-hover focus-visible:bg-v2-overlay-simple-overlay-hover focus-visible:outline-none"
+        classList={{ "text-v2-state-fg-warning": full(), "text-v2-text-text-muted": !full() }}
+        onMouseDown={(event) => event.preventDefault()}
+        onClick={toggle}
+      >
+        <Icon name={full() ? "shield-alert" : "lock"} size="small" class="shrink-0" />
+        <span class="whitespace-nowrap">
+          {full() ? language.t("session.new.permissions.full") : language.t("session.new.permissions.ask")}
+        </span>
+      </button>
+    </Tooltip>
+  )
+}
+
 // Keeps as many leading segments as fit, then "…/", then the last two segments. The cut always lands on a slash.
 function fitPath(value: string, width: number, font: string) {
   const separator = value.includes("/") ? "/" : "\\"
@@ -253,7 +309,7 @@ function NewSessionLocation(props: {
   const fitted = createMemo(() => fitPath(path() ?? "", layout.width, layout.font))
 
   return (
-    <div class="relative flex min-h-9 min-w-0 items-center gap-3 ps-2 pe-1.5 text-[13px] font-[440] leading-[var(--line-height-compact)] tracking-[-0.04px]">
+    <div class="relative flex min-h-10 min-w-0 items-center gap-3 ps-1 pe-1.5 text-[14px] font-[440] leading-[var(--line-height-base)] tracking-[-0.1px]">
       <div class="flex min-w-0 max-w-full flex-wrap items-center gap-1 py-1.5">
         <Tooltip
           appearance={props.onboarding ? "large" : undefined}
@@ -310,6 +366,17 @@ function NewSessionLocation(props: {
           </button>
         </Tooltip>
         {props.branch}
+        <button
+          type="button"
+          data-action="new-session-server"
+          class="ms-2 flex h-7 min-w-0 items-center gap-1.5 rounded-sm ps-1.5 pe-2 text-v2-text-text-base transition-colors hover:bg-v2-overlay-simple-overlay-hover focus-visible:bg-v2-overlay-simple-overlay-hover focus-visible:outline-none"
+          onClick={props.onClick}
+        >
+          <Icon name="laptop" size="small" class="shrink-0 text-v2-icon-icon-base" />
+          <span class="min-w-0 truncate">
+            {props.project.server?.hint ?? props.project.server?.name ?? language.t("server.thisComputer")}
+          </span>
+        </button>
       </div>
       {/* An open tooltip can outlive this row; keep its path instead of a stale Show accessor. */}
       <Show when={path()} keyed>

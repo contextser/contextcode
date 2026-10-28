@@ -78,7 +78,7 @@ export function createPromptProjectController(input: { controls: Accessor<Prompt
     servers: () => input.controls().servers ?? [],
     labels: {
       add: () => language.t("session.new.project.add"),
-      new: () => language.t("session.new.project.new"),
+      choose: () => language.t("session.new.project.choose"),
     },
     add(server?: string) {
       input.controls().add(language.t("command.project.open"), server)
@@ -97,12 +97,11 @@ export function PromptProjectAddButton(props: { controller: PromptProjectControl
     <button
       data-action="prompt-project"
       type="button"
-      class="flex h-7 min-w-0 max-w-[160px] items-center gap-1.5 rounded-sm px-2 text-[13px] font-[440] leading-5 tracking-[-0.04px] text-v2-text-text-faint transition-colors hover:bg-v2-overlay-simple-overlay-hover focus-visible:bg-v2-overlay-simple-overlay-hover focus-visible:outline-none"
+      class="flex h-7 min-w-0 max-w-[200px] items-center gap-1.5 rounded-sm ps-1.5 pe-2 text-[14px] font-[440] leading-5 tracking-[-0.1px] text-v2-text-text-muted transition-colors hover:bg-v2-overlay-simple-overlay-hover hover:text-v2-text-text-base focus-visible:bg-v2-overlay-simple-overlay-hover focus-visible:outline-none"
       onClick={() => props.controller.add()}
     >
-      <Icon name="folder-add-left" size="small" class="shrink-0 text-v2-icon-icon-muted" />
-      <span class="min-w-0 truncate leading-5">{props.controller.labels.new()}</span>
-      <Icon name="chevron-down" size="small" class="shrink-0 text-v2-icon-icon-muted" />
+      <Icon name="folder" size="small" class="shrink-0 text-v2-icon-icon-muted" />
+      <span class="min-w-0 truncate leading-5">{props.controller.labels.choose()}</span>
     </button>
   )
 }

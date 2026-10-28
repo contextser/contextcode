@@ -645,6 +645,10 @@ export const dict = {
   "session.question.restore": "Restore question",
 
   "session.new.title": "What should we build?",
+  "session.new.placeholder": "Do anything",
+  "session.new.permissions.full": "Full access",
+  "session.new.permissions.ask": "Ask for approval",
+  "session.new.project.choose": "Choose project",
   "session.new.project.new": "New project",
   "session.new.project.search": "Search projects",
   "session.new.project.add": "Add project",

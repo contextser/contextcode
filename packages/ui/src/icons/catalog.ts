@@ -110,6 +110,14 @@ const icons = {
     viewBox: "0 0 16 16",
     body: `<path d="M4.05559 9.38889H0.500007C0.500007 9.38889 0.500017 8.59298 0.500017 7.61112V2.27778C0.500017 1.29594 0.500102 0.5 0.500102 0.5H13.3889C13.3889 0.5 13.3889 1.29594 13.3889 2.27778V7.61112C13.3889 8.59298 13.3889 9.38889 13.3889 9.38889H9.83336M4.05559 9.38889V11.6111H6.94448H9.83336V9.38889M4.05559 9.38889H9.83336" transform="translate(1.05556 1.94444)" stroke="currentColor"/>`,
   },
+  laptop: {
+    viewBox: "0 0 16 16",
+    body: `<path d="M3 11V4.5A1 1 0 0 1 4 3.5h8a1 1 0 0 1 1 1V11" stroke="currentColor" stroke-linejoin="round"/><path d="M1.5 11h13v.5a1.5 1.5 0 0 1-1.5 1.5H3a1.5 1.5 0 0 1-1.5-1.5V11Z" stroke="currentColor" stroke-linejoin="round"/>`,
+  },
+  "shield-alert": {
+    viewBox: "0 0 16 16",
+    body: `<path d="M8 1.75 13 3.5v4c0 3.1-2.1 5.6-5 6.75C5.1 13.1 3 10.6 3 7.5v-4L8 1.75Z" stroke="currentColor" stroke-linejoin="round"/><path d="M8 5v3.5" stroke="currentColor" stroke-linecap="round"/><circle cx="8" cy="10.75" r=".75" fill="currentColor"/>`,
+  },
   "workspace-new": {
     viewBox: "0 0 16 16",
     body: `<path d="M2 10.7578V14.0011H5.24324M13.9991 5.24324V2H10.7559M13.9991 10.7578V14.0011H10.7559M2 5.24324V2H5.24324" stroke="currentColor" stroke-miterlimit="10" stroke-linecap="square"/><path d="M8 4.5V11.5M4.5 8H11.5" stroke="currentColor" stroke-linejoin="round"/>`,
