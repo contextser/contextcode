@@ -11,29 +11,6 @@
   background: var(--v2-background-bg-base);
   box-shadow: var(--v2-elevation-raised);
 
-  /* A slow accent sweep around the edge while the agent is typing. */
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    padding: 1px;
-    border-radius: inherit;
-    background: conic-gradient(
-      from var(--live-angle, 0deg),
-      transparent 0deg,
-      color-mix(in srgb, var(--live-accent) 85%, transparent) 60deg,
-      transparent 140deg,
-      transparent 360deg
-    );
-    mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    pointer-events: none;
-    animation: live-code-sweep 3.2s linear infinite;
-  }
-
   [data-slot="live-code-header"] {
     display: flex;
     align-items: center;
@@ -287,11 +264,6 @@
 
 /* Once the whole file is shown, the live affordances settle before the card hands back to the diff. */
 [data-component="live-code-writer"][data-finished] {
-  &::before {
-    opacity: 0;
-    animation: none;
-  }
-
   [data-slot="live-code-avatar"]::after {
     animation: none;
     opacity: 0;
@@ -305,6 +277,11 @@
 }
 
 /* The floating card's holder enters once and leaves once; files swap inside it without the card moving. */
+/* The space under the floating card eases open and shut, so the timeline glides out from under the card. */
+[data-slot="live-code-space"] {
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 [data-slot="live-code-float"] {
   animation: live-code-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
@@ -351,18 +328,6 @@
   }
 }
 
-@property --live-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-@keyframes live-code-sweep {
-  to {
-    --live-angle: 360deg;
-  }
-}
-
 @keyframes live-code-blink {
   to {
     visibility: hidden;
@@ -385,9 +350,12 @@
     animation: none;
   }
 
+  [data-slot="live-code-space"] {
+    transition: none;
+  }
+
   [data-component="live-code-writer"] {
     &,
-    &::before,
     [data-slot="live-code-avatar"]::after,
     [data-slot="live-code-caret"] {
       animation: none;

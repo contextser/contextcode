@@ -1,8 +1,10 @@
 import { createEffect, createMemo, createSignal, onCleanup, Show, untrack } from "solid-js"
+import { createResizeObserver } from "@solid-primitives/resize-observer"
 import type { SessionMessageAssistantTool, SessionMessageInfo } from "@contextcode/client/promise"
 import { LiveCodeWriter } from "@contextcode/session-ui/live-code-writer"
 
 const fileTools = new Set(["write", "edit", "patch"])
+const gap = 12
 
 /**
  * Floats the file the agent is writing above the composer and types it out, one call after another in a single card.
@@ -25,6 +27,8 @@ export function SessionLiveWriter(props: { messages: readonly SessionMessageInfo
   // The card stays up from the first queued file until a short exit after the last, so files swap inside it.
   const [shown, setShown] = createSignal<SessionMessageAssistantTool>()
   const [leaving, setLeaving] = createSignal(false)
+  const [height, setHeight] = createSignal(0)
+  const [card, setCard] = createSignal<HTMLDivElement>()
 
   createEffect(() => {
     const next = queue()[0]
@@ -37,30 +41,44 @@ export function SessionLiveWriter(props: { messages: readonly SessionMessageInfo
 
     if (!untrack(shown)) return
     setLeaving(true)
+    // Unmount only once the space has eased shut, after the card's own 240ms exit.
     const timer = setTimeout(() => {
       setShown(undefined)
       setLeaving(false)
-    }, 240)
+      setHeight(0)
+    }, 420)
     onCleanup(() => clearTimeout(timer))
   })
 
+  createResizeObserver(card, (rect) => setHeight(Math.ceil(rect.height)))
+
   return (
     <Show when={shown()}>
+      {/* The space grows to the card's height, which lifts the timeline's end above it instead of covering it; the
+          card itself hangs from the space's bottom edge, so it stays put by the composer while the timeline moves. */}
       <div
-        data-slot="live-code-float"
-        data-leaving={leaving() ? "" : undefined}
-        class="pointer-events-auto absolute inset-x-0 bottom-full z-[80] mb-3"
+        data-slot="live-code-space"
+        class="relative shrink-0"
+        style={{ height: `${leaving() || height() === 0 ? 0 : height() + gap}px` }}
       >
-        <Show when={shown()} keyed>
-          {(call) => (
-            <LiveCodeWriter
-              tool={call}
-              floating
-              backlog={Math.max(0, queue().length - 1)}
-              onDone={() => setPlayed((previous) => new Set([...previous, call.id]))}
-            />
-          )}
-        </Show>
+        <div
+          ref={setCard}
+          data-slot="live-code-float"
+          data-leaving={leaving() ? "" : undefined}
+          class="pointer-events-auto absolute inset-x-0 z-[80]"
+          style={{ bottom: `${gap}px` }}
+        >
+          <Show when={shown()} keyed>
+            {(call) => (
+              <LiveCodeWriter
+                tool={call}
+                floating
+                backlog={Math.max(0, queue().length - 1)}
+                onDone={() => setPlayed((previous) => new Set([...previous, call.id]))}
+              />
+            )}
+          </Show>
+        </div>
       </div>
     </Show>
   )
