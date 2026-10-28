@@ -1223,7 +1223,10 @@ for (const delivery of ["steer", "queue"] as const) {
     ])
     await transcript.screenshot({ path: testInfo.outputPath("pending-steer.png") })
 
-    await expect(tools.or(pending)).toHaveText([/^Used\s*2\s*Read, Grep$/, /U2: Also check the retry path\./])
+    await expect(tools.or(pending)).toHaveText([
+      /^Read\s*queue\.ts\s*Searched\s*“retry”$/,
+      /U2: Also check the retry path\./,
+    ])
     await expect(transcript.locator('[data-timeline-row="AssistantPart"]').filter({ has: tools })).toHaveAttribute(
       "data-message-id",
       userID,
@@ -1239,7 +1242,7 @@ for (const delivery of ["steer", "queue"] as const) {
     // Working ends the work the model has seen, so the steer it has not seen yet waits below it.
     const working = transcript.locator('[data-component="session-working"]')
     await expect(tools.or(working).or(pending)).toHaveText([
-      /^Used\s*2\s*Read, Grep$/,
+      /^Read\s*queue\.ts\s*Searched\s*“retry”$/,
       /Working/,
       /U2: Also check the retry path\./,
     ])
@@ -1249,7 +1252,7 @@ for (const delivery of ["steer", "queue"] as const) {
     await expect(thinking).toHaveCount(0)
     await expect(pending).toHaveCount(1)
     await expect(tools.or(pending).or(working)).toHaveText([
-      /^Used\s*2\s*Read, Grep$/,
+      /^Read\s*queue\.ts\s*Searched\s*“retry”$/,
       /U2: Also check the retry path\./,
       /Working/,
     ])
@@ -1286,7 +1289,7 @@ for (const delivery of ["steer", "queue"] as const) {
     await expect(response).toHaveAttribute("data-message-id", inboxID)
     await expect(thinking).toHaveCount(0)
     await expect(tools.or(pending).or(response)).toHaveText([
-      /^Used\s*2\s*Read, Grep$/,
+      /^Read\s*queue\.ts\s*Searched\s*“retry”$/,
       /U2: Also check the retry path\./,
       /A3: Now checking the retry path for U2\./,
     ])
