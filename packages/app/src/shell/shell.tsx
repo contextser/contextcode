@@ -1,4 +1,4 @@
-import { Show, startTransition, Suspense, type ParentProps } from "solid-js"
+import { onCleanup, Show, startTransition, Suspense, type ParentProps } from "solid-js"
 import { createStore } from "solid-js/store"
 import { createMediaQuery } from "@solid-primitives/media"
 import { ResizeHandle } from "@contextcode/ui/resize-handle"
@@ -6,6 +6,7 @@ import { useDialog } from "@contextcode/ui/context/dialog"
 import { prefersReducedMotion } from "@contextcode/ui/motion"
 import { Titlebar } from "@/shell/titlebar/titlebar"
 import { SidebarRail } from "@/shell/titlebar/sidebar-nav"
+import { setChromeTitleMount } from "@/shell/chrome-title"
 import { usePlatform } from "@/runtime/platform/platform"
 import { ToastRegion } from "@/shell/notifications/toast"
 import { UploadToastHost } from "@/composer/attachments/uploads"
@@ -314,14 +315,24 @@ export default function Layout(props: ParentProps) {
               : "var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px))",
           }}
         >
-          <Show when={joined() && dragInset()}>
-            {/* The band above the joined card moves the window, as the titlebar does. */}
+          <Show when={joined()}>
+            {/* The chrome row above the joined card: it moves the window, as the titlebar does, and holds the active
+                session's title row after a divider, as in Codex. Controls inside a drag region opt out of dragging. */}
             <div
-              aria-hidden="true"
-              class="absolute inset-x-0 top-0"
+              data-slot="shell-chrome"
+              class="absolute inset-x-0 top-0 flex items-center ps-2 pe-2 pt-2"
               style={{ height: `${joinedTop}px` }}
-              data-tauri-drag-region
-            />
+              data-tauri-drag-region={dragInset() ? "" : undefined}
+            >
+              <div aria-hidden="true" class="h-4 w-px shrink-0 bg-v2-border-border-base" />
+              <div
+                class="flex h-full min-w-0 flex-1"
+                ref={(element) => {
+                  setChromeTitleMount(element)
+                  onCleanup(() => setChromeTitleMount(undefined))
+                }}
+              />
+            </div>
           </Show>
           <PluginServerCover>
             <Suspense>{props.children}</Suspense>

@@ -506,7 +506,7 @@ function MessageTimelineView(
       )}
       header={
         <Show when={!props.hideHeader}>
-          <SessionTitleHeader>
+          <SessionTitleHeader chrome={props.active !== false}>
             <SessionHeaderLayout
               title={title.editing ? title.draft : childTitle()}
               location={

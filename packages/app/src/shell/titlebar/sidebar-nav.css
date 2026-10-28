@@ -393,3 +393,9 @@
     border-end-start-radius: 0;
   }
 }
+
+/* With the title row in the chrome, the review toggle rides up into the same row, clear of the drag region. */
+[data-shell-joined] [data-slot="session-review-toggle"] {
+  top: -48px;
+  app-region: no-drag;
+}

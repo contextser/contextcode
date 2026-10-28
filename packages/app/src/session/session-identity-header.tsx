@@ -22,7 +22,9 @@ import {
   type ParentProps,
 } from "solid-js"
 import { createStore } from "solid-js/store"
+import { Portal } from "solid-js/web"
 import { PluginSlot } from "@/runtime/plugin/render"
+import { chromeTitleMount } from "@/shell/chrome-title"
 import { containsDirectory, getFilename } from "@contextcode/util/path"
 import { useServer } from "@/runtime/server/current"
 import { ServerConnection, useServers } from "@/runtime/server/registry"
@@ -47,7 +49,21 @@ import "./session-identity-header.css"
 
 const SessionHeaderCollapse = createContext<() => number>(() => 0)
 
-export function SessionTitleHeader(props: ParentProps) {
+export function SessionTitleHeader(props: ParentProps<{ chrome?: boolean }>) {
+  return (
+    <Show when={props.chrome && chromeTitleMount()} fallback={<StickyTitleHeader>{props.children}</StickyTitleHeader>}>
+      {(mount) => (
+        <Portal mount={mount()} ref={(element) => (element.className = "flex h-full min-w-0 flex-1 items-center")}>
+          <div data-session-title class="min-w-0 flex-1 pe-3 ps-1.5">
+            {props.children}
+          </div>
+        </Portal>
+      )}
+    </Show>
+  )
+}
+
+function StickyTitleHeader(props: ParentProps) {
   return (
     <>
       {/* The bottom inset reserves room for the fade without covering rows stuck below the bar. */}
