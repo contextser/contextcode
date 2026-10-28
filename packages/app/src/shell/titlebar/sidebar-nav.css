@@ -87,25 +87,6 @@
     }
   }
 
-  /* The mark on a small rounded tile, as in contextser.com's header. */
-  [data-slot="sidebar-brand-mark"] {
-    display: grid;
-    flex-shrink: 0;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    margin-inline-end: 2px;
-    border-radius: 8px;
-    background: var(--v2-background-bg-base);
-    box-shadow: var(--v2-elevation-raised);
-    color: var(--v2-text-text-base);
-
-    svg {
-      width: 18px;
-      height: 18px;
-    }
-  }
-
   [data-slot="sidebar-brand-action"] {
     position: relative;
     display: grid;

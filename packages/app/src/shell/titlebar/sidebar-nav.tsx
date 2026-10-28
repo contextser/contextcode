@@ -5,7 +5,7 @@ import { Button } from "@contextcode/ui/button"
 import { useDialog } from "@contextcode/ui/context/dialog"
 import { Dialog, DialogFooter, DialogHeader, DialogTitleGroup } from "@contextcode/ui/dialog"
 import { Icon } from "@contextcode/ui/icon"
-import { MarkGlyph } from "@contextcode/ui/logo"
+import { Logo } from "@contextcode/ui/logo"
 import { Menu } from "@contextcode/ui/menu"
 import { Tooltip } from "@contextcode/ui/tooltip"
 import { getFilename } from "@contextcode/util/path"
@@ -200,11 +200,13 @@ export function SidebarPanel(props: { onNewChat: () => void }) {
   return (
     <div data-component="sidebar-panel">
       <div data-slot="sidebar-brand">
-        <button type="button" data-slot="sidebar-brand-name" onClick={() => command.trigger("home.toggle")}>
-          <span data-slot="sidebar-brand-mark" aria-hidden="true">
-            <MarkGlyph />
-          </span>
-          <span>Context Code</span>
+        <button
+          type="button"
+          data-slot="sidebar-brand-name"
+          aria-label="Context Code"
+          onClick={() => command.trigger("home.toggle")}
+        >
+          <Logo class="h-[15px] w-auto shrink-0" />
           <Icon name="chevron-down" size="small" />
         </button>
         <div class="flex-1" />
