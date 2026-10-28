@@ -27,17 +27,34 @@ const scope = "openid profile email"
 // Sign-in waits this long for the browser before giving up.
 const signInTimeout = 5 * 60_000
 
-// The id of the Context Code client registered at accounts.contextser.com (a public client: no secret). The
-// environment variable overrides it for testing. Signing in is required either way: without an id the gate stays up
-// and sign-in reports that it is not configured.
-const registeredClientId = ""
-const clientId = process.env.CONTEXTCODE_ACCOUNTS_CLIENT_ID ?? registeredClientId
+// Contextser issues each product a live and a sandbox client; which one signs in comes from
+// CONTEXTCODE_ACCOUNTS_ENV or MAIN_VITE_CONTEXTSER_ENV, live by default. Their ids and secrets live in the untracked
+// packages/desktop/.env.local, never in the source. Sandbox credentials may use the loopback callback; live ones may
+// not, so live sign-in needs its client registered as a public client (no secret) with this callback.
+const environment =
+  (process.env.CONTEXTCODE_ACCOUNTS_ENV ?? import.meta.env.MAIN_VITE_CONTEXTSER_ENV) === "sandbox" ? "sandbox" : "live"
+const credentials =
+  environment === "sandbox"
+    ? {
+        id: import.meta.env.MAIN_VITE_CONTEXTSER_SANDBOX_CLIENT_ID,
+        secret: import.meta.env.MAIN_VITE_CONTEXTSER_SANDBOX_CLIENT_SECRET,
+      }
+    : {
+        id: import.meta.env.MAIN_VITE_CONTEXTSER_LIVE_CLIENT_ID,
+        secret: import.meta.env.MAIN_VITE_CONTEXTSER_LIVE_CLIENT_SECRET,
+      }
+// Signing in is required either way: without an id the gate stays up and sign-in reports that it is not configured.
+const clientId = process.env.CONTEXTCODE_ACCOUNTS_CLIENT_ID ?? credentials.id ?? ""
+// A confidential client proves itself with its secret as well as PKCE; a public one sends none.
+const client = (): Record<string, string> =>
+  credentials.secret ? { client_id: clientId, client_secret: credentials.secret } : { client_id: clientId }
 
 export type AccountProfile = { sub: string; name?: string; email?: string; picture?: string }
 
 type Stored = { refreshToken: string; accessToken: string; expiresAt: number; profile: AccountProfile }
 
-const storePath = () => join(app.getPath("userData"), "contextser-account.bin")
+// One file per environment, so sandbox tokens never stand in for a live session.
+const storePath = () => join(app.getPath("userData"), `contextser-account-${environment}.bin`)
 
 let pending: { server: Server; finish: (error: string) => void } | undefined
 let refreshing: Promise<Stored | undefined> | undefined
@@ -140,7 +157,7 @@ export async function signOut() {
   await fetch(endpoints.revoke, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({ token: current.refreshToken, token_type_hint: "refresh_token", client_id: clientId }),
+    body: new URLSearchParams({ token: current.refreshToken, token_type_hint: "refresh_token", ...client() }),
   }).catch(() => undefined)
 }
 
@@ -179,7 +196,7 @@ async function exchange(body: Record<string, string>): Promise<TokenResponse | {
   const response = await fetch(endpoints.token, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
-    body: new URLSearchParams({ ...body, client_id: clientId }),
+    body: new URLSearchParams({ ...body, ...client() }),
   }).catch(() => undefined)
 
   if (!response) return { offline: true }
