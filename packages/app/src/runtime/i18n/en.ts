@@ -617,6 +617,8 @@ export const dict = {
   "session.todo.label.other": "{{done}} of {{count}} todos done",
   "session.timeline.working": "Working",
   "session.agent.name": "Context Agent",
+  "session.agent.understanding": "Reading your request",
+  "session.agent.reviewing": "Reviewing",
   "session.agent.thinking": "Thinking",
   "session.agent.responding": "Writing a reply",
   "session.agent.reading": "Reading",

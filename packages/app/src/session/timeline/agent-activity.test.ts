@@ -34,13 +34,30 @@ describe("agentActivity", () => {
     )
   })
 
-  test("reads as thinking between calls and while reasoning, and counts only this turn", () => {
-    expect(agentActivity([user(1), assistant([tool("read", "completed", {})]), user(5), assistant([])])).toEqual({
-      kind: "thinking",
+  test("reads the request back before anything arrives, and counts only this turn", () => {
+    const prompt = { ...user(5), text: "Make the **header** sticky\nand add a progress bar" } as SessionMessageInfo
+
+    expect(agentActivity([user(1), assistant([tool("read", "completed", {})]), prompt, assistant([])])).toEqual({
+      kind: "understanding",
+      target: "Make the header sticky and add a progress bar",
       since: 5,
       actions: 0,
     })
-    expect(agentActivity([user(1), assistant([{ type: "reasoning", text: "…" }])]).kind).toBe("thinking")
     expect(agentActivity([user(1), assistant([{ type: "text", text: "Done." }])]).kind).toBe("responding")
+  })
+
+  test("names the thought the model is on: its latest heading, else its latest finished sentence", () => {
+    const thinking = (text: string) => agentActivity([user(1), assistant([{ type: "reasoning", text }])]).target
+
+    expect(thinking("**Planning the layout**\nFirst I check the header. Then the gr")).toBe("Planning the layout")
+    expect(thinking("I need the header file. Then I check the grid")).toBe("I need the header file.")
+    expect(thinking("I need the header file. Then I check the grid.")).toBe("Then I check the grid.")
+    expect(thinking("Thinking about")).toBeUndefined()
+  })
+
+  test("reviews what a finished call returned before the next step", () => {
+    expect(
+      agentActivity([user(1), assistant([tool("read", "completed", { path: "src/site-header.tsx" })])]),
+    ).toMatchObject({ kind: "reviewing", target: "site-header.tsx", actions: 1 })
   })
 })

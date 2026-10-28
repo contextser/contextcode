@@ -176,3 +176,14 @@
     }
   }
 }
+
+/* A thought or the request itself reads as prose, not as a file or command chip. */
+[data-component="agent-status"]:is([data-kind="thinking"], [data-kind="understanding"])
+  [data-slot="agent-status-target"] {
+  max-width: 44ch;
+  padding: 0;
+  background: none;
+  color: var(--v2-text-text-muted);
+  font-family: var(--v2-font-family-sans);
+  font-size: 13px;
+}
