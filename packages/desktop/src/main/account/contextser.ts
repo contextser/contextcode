@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto"
 import { createServer, type Server } from "node:http"
 import { readFile, rm, writeFile } from "node:fs/promises"
 import { join } from "node:path"
-import { app, safeStorage, shell } from "electron"
+import { app, clipboard, safeStorage, shell } from "electron"
 
 /**
  * Signing in to Context Code with a Contextser account (accounts.contextser.com), as a public OAuth client: no secret,
@@ -54,7 +54,9 @@ export async function accountSession() {
   return { required: true, profile: fresh?.profile ?? null }
 }
 
-export async function signIn(): Promise<{ profile: AccountProfile | null; error?: string }> {
+export async function signIn(options: {
+  copyLink: boolean
+}): Promise<{ profile: AccountProfile | null; error?: string }> {
   if (!clientId) return { profile: null, error: "sign-in is not configured for this build yet" }
   pending?.finish("cancelled")
   const verifier = base64url(randomBytes(32))
@@ -104,7 +106,8 @@ export async function signIn(): Promise<{ profile: AccountProfile | null; error?
         code_challenge: challenge,
         code_challenge_method: "S256",
       }).toString()
-      void shell.openExternal(url.toString())
+      if (options.copyLink) clipboard.writeText(url.toString())
+      else void shell.openExternal(url.toString())
     })
   })
 

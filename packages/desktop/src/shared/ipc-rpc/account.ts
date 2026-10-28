@@ -13,8 +13,12 @@ export const AccountSession = Rpc.make("AccountSession", {
   success: Schema.Struct({ required: Schema.Boolean, profile: Schema.NullOr(AccountProfile) }),
 })
 
-/** Runs the browser sign-in; `error` names why it ended without a profile. */
+/**
+ * Runs the browser sign-in; `error` names why it ended without a profile. With `copyLink` the sign-in link is copied
+ * for the person to open in a browser of their choosing instead of the default one.
+ */
 export const AccountSignIn = Rpc.make("AccountSignIn", {
+  payload: { copyLink: Schema.Boolean },
   success: Schema.Struct({ profile: Schema.NullOr(AccountProfile), error: Schema.optionalKey(Schema.String) }),
 })
 

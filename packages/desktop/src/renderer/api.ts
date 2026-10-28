@@ -22,7 +22,7 @@ const seeded = window.electron.storageSnapshot.then((snapshot) => new Map(Object
 
 export const api: ElectronAPI = {
   accountSession: () => invoke("AccountSession").then(mutable),
-  accountSignIn: () => invoke("AccountSignIn").then(mutable),
+  accountSignIn: (copyLink) => invoke("AccountSignIn", { copyLink }).then(mutable),
   accountCancelSignIn: () => invoke("AccountCancelSignIn"),
   accountSignOut: () => invoke("AccountSignOut"),
   awaitInitialization: () => invoke("AppAwaitInitialization"),
