@@ -1211,10 +1211,10 @@ for (const delivery of ["steer", "queue"] as const) {
     })
     const tools = page.locator('[data-timeline-part-ids="tool_queue_read,tool_queue_grep"]')
     await expect(tools).toBeVisible()
-    await expect(tools).toHaveText(/^Used\s*2\s*Read, Grep$/)
+    await expect(tools).toHaveText(/^Read\s*queue\.ts\s*Searched\s*“retry”$/)
     await expect(tools.locator('[data-component="context-tool-group-trigger"]')).toHaveAttribute(
       "aria-label",
-      "Used 2 Read, Grep",
+      "Read queue.ts, Searched “retry”",
     )
     await expect(thinking).toHaveCount(0)
     await expect(pending).toBeVisible()

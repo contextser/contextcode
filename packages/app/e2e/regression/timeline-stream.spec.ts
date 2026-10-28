@@ -242,10 +242,10 @@ test.describe("static projection", () => {
 
     await expect(page.locator('[data-timeline-part-id="prt_expanded_shell"]')).toBeVisible()
     const group = page.locator('[data-timeline-part-ids="prt_collapsed_patch,prt_collapsed_read"]')
-    await expect(group.getByRole("button", { name: "Used 2 Patch, Read", exact: true })).toBeVisible()
+    await expect(group.getByRole("button", { name: "Edited 1 file, Read value.ts", exact: true })).toBeVisible()
     await expect(group.locator('[data-component="context-tool-group-trigger"]')).toHaveAttribute(
       "aria-label",
-      "Used 2 Patch, Read",
+      "Edited 1 file, Read value.ts",
     )
     await expect(page.locator('[data-timeline-spacing="tool"]')).toHaveCSS("padding-top", "8px")
   })
@@ -815,7 +815,7 @@ test.describe("Working", () => {
 
     await timeline.send(partUpdated(toolPart("prt_after_thought", "read", "running", { filePath: "package.json" })))
     await expect(group).toHaveAttribute("data-timeline-part-ids", `${assistantID}:reasoning:0,prt_after_thought`)
-    await expect(trigger).toHaveAttribute("aria-label", "Used 1 Read")
+    await expect(trigger).toHaveAttribute("aria-label", "Reading 1 file")
     await expect(elapsed).toHaveCount(0)
     await expect(working).toBeVisible()
   })
@@ -950,7 +950,7 @@ test.describe("Working", () => {
 
       const trigger = page
         .locator('[data-component="collapsed-tool-group"]')
-        .getByRole("button", { name: "Used 2 Shell", exact: true, includeHidden: true })
+        .getByRole("button", { name: "Ran 2 commands", exact: true, includeHidden: true })
 
       await expect(trigger).toHaveAttribute("aria-expanded", "false")
       await expect(working).toBeVisible()

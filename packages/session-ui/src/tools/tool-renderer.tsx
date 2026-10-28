@@ -311,6 +311,129 @@ function toolTitle(tool: SessionMessageAssistantTool, i18n: UiI18n) {
   }
 }
 
+type ActivityKind = keyof typeof activityIcons
+
+const activityKinds: Record<string, ActivityKind> = {
+  read: "read",
+  list: "explore",
+  glob: "explore",
+  grep: "explore",
+  webfetch: "web",
+  browser: "web",
+  websearch: "websearch",
+  shell: "shell",
+  execute: "shell",
+  edit: "edit",
+  write: "edit",
+  patch: "edit",
+  subagent: "subagent",
+  skill: "skill",
+  question: "question",
+}
+
+const activityIcons = {
+  read: "glasses",
+  explore: "magnifying-glass",
+  web: "window-cursor",
+  websearch: "outline-globe",
+  shell: "console",
+  edit: "pencil-line",
+  subagent: "fork",
+  skill: "post-skill",
+  question: "speech-bubble",
+  other: "cube",
+}
+
+/**
+ * What a group of tool calls did, as short sentences by kind of work: "Browsed devmonks.co", "Read 3 files". A lone
+ * call names its subject; repeated generic work ("Searched the codebase") carries a ×N count instead.
+ */
+function activitySegments(parts: readonly ContextGroupPart[], i18n: UiI18n) {
+  const groups = parts.reduce((map, part) => {
+    if (part.type !== "tool" && part.type !== "shell") return map
+    const kind = part.type === "tool" ? (activityKinds[part.name] ?? "other") : "shell"
+    map.set(kind, [...(map.get(kind) ?? []), part.type === "tool" ? part : undefined])
+
+    return map
+  }, new Map<ActivityKind, (SessionMessageAssistantTool | undefined)[]>())
+
+  return [...groups].map(([kind, items]) => {
+    const tools = items.filter((item): item is SessionMessageAssistantTool => item !== undefined)
+    const active = tools.some((tool) => tool.state.status === "streaming" || tool.state.status === "running")
+    const single = items.length === 1 ? tools[0] : undefined
+    const target = activityTarget(kind, items.length, single, tools, i18n)
+
+    return {
+      kind,
+      active,
+      icon: activityIcons[kind],
+      verb: i18n.t(`ui.messagePart.activity.verb.${kind}${active ? ".active" : ""}`),
+      target: target.text,
+      times: target.generic && items.length > 1 ? items.length : undefined,
+    }
+  })
+}
+
+function activityTarget(
+  kind: ActivityKind,
+  count: number,
+  single: SessionMessageAssistantTool | undefined,
+  tools: SessionMessageAssistantTool[],
+  i18n: UiI18n,
+) {
+  const input = toolInput(single ? currentToolInput(single) : {})
+  const named = (text: string | undefined) => (text ? { text, generic: false } : undefined)
+
+  if (kind === "read" || kind === "edit")
+    return (
+      named(getFilename(input.path ?? "")) ?? {
+        text: i18n.plural("ui.messagePart.activity.target.files", count),
+        generic: false,
+      }
+    )
+
+  if (kind === "web")
+    return (
+      named(input.url && URL.parse(input.url)?.hostname.replace(/^www\./, "")) ?? {
+        text: i18n.plural("ui.messagePart.activity.target.pages", count),
+        generic: false,
+      }
+    )
+
+  if (kind === "websearch")
+    return (
+      named(input.query && `“${input.query}”`) ?? { text: i18n.t("ui.messagePart.activity.target.web"), generic: true }
+    )
+
+  if (kind === "explore")
+    return (
+      named(input.pattern && `“${input.pattern}”`) ?? {
+        text: i18n.t("ui.messagePart.activity.target.codebase"),
+        generic: true,
+      }
+    )
+
+  if (kind === "shell") return { text: i18n.plural("ui.messagePart.activity.target.commands", count), generic: false }
+
+  if (kind === "subagent")
+    return (
+      named(input.description) ?? { text: i18n.plural("ui.messagePart.activity.target.tasks", count), generic: false }
+    )
+
+  if (kind === "skill")
+    return (
+      named(single && (toolMetadata(currentToolMetadata(single)).name ?? input.name ?? input.id)) ?? {
+        text: i18n.plural("ui.messagePart.activity.target.skills", count),
+        generic: false,
+      }
+    )
+
+  if (kind === "question")
+    return { text: i18n.plural("ui.messagePart.activity.target.questions", count), generic: false }
+
+  return { text: i18n.list([...new Set(tools.map((tool) => toolTitle(tool, i18n)))]), generic: true }
+}
+
 function urls(text: string | undefined) {
   if (!text) return []
 
@@ -505,6 +628,9 @@ export function CurrentContextToolGroup(props: {
     }
   })
 
+  // Thinking keeps its own live label; finished or running tool work reads as sentences by kind.
+  const segments = createMemo(() => (thinking() ? [] : activitySegments(props.parts, i18n)))
+
   const items = createMemo(() =>
     (props.open ? props.parts : []).reduce<
       (SessionMessageAssistantTool[] | Exclude<ContextGroupPart, SessionMessageAssistantTool>)[]
@@ -593,40 +719,89 @@ export function CurrentContextToolGroup(props: {
         open={props.open}
         onOpenChange={change}
         trigger={
-          <div data-component="context-tool-group-trigger" aria-label={label().text}>
-            <span data-slot="context-tool-group-title">
-              <Show when={label().before || label().count || label().between}>
-                <span data-slot="context-tool-group-usage">
-                  <Show when={label().before}>
-                    {(before) => <span data-slot="context-tool-group-prefix">{before()}</span>}
+          <Show
+            when={segments().length > 0}
+            fallback={
+              <div data-component="context-tool-group-trigger" aria-label={label().text}>
+                <span data-slot="context-tool-group-title">
+                  <Show when={label().before || label().count || label().between}>
+                    <span data-slot="context-tool-group-usage">
+                      <Show when={label().before}>
+                        {(before) => <span data-slot="context-tool-group-prefix">{before()}</span>}
+                      </Show>
+                      <Show when={label().count}>
+                        {(count) => (
+                          <span data-slot="context-tool-group-count">
+                            <AnimatedNumber value={count()} />
+                          </span>
+                        )}
+                      </Show>
+                      <Show when={label().between}>
+                        {(between) => <span data-slot="context-tool-group-prefix">{between()}</span>}
+                      </Show>
+                    </span>
                   </Show>
-                  <Show when={label().count}>
-                    {(count) => (
-                      <span data-slot="context-tool-group-count">
-                        <AnimatedNumber value={count()} />
+                  <Show when={label().title}>
+                    {(title) => (
+                      <span data-slot="basic-tool-tool-title">
+                        <Show when={thinking()} fallback={title()}>
+                          <TextShimmer text={title()} active />
+                        </Show>
                       </span>
                     )}
                   </Show>
-                  <Show when={label().between}>
-                    {(between) => <span data-slot="context-tool-group-prefix">{between()}</span>}
+                  <Show when={elapsed()}>{(value) => <span data-slot="basic-tool-tool-subtitle">{value()}</span>}</Show>
+                  <Show when={label().after}>
+                    {(after) => <span data-slot="context-tool-group-prefix">{after()}</span>}
                   </Show>
                 </span>
-              </Show>
-              <Show when={label().title}>
-                {(title) => (
-                  <span data-slot="basic-tool-tool-title">
-                    <Show when={thinking()} fallback={title()}>
-                      <TextShimmer text={title()} active />
-                    </Show>
+              </div>
+            }
+          >
+            <div
+              data-component="context-tool-group-trigger"
+              aria-label={segments()
+                .map((segment) =>
+                  [segment.verb, segment.target, segment.times && `×${segment.times}`].filter(Boolean).join(" "),
+                )
+                .join(", ")}
+            >
+              <span data-slot="context-tool-group-activity">
+                <For each={segments().slice(0, 3)}>
+                  {(segment) => (
+                    <span
+                      data-slot="context-tool-group-segment"
+                      data-kind={segment.kind}
+                      data-active={segment.active ? "" : undefined}
+                    >
+                      <span data-slot="context-tool-group-glyph" aria-hidden="true">
+                        <Icon name={segment.icon} size="small" />
+                      </span>
+                      <span data-slot="context-tool-group-verb">
+                        <Show when={segment.active} fallback={segment.verb}>
+                          <TextShimmer text={segment.verb} active />
+                        </Show>
+                      </span>{" "}
+                      <span data-slot="context-tool-group-target">{segment.target}</span>
+                      <Show when={segment.times}>
+                        {(times) => (
+                          <>
+                            {" "}
+                            <span data-slot="context-tool-group-times">×{times()}</span>
+                          </>
+                        )}
+                      </Show>{" "}
+                    </span>
+                  )}
+                </For>
+                <Show when={segments().length > 3}>
+                  <span data-slot="context-tool-group-more">
+                    {i18n.t("ui.messagePart.activity.more", { count: segments().length - 3 })}
                   </span>
-                )}
-              </Show>
-              <Show when={elapsed()}>{(value) => <span data-slot="basic-tool-tool-subtitle">{value()}</span>}</Show>
-              <Show when={label().after}>
-                {(after) => <span data-slot="context-tool-group-prefix">{after()}</span>}
-              </Show>
-            </span>
-          </div>
+                </Show>
+              </span>
+            </div>
+          </Show>
         }
       >
         <div data-component="context-tool-group-list">

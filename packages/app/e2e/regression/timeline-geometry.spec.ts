@@ -130,7 +130,7 @@ test("keeps a grouped tool summary stable as its calls complete", async ({ page 
   })
 
   const context = page.locator(contextSelector)
-  const label = "Used 4 Read, Glob, Grep, List"
+  const label = "Read recent-a.ts, Searched the codebase ×3"
   const trigger = context.locator(':scope > [data-component="collapsible"] > [data-slot="collapsible-trigger"]')
   await expect(trigger).toHaveAccessibleName(label)
   // Open the group so each call shows whether it is still running.
