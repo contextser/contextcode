@@ -1,5 +1,4 @@
-import { Splash } from "@contextcode/ui/logo"
-import { Wordmark } from "@contextcode/ui/wordmark"
+import { MarkGlyph, Splash } from "@contextcode/ui/logo"
 import type { Platform } from "@contextcode/app/desktop"
 import { onCleanup, onMount, Show } from "solid-js"
 import { createStore } from "solid-js/store"
@@ -68,7 +67,7 @@ export function LoadingSplash(props: {
         aria-hidden="true"
         class="h-dvh w-screen bg-v2-background-bg-base"
         style={{
-          // Match the default session's titlebar, panel insets, and wordmark position.
+          // Match the default session's titlebar, panel insets, and mark position.
           "padding-block-start": `calc(${titlebarHeight()} + ${props.platform.os === "windows" ? 1 : 8}px)`,
           "padding-block-end": "8px",
           "padding-inline": "32px",
@@ -77,17 +76,13 @@ export function LoadingSplash(props: {
           if (event.animationName === "first-launch-wordmark-draw") props.onDrawEnd()
         }}
       >
-        <div class="relative size-full">
-          <div class="absolute inset-x-0 top-[25.375%]">
-            <div class="mx-auto w-full max-w-[720px]">
-              <Wordmark
-                outline
-                fade={false}
-                muted={false}
-                class="mx-auto block h-auto w-4/5 text-v2-icon-icon-faint opacity-50"
-              />
-            </div>
+        {/* Mirrors the new session screen: the mark and heading centered above the docked composer. */}
+        <div class="flex size-full flex-col">
+          <div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-6">
+            <MarkGlyph outline class="size-10 shrink-0 text-v2-icon-icon-faint" />
+            <div class="h-9" />
           </div>
+          <div class="h-[152px] shrink-0" />
         </div>
       </div>
     </Show>

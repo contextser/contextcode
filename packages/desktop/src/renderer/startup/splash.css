@@ -1,5 +1,5 @@
 [data-component="first-launch-splash"] path {
-  /* Outline paths use a normalized length so the drawing scales with the wordmark. */
+  /* Outline paths use a normalized length so the drawing scales with the mark. */
   stroke-dasharray: 1;
   animation: first-launch-wordmark-draw 1000ms ease-out both;
 }

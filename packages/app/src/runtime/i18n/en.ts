@@ -644,6 +644,7 @@ export const dict = {
   "session.question.minimize": "Minimize question",
   "session.question.restore": "Restore question",
 
+  "session.new.title": "What should we build?",
   "session.new.project.new": "New project",
   "session.new.project.search": "Search projects",
   "session.new.project.add": "Add project",

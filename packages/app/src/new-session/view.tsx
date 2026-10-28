@@ -3,7 +3,7 @@ import { Tooltip } from "@contextcode/ui/tooltip"
 import { Icon } from "@contextcode/ui/icon"
 import { Slash } from "@contextcode/ui/slash"
 import { Keybind } from "@contextcode/ui/keybind"
-import { Wordmark } from "@contextcode/ui/wordmark"
+import { MarkGlyph } from "@contextcode/ui/logo"
 import { useCommand } from "@/shell/commands/command"
 import { Show, createMemo, createSignal, type JSX } from "solid-js"
 import { createStore } from "solid-js/store"
@@ -58,51 +58,58 @@ export function NewSessionView(props: {
     WorkspaceOnboardingSchema,
     { used: false },
   )
+  const language = useLanguage()
 
   return (
     <div class="@container relative flex flex-col min-h-0 h-full flex-1">
       <div
         data-component="new-session"
-        class="relative isolate flex-1 min-h-0 overflow-hidden rounded-[10px] bg-v2-background-bg-base shadow-[var(--v2-elevation-raised)]"
+        class="relative isolate flex flex-1 min-h-0 flex-col overflow-hidden rounded-[10px] bg-v2-background-bg-base shadow-[var(--v2-elevation-raised)]"
       >
         <ComposerDropzone
           active={props.composer.state.drag === "active"}
           input={props.composer.model.selection.current()?.capabilities.input}
         />
-        <div class="absolute inset-x-0 top-[25.375%] flex justify-center px-6">
-          <div class={NEW_SESSION_CONTENT_WIDTH}>
-            <Wordmark fade={false} class="mx-auto block h-auto w-4/5 text-v2-background-bg-inverse" />
-            <div class="mt-8 flex flex-col gap-3">
-              <div data-slot="new-session-composer" class="flex flex-col gap-1">
-                <div class="relative z-10">
-                  <Composer model={props.composer} />
-                </div>
-                <Show when={props.project.selected()}>
-                  {(project) => (
-                    <NewSessionLocation
-                      project={project()}
-                      workspace={props.workspace.bar.visible() ? props.workspace.selection.value() : "main"}
-                      root={props.workspace.project.root()}
-                      branch={<NewSessionBranch workspace={props.workspace} onDone={props.composer.restoreFocus} />}
-                      onboarding={onboardingReady() && !onboarding.used && props.workspace.bar.visible()}
-                      onClick={() =>
-                        props.location({
-                          onWorkspace: (value) => {
-                            if (value !== "main") setOnboarding("used", true)
-                          },
-                        })
-                      }
-                    />
-                  )}
-                </Show>
-              </div>
-              <Show when={props.project.empty()}>
-                <PromptProjectAddButton controller={props.project} />
+        <div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-6">
+          <MarkGlyph class="size-10 shrink-0 text-v2-icon-icon-faint" />
+          <h1 class="text-center text-[28px] font-[440] leading-9 tracking-[-0.4px] text-v2-text-text-base">
+            {language.t("session.new.title")}
+          </h1>
+          <NewSessionTips selection={props.composer.model.selection} onDone={props.composer.restoreFocus} />
+        </div>
+        <div class="flex shrink-0 justify-center px-6 pb-6">
+          <div data-slot="new-session-composer" class={NEW_SESSION_CONTENT_WIDTH}>
+            {/* The location tray sits behind the composer's top edge, like a tab the composer is docked into. */}
+            <div class="mx-3 -mb-3 rounded-t-[14px] bg-v2-background-bg-layer-02 px-1 pb-3">
+              <Show when={props.project.selected()}>
+                {(project) => (
+                  <NewSessionLocation
+                    project={project()}
+                    workspace={props.workspace.bar.visible() ? props.workspace.selection.value() : "main"}
+                    root={props.workspace.project.root()}
+                    branch={<NewSessionBranch workspace={props.workspace} onDone={props.composer.restoreFocus} />}
+                    onboarding={onboardingReady() && !onboarding.used && props.workspace.bar.visible()}
+                    onClick={() =>
+                      props.location({
+                        onWorkspace: (value) => {
+                          if (value !== "main") setOnboarding("used", true)
+                        },
+                      })
+                    }
+                  />
+                )}
               </Show>
+              <Show when={props.project.empty()}>
+                <div class="flex min-h-9 items-center ps-2">
+                  <PromptProjectAddButton controller={props.project} />
+                </div>
+              </Show>
+            </div>
+            <div class="relative z-10">
+              <Composer model={props.composer} />
             </div>
           </div>
         </div>
-        <NewSessionTips selection={props.composer.model.selection} onDone={props.composer.restoreFocus} />
       </div>
     </div>
   )
@@ -153,7 +160,7 @@ function NewSessionTips(props: { selection: ComposerModel["model"]["selection"];
 
   return (
     <Show when={presence.present()}>
-      <div class="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center px-10">
+      <div class="flex max-w-full justify-center">
         <div
           ref={setRef}
           data-component="new-session-tip"

@@ -22,6 +22,37 @@ export const Mark = (props: { class?: string }) => {
   )
 }
 
+/** The mark in currentColor. `outline` draws hairline centerlines that can animate along their path. */
+export const MarkGlyph = (props: { class?: string; outline?: boolean }) => {
+  return (
+    <svg
+      data-component="logo-mark-glyph"
+      classList={{
+        [props.class ?? ""]: !!props.class,
+        "overflow-visible [&_path]:[vector-effect:non-scaling-stroke]": props.outline,
+      }}
+      viewBox="4 4 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        pathLength={props.outline ? 1 : undefined}
+        d="M24.98 9.84A10 10 0 1 0 24.98 22.16"
+        stroke="currentColor"
+        stroke-width={props.outline ? 1 : 4.4}
+        stroke-linecap="round"
+      />
+      <path
+        pathLength={props.outline ? 1 : undefined}
+        d="M25.95 16A2.55 2.55 0 1 1 20.85 16A2.55 2.55 0 1 1 25.95 16Z"
+        fill={props.outline ? "none" : "currentColor"}
+        stroke={props.outline ? "currentColor" : undefined}
+        stroke-width={props.outline ? 1 : undefined}
+      />
+    </svg>
+  )
+}
+
 export const Splash = (props: Pick<ComponentProps<"svg">, "ref" | "class">) => {
   return (
     <svg
