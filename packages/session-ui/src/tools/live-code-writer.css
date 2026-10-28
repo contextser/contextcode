@@ -131,7 +131,6 @@
     overflow: auto;
     overscroll-behavior: contain;
     padding-block: 10px 28px;
-    scroll-behavior: smooth;
     font-family: var(--v2-font-family-code);
     font-size: 12px;
     line-height: var(--live-line);
@@ -163,6 +162,17 @@
 
     &[data-diff="meta"] [data-slot="live-code-text"] {
       color: var(--v2-text-text-faint);
+    }
+
+    /* Unchanged code around an edit recedes so the change reads first. */
+    &[data-context] {
+      opacity: 0.55;
+    }
+
+    /* A replaced line stays readable but struck through. */
+    &[data-diff="delete"] [data-slot="live-code-text"] {
+      text-decoration: line-through;
+      text-decoration-color: color-mix(in srgb, var(--syntax-diff-delete) 60%, transparent);
     }
   }
 
@@ -397,10 +407,6 @@
 
     [data-slot="live-code-cursor"] {
       transition: none;
-    }
-
-    [data-slot="live-code-body"] {
-      scroll-behavior: auto;
     }
   }
 }

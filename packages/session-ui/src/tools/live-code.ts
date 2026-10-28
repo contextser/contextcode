@@ -200,3 +200,51 @@ function classify(text: string, next: string | undefined): CodeToken["kind"] {
 
   return "punct"
 }
+
+export type EditContext = {
+  /** The new file's line number of the first context line. */
+  start: number
+  before: string[]
+  removed: string[]
+  after: string[]
+}
+
+/**
+ * Where an edit lands in its file, read from the first hunk of the call's diff once the call has run: the unchanged
+ * lines around it and the lines it replaces, so the new code can be typed in place.
+ */
+export function editContext(tool: SessionMessageAssistantTool): EditContext | undefined {
+  if (tool.name !== "edit" || !("metadata" in tool.state)) return
+  const files = tool.state.metadata?.files
+  const patch = Array.isArray(files)
+    ? files
+        .map((file: unknown) =>
+          typeof file === "object" && file !== null && "patch" in file && typeof file.patch === "string"
+            ? file.patch
+            : undefined,
+        )
+        .find((value) => value !== undefined)
+    : undefined
+  const lines = patch?.split("\n") ?? []
+  const header = lines.findIndex((line) => line.startsWith("@@"))
+  const start = header === -1 ? undefined : /\+(\d+)/.exec(lines[header]!)?.[1]
+
+  if (start === undefined) return
+  const body = lines.slice(header + 1)
+  const end = body.findIndex((line) => line.startsWith("@@"))
+  const hunk = (end === -1 ? body : body.slice(0, end)).filter((line) => !line.startsWith("\\"))
+  const firstChange = hunk.findIndex((line) => line.startsWith("-") || line.startsWith("+"))
+  const lastChange = hunk.findLastIndex((line) => line.startsWith("-") || line.startsWith("+"))
+
+  if (firstChange === -1) return
+
+  return {
+    start: Number(start),
+    before: hunk.slice(0, firstChange).map((line) => line.slice(1)),
+    removed: hunk.slice(firstChange, lastChange + 1).flatMap((line) => (line.startsWith("-") ? [line.slice(1)] : [])),
+    after: hunk
+      .slice(lastChange + 1)
+      .filter((line) => line !== "")
+      .map((line) => line.slice(1)),
+  }
+}

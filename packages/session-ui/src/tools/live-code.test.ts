@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import type { SessionMessageAssistantTool } from "@contextcode/client/promise"
-import { liveCode, partialStrings } from "./live-code"
+import { editContext, liveCode, partialStrings } from "./live-code"
 
 const streaming = (name: string, input: string) =>
   ({
@@ -44,6 +44,38 @@ describe("liveCode", () => {
       mode: "edit",
       path: "a.ts",
       code: "b",
+    })
+  })
+})
+
+describe("editContext", () => {
+  test("places an edit in its file from the first hunk of the diff", () => {
+    const patch = [
+      "Index: a.ts",
+      "--- a.ts",
+      "+++ a.ts",
+      "@@ -10,6 +10,6 @@",
+      " const a = 1",
+      " const b = 2",
+      "-const c = 3",
+      "+const c = 4",
+      " const d = 5",
+      " const e = 6",
+      "",
+    ].join("\n")
+    const tool = {
+      type: "tool",
+      id: "edit_1",
+      name: "edit",
+      time: { created: 0 },
+      state: { status: "completed", input: {}, metadata: { files: [{ file: "a.ts", patch }] }, content: [] },
+    } as unknown as SessionMessageAssistantTool
+
+    expect(editContext(tool)).toEqual({
+      start: 10,
+      before: ["const a = 1", "const b = 2"],
+      removed: ["const c = 3"],
+      after: ["const d = 5", "const e = 6"],
     })
   })
 })

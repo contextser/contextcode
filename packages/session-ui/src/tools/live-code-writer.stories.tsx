@@ -85,3 +85,49 @@ export const Burst = {
     )
   },
 }
+
+const before = Array.from({ length: 40 }, (_, index) => `  const step${index} = compute(${index})`).join("\n")
+
+/** An edit typed in place, between the unchanged lines around it, after the line it replaces. */
+export const EditInPlace = {
+  render: () => {
+    const newString = `  const total = steps\n    .filter((step) => step.enabled)\n    .reduce((sum, step) => sum + step.weight, 0)\n  return total / steps.length`
+    const patch = [
+      "--- src/score.ts",
+      "+++ src/score.ts",
+      "@@ -38,9 +38,12 @@",
+      ...before
+        .split("\n")
+        .slice(34, 38)
+        .map((line) => ` ${line}`),
+      "-  return steps.length",
+      ...newString.split("\n").map((line) => `+${line}`),
+      " }",
+      " ",
+      " export default score",
+      "",
+    ].join("\n")
+    const [tool, setTool] = createStore<SessionMessageAssistantTool>({
+      type: "tool",
+      id: "live_edit",
+      name: "edit",
+      time: { created: 0 },
+      state: {
+        status: "completed",
+        input: { path: "src/score.ts", oldString: "  return steps.length", newString },
+        metadata: { files: [{ file: "src/score.ts", patch, additions: 4, deletions: 1 }] },
+        content: [],
+      },
+    })
+
+    return (
+      <section style={{ width: "100%", "max-width": "760px", padding: "24px" }}>
+        <CurrentSessionProviders document={storyDocument([])}>
+          <Show when={tool.id} keyed>
+            <LiveCodeWriter tool={tool} onDone={() => setTool("id", `live_edit_${Date.now()}`)} />
+          </Show>
+        </CurrentSessionProviders>
+      </section>
+    )
+  },
+}

@@ -7,7 +7,7 @@ import { AnimatedNumber } from "@contextcode/ui/animated-number"
 import { TextShimmer } from "@contextcode/ui/text-shimmer"
 import { prefersReducedMotion } from "@contextcode/ui/motion"
 import { getDirectory, getFilename } from "@contextcode/util/path"
-import { highlightLine, liveCode } from "./live-code"
+import { editContext, highlightLine, liveCode } from "./live-code"
 import "./live-code-writer.css"
 
 /**
@@ -88,19 +88,31 @@ export function LiveCodeWriter(props: {
 
   const typing = () => streaming() || view.shown < target().length
 
+  // An edit is typed in place: between the unchanged lines around it, after the lines it replaces.
+  const context = createMemo(() => editContext(props.tool))
+  const firstLine = () => {
+    const edit = context()
+
+    return edit ? edit.start + edit.before.length : 1
+  }
   const text = () => target().slice(0, view.shown)
   const lines = createMemo(() => text().split("\n"))
   const path = () => live()?.path ?? ""
   const added = () => lines().length - (text() === "" ? 1 : 0)
 
-  // Place the agent's cursor on the caret and keep it in view unless the reader scrolled away.
+  // Place the agent's cursor on the caret, and glide the view so the line being written sits about a third of the way
+  // down, the way a person keeps their place while typing. Reading elsewhere (wheel or touch) stops the following.
   createEffect(
     on(text, () => {
       queueMicrotask(() => {
         if (!caret || !body) return
         setView("cursor", { x: caret.offsetLeft, y: caret.offsetTop })
 
-        if (view.follow) body.scrollTop = Math.max(0, caret.offsetTop - body.clientHeight + 64)
+        if (view.follow) {
+          const goal = Math.max(0, caret.offsetTop - body.clientHeight * 0.35)
+          const distance = goal - body.scrollTop
+          body.scrollTop += Math.abs(distance) < 2 || prefersReducedMotion() ? distance : distance * 0.3
+        }
         props.onSizeChange?.()
       })
     }),
@@ -174,12 +186,24 @@ export function LiveCodeWriter(props: {
           <div
             ref={body}
             data-slot="live-code-body"
-            onScroll={(event) => {
-              const element = event.currentTarget
-              setView("follow", element.scrollHeight - element.scrollTop - element.clientHeight < 80)
-            }}
+            onWheel={() => setView("follow", false)}
+            onTouchMove={() => setView("follow", false)}
           >
             <div data-slot="live-code-sheet">
+              <Show when={context()}>
+                {(edit) => (
+                  <>
+                    <For each={edit().before}>
+                      {(line, index) => (
+                        <CodeLine number={edit().start + index()} line={line} path={path()} kind="context" />
+                      )}
+                    </For>
+                    <For each={edit().removed}>
+                      {(line) => <CodeLine number="−" line={line} path={path()} kind="removed" />}
+                    </For>
+                  </>
+                )}
+              </Show>
               <For each={lines()}>
                 {(line, index) => {
                   const last = () => index() === lines().length - 1
@@ -189,18 +213,20 @@ export function LiveCodeWriter(props: {
                       data-slot="live-code-line"
                       data-active={last() ? "" : undefined}
                       data-diff={
-                        current().mode === "patch"
-                          ? line.startsWith("+")
-                            ? "add"
-                            : line.startsWith("-")
-                              ? "delete"
-                              : line.startsWith("***") || line.startsWith("@@")
-                                ? "meta"
-                                : undefined
-                          : undefined
+                        context()
+                          ? "add"
+                          : current().mode === "patch"
+                            ? line.startsWith("+")
+                              ? "add"
+                              : line.startsWith("-")
+                                ? "delete"
+                                : line.startsWith("***") || line.startsWith("@@")
+                                  ? "meta"
+                                  : undefined
+                            : undefined
                       }
                     >
-                      <span data-slot="live-code-number">{index() + 1}</span>
+                      <span data-slot="live-code-number">{firstLine() + index()}</span>
                       <span data-slot="live-code-text">
                         <For each={highlightLine(line, path())}>
                           {(token) => <span data-token={token.kind}>{token.text}</span>}
@@ -213,6 +239,20 @@ export function LiveCodeWriter(props: {
                   )
                 }}
               </For>
+              <Show when={context()}>
+                {(edit) => (
+                  <For each={edit().after}>
+                    {(line, index) => (
+                      <CodeLine
+                        number={firstLine() + lines().length + index()}
+                        line={line}
+                        path={path()}
+                        kind="context"
+                      />
+                    )}
+                  </For>
+                )}
+              </Show>
               <div
                 data-slot="live-code-cursor"
                 aria-hidden="true"
@@ -231,6 +271,24 @@ export function LiveCodeWriter(props: {
         </section>
       )}
     </Show>
+  )
+}
+
+// A line the agent is not typing: unchanged code around an edit, or a line the edit replaces.
+function CodeLine(props: { number: number | string; line: string; path: string; kind: "context" | "removed" }) {
+  return (
+    <div
+      data-slot="live-code-line"
+      data-context={props.kind === "context" ? "" : undefined}
+      data-diff={props.kind === "removed" ? "delete" : undefined}
+    >
+      <span data-slot="live-code-number">{props.number}</span>
+      <span data-slot="live-code-text">
+        <For each={highlightLine(props.line, props.path)}>
+          {(token) => <span data-token={token.kind}>{token.text}</span>}
+        </For>
+      </span>
+    </div>
   )
 }
 
