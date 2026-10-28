@@ -27,8 +27,9 @@ const scope = "openid profile email"
 // Sign-in waits this long for the browser before giving up.
 const signInTimeout = 5 * 60_000
 
-// The id of the Context Code client registered at accounts.contextser.com (a public client: no secret). Without one,
-// sign-in is off and the app opens as it did before accounts. The environment variable overrides it for testing.
+// The id of the Context Code client registered at accounts.contextser.com (a public client: no secret). The
+// environment variable overrides it for testing. Signing in is required either way: without an id the gate stays up
+// and sign-in reports that it is not configured.
 const registeredClientId = ""
 const clientId = process.env.CONTEXTCODE_ACCOUNTS_CLIENT_ID ?? registeredClientId
 
@@ -41,11 +42,8 @@ const storePath = () => join(app.getPath("userData"), "contextser-account.bin")
 let pending: { server: Server; finish: (error: string) => void } | undefined
 let refreshing: Promise<Stored | undefined> | undefined
 
-export const accountRequired = () => clientId !== ""
-
 /** Who is signed in, refreshing an expired access token first. Offline, the last known profile stands. */
 export async function accountSession() {
-  if (!accountRequired()) return { required: false, profile: null }
   const stored = await load()
 
   if (!stored) return { required: true, profile: null }
@@ -57,7 +55,7 @@ export async function accountSession() {
 }
 
 export async function signIn(): Promise<{ profile: AccountProfile | null; error?: string }> {
-  if (!accountRequired()) return { profile: null, error: "Sign-in is not configured for this build." }
+  if (!clientId) return { profile: null, error: "sign-in is not configured for this build yet" }
   pending?.finish("cancelled")
   const verifier = base64url(randomBytes(32))
   const state = base64url(randomBytes(16))

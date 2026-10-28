@@ -60,9 +60,9 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
         }),
   )
 
-  // Signing in comes before everything else. A build without a registered client, or a failed check, opens as before.
+  // Signing in comes before everything else; a failed check keeps the gate up rather than letting anyone through.
   const [account, { mutate: setAccount }] = createResource(() =>
-    props.api.accountSession().catch(() => ({ required: false, profile: null })),
+    props.api.accountSession().catch(() => ({ required: true, profile: null })),
   )
   const gated = () => account()?.required === true && !account()?.profile
 
