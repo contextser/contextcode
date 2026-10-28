@@ -127,7 +127,8 @@
     width: 34px;
     height: 34px;
     border-radius: 999px;
-    color: white;
+    /* The accent's own foreground: white on the light theme's ink, ink on the dark theme's white. */
+    color: var(--v2-text-text-contrast);
     background-image:
       linear-gradient(180deg, var(--v2-alpha-light-20) 0%, var(--v2-alpha-light-0) 100%),
       linear-gradient(90deg, var(--v2-background-bg-accent) 0%, var(--v2-background-bg-accent) 100%);

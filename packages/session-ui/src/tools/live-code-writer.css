@@ -76,7 +76,7 @@
     place-items: center;
     border-radius: 999px;
     background: var(--live-accent);
-    color: white;
+    color: var(--v2-text-text-contrast);
     box-shadow: 0 0 0 2px var(--v2-background-bg-layer-01);
 
     &::after {
@@ -235,7 +235,7 @@
     padding: 2px 8px 2px 4px;
     border-radius: 999px 999px 999px 4px;
     background: var(--live-accent);
-    color: white;
+    color: var(--v2-text-text-contrast);
     font-family: var(--v2-font-family-sans);
     font-size: 11px;
     font-weight: 600;
