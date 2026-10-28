@@ -46,11 +46,17 @@
 }
 
 /* The app name, starting a chat, projects, then every recent session. */
+/* A bento tile of its own beside the main card: every corner rounded, lifted off the shell like the main card. */
 [data-component="sidebar-panel"] {
   display: flex;
   min-height: 0;
   flex: 1;
   flex-direction: column;
+  padding: 10px 16px 0;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--v2-background-bg-base);
+  box-shadow: var(--v2-elevation-raised);
   font-family: var(--v2-font-family-sans);
 
   button {
