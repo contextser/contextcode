@@ -195,16 +195,16 @@ describe("settings schema", () => {
   })
 })
 
-test("font defaults are Inter and IBM Plex Mono", () => {
-  expect(sansDefault).toBe("Inter")
+test("font defaults are Satoshi and IBM Plex Mono", () => {
+  expect(sansDefault).toBe("Satoshi")
   expect(monoDefault).toBe("IBM Plex Mono")
 })
 
 test.each([
-  { name: "sans", family: sansFontFamily, font: undefined, prefix: '"Inter", ' },
-  { name: "sans", family: sansFontFamily, font: "", prefix: '"Inter", ' },
-  { name: "sans", family: sansFontFamily, font: "   ", prefix: '"Inter", ' },
-  { name: "sans", family: sansFontFamily, font: "Custom Sans", prefix: '"Custom Sans", "Inter", ' },
+  { name: "sans", family: sansFontFamily, font: undefined, prefix: '"Satoshi", ' },
+  { name: "sans", family: sansFontFamily, font: "", prefix: '"Satoshi", ' },
+  { name: "sans", family: sansFontFamily, font: "   ", prefix: '"Satoshi", ' },
+  { name: "sans", family: sansFontFamily, font: "Custom Sans", prefix: '"Custom Sans", "Satoshi", ' },
   { name: "mono", family: monoFontFamily, font: undefined, prefix: '"IBM Plex Mono", ' },
   { name: "mono", family: monoFontFamily, font: "", prefix: '"IBM Plex Mono", ' },
   { name: "mono", family: monoFontFamily, font: "   ", prefix: '"IBM Plex Mono", ' },
