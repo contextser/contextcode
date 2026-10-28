@@ -835,7 +835,7 @@ test("lists slash commands in their built-in order", async ({ page }) => {
 const followUp = "Add follow-up, / for commands, @ for context…"
 
 for (const row of [
-  { state: "an idle", copy: "Ask anything, / for commands, @ for context…" },
+  { state: "an idle", copy: "Work with Context Code" },
   { state: "a running", copy: followUp, sessionStatus: { ses_placeholder: { type: "running" } } },
   {
     state: "an idle queued",

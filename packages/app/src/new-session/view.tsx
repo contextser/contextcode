@@ -19,6 +19,7 @@ import {
 import { Schema } from "effect"
 import { createPresence } from "@/runtime/presence"
 import { Composer } from "@/composer/composer"
+import { ComposerPermissions } from "@/composer/permissions"
 import { ComposerDropzone } from "@/composer/dropzone"
 import type { ComposerModel } from "@/composer/model"
 import {
@@ -31,8 +32,6 @@ import { useLanguage } from "@/runtime/i18n/language"
 import { useWorkspaceLocation } from "@/workspaces/location"
 import { useProviders } from "@/providers/catalog/providers"
 import { NEW_SESSION_CONTENT_WIDTH } from "@/new-session/layout"
-import { useServerSDK } from "@/runtime/server/client"
-import { projectSettingsKey, useSettings } from "@/settings/model"
 import { Persist, persisted } from "@/runtime/persistence/storage"
 import { Persistence } from "@/runtime/persistence/schema"
 import type { NewSessionWorkspaceController } from "./workspace/controller"
@@ -111,7 +110,7 @@ export function NewSessionView(props: {
                 model={props.composer}
                 appearance="hero"
                 placeholder={language.t("session.new.placeholder")}
-                leading={<NewSessionPermissions project={props.project.selected()} />}
+                leading={<ComposerPermissions projectID={props.project.selected()?.id} />}
               />
             </div>
           </div>
@@ -202,56 +201,6 @@ function NewSessionTips(props: { selection: ComposerModel["model"]["selection"];
         </div>
       </div>
     </Show>
-  )
-}
-
-/** Shows whether this project's permission requests are approved automatically, and toggles it. */
-function NewSessionPermissions(props: { project?: PromptProject }) {
-  const language = useLanguage()
-  const settings = useSettings()
-  const sdk = useServerSDK()
-  const key = () => projectSettingsKey(sdk.scope, props.project?.id)
-  const full = () => settings.permissions.autoApproves(key())
-
-  // Like the session command: set this project's choice, falling back to the default when they match.
-  const toggle = () => {
-    const project = key()
-    const active = !full()
-
-    if (!project) return settings.permissions.setAutoApproveDefault(active)
-    settings.permissions.setAutoApproveOverride(
-      project,
-      active === settings.permissions.autoApproveDefault() ? undefined : active,
-    )
-  }
-
-  return (
-    <Tooltip
-      placement="top"
-      openDelay={800}
-      value={
-        full()
-          ? language.t("command.permissions.autoaccept.disable")
-          : key()
-            ? language.t("command.permissions.autoaccept.project")
-            : language.t("command.permissions.autoaccept.enable")
-      }
-    >
-      <button
-        type="button"
-        data-action="new-session-permissions"
-        aria-pressed={full()}
-        class="flex h-8 shrink-0 items-center gap-1.5 rounded-full ps-2 pe-2.5 text-[14px] font-[440] leading-5 tracking-[-0.1px] transition-colors hover:bg-v2-overlay-simple-overlay-hover focus-visible:bg-v2-overlay-simple-overlay-hover focus-visible:outline-none"
-        classList={{ "text-v2-state-fg-warning": full(), "text-v2-text-text-muted": !full() }}
-        onMouseDown={(event) => event.preventDefault()}
-        onClick={toggle}
-      >
-        <Icon name={full() ? "shield-alert" : "lock"} size="small" class="shrink-0" />
-        <span class="whitespace-nowrap">
-          {full() ? language.t("session.new.permissions.full") : language.t("session.new.permissions.ask")}
-        </span>
-      </button>
-    </Tooltip>
   )
 }
 

@@ -69,7 +69,12 @@ export function Composer(props: {
             title={language.t("command.model.choose")}
             keybind={command.keybindParts("model.choose")}
             model={props.model.model.selection}
-            providerName={props.model.model.preview?.provider ?? props.model.model.providerName}
+            // The hero composer names only the model, as the start screen does.
+            providerName={
+              props.appearance === "hero"
+                ? undefined
+                : (props.model.model.preview?.provider ?? props.model.model.providerName)
+            }
             modelName={modelName()}
             onClose={props.model.restoreFocus}
             onUnpaidClick={() => dialog.show(() => <DialogSelectModelUnpaid model={props.model.model.selection} />)}

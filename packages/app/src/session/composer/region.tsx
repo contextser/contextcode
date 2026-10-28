@@ -49,6 +49,7 @@ import type { Region } from "@/runtime/plugin/panels"
 import { SessionLocationMissing } from "./location-missing"
 import { SessionPluginPills } from "./plugin-pills"
 import { SessionLiveWriter } from "./live-writer"
+import { ComposerPermissions } from "@/composer/permissions"
 import { SessionActivityDock } from "./activity-dock"
 import type { MountedSession, SessionScreen } from "@contextcode/plugin/gui"
 
@@ -556,6 +557,8 @@ export function ActiveSessionComposerRegion(props: {
                 <Composer
                   model={props.model.composer}
                   borderUnderlay
+                  appearance="hero"
+                  leading={<ComposerPermissions projectID={props.session.data.info()?.projectID} />}
                   readOnly={props.model.queue.undoing()}
                   suggestionBoundary={props.suggestionBoundary}
                 />

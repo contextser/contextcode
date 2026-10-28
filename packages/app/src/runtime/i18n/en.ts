@@ -332,6 +332,7 @@ export const dict = {
 
   "prompt.placeholder.shell": "Enter shell command… {{example}}",
   "prompt.placeholder.normal": 'Ask anything… "{{example}}"',
+  "session.composer.placeholder": "Work with Context Code",
   "prompt.mode.shell": "Shell",
   "prompt.mode.normal": "Prompt",
   "session.child.backToParent": "Main session",
