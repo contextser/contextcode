@@ -83,12 +83,14 @@ export async function signIn(): Promise<{ profile: AccountProfile | null; error?
       const url = new URL(request.url ?? "/", redirectUri)
 
       if (url.pathname !== "/callback") {
-        response.writeHead(404).end()
+        response.writeHead(404, { connection: "close" }).end()
         return
       }
       const error = url.searchParams.get("error")
       const ok = !error && url.searchParams.get("state") === state && !!url.searchParams.get("code")
-      response.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(page(ok))
+      // No keep-alive: a browser reuses an open connection, which would carry the next sign-in's callback to this
+      // listener after it has finished instead of to the new one.
+      response.writeHead(200, { "content-type": "text/html; charset=utf-8", connection: "close" }).end(page(ok))
       finish(ok ? undefined : (url.searchParams.get("error_description") ?? error ?? "state mismatch"))
 
       if (ok) resolve({ code: url.searchParams.get("code") ?? undefined })
@@ -101,6 +103,7 @@ export async function signIn(): Promise<{ profile: AccountProfile | null; error?
       done = true
       clearTimeout(timer)
       server.close()
+      server.closeAllConnections()
       pending = undefined
 
       if (error) resolve({ error })
