@@ -1,0 +1,178 @@
+/* The live agent line that replaces "Working": an animated Contextser mark and a narrated current step. */
+[data-component="agent-status"] {
+  --agent-accent: var(--v2-background-bg-accent);
+
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  font-size: 13px;
+  font-weight: 440;
+  line-height: var(--line-height-compact);
+  color: var(--v2-text-text-muted);
+
+  [data-slot="agent-status-mark"] {
+    position: relative;
+    display: grid;
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+
+    /* A soft halo that breathes behind the mark. */
+    &::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 999px;
+      background: radial-gradient(circle, color-mix(in srgb, var(--agent-accent) 28%, transparent), transparent 70%);
+      animation: agent-status-breathe 2.4s ease-in-out infinite;
+    }
+
+    svg {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      overflow: visible;
+    }
+  }
+
+  [data-slot="agent-status-orbit"] {
+    stroke: var(--agent-accent);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-dasharray: 18 74;
+    opacity: 0.55;
+    transform-origin: 16px 16px;
+    animation: agent-status-orbit 1.6s linear infinite;
+  }
+
+  [data-slot="agent-status-arc"] {
+    stroke: var(--v2-text-text-base);
+    stroke-width: 4.4;
+    stroke-linecap: round;
+    stroke-dasharray: 52;
+    animation: agent-status-draw 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  [data-slot="agent-status-dot"] {
+    fill: var(--agent-accent);
+    transform-origin: 23.4px 16px;
+    animation: agent-status-pulse 1.2s ease-in-out infinite;
+  }
+
+  [data-slot="agent-status-name"] {
+    flex-shrink: 0;
+    color: var(--v2-text-text-base);
+    font-weight: 600;
+  }
+
+  [data-slot="agent-status-divider"] {
+    width: 1px;
+    height: 12px;
+    flex-shrink: 0;
+    background: var(--v2-border-border-base);
+  }
+
+  [data-slot="agent-status-track"] {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  [data-slot="agent-status-activity"] {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 6px;
+    animation: agent-status-step 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-slot="agent-status-icon"] {
+    flex-shrink: 0;
+    color: var(--agent-accent);
+  }
+
+  [data-slot="agent-status-target"] {
+    min-width: 0;
+    overflow: hidden;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: var(--v2-background-bg-layer-02);
+    color: var(--v2-text-text-base);
+    font-family: var(--v2-font-family-code);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  [data-slot="agent-status-meta"] {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+    margin-inline-start: 2px;
+    color: var(--v2-text-text-faint);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+
+    span + span::before {
+      content: "·";
+      margin-inline-end: 8px;
+    }
+  }
+}
+
+@keyframes agent-status-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes agent-status-draw {
+  0% {
+    stroke-dashoffset: 52;
+  }
+  45%,
+  70% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -52;
+  }
+}
+
+@keyframes agent-status-pulse {
+  50% {
+    transform: scale(1.35);
+    opacity: 0.6;
+  }
+}
+
+@keyframes agent-status-breathe {
+  50% {
+    opacity: 0.35;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes agent-status-step {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-component="agent-status"] {
+    [data-slot="agent-status-mark"]::before,
+    [data-slot="agent-status-orbit"],
+    [data-slot="agent-status-arc"],
+    [data-slot="agent-status-dot"],
+    [data-slot="agent-status-activity"] {
+      animation: none;
+    }
+  }
+}

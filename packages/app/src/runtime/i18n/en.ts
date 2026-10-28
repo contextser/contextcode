@@ -180,7 +180,8 @@ export const dict = {
   "provider.connect.console.title": "Connecting to Context Code Console",
   "provider.connect.console.titleGo": "Connecting to OpenCode Go",
   "provider.connect.console.retry": "Try again",
-  "provider.connect.console.serviceKeyDescription": "Connect using a service-account API key from Context Code Console.",
+  "provider.connect.console.serviceKeyDescription":
+    "Connect using a service-account API key from Context Code Console.",
   "provider.connect.console.instructions":
     "Continue in your browser. Confirm the code shown there matches the one below.",
   "provider.connect.console.deviceCode": "Device code",
@@ -423,7 +424,8 @@ export const dict = {
   "server.connect.scan.description": "Point your camera at the QR code shown by contextcode pair.",
   "server.connect.scan.invalid": "This is not a Context Code pairing code. Scan the code shown by contextcode pair.",
   "server.connect.scan.failed": "This browser could not read the QR code. Enter your connection details manually.",
-  "server.connect.link.expired": "This pairing link expired or was already used. Run contextcode pair to get a new one.",
+  "server.connect.link.expired":
+    "This pairing link expired or was already used. Run contextcode pair to get a new one.",
   "server.connect.link.unreachable":
     "Could not reach {{url}}. Check that this device can reach the server, then try again.",
   "server.connect.link.legacy":
@@ -613,6 +615,20 @@ export const dict = {
   "session.todo.label.one": "{{done}} of {{count}} todo done",
   "session.todo.label.other": "{{done}} of {{count}} todos done",
   "session.timeline.working": "Working",
+  "session.agent.name": "Context Agent",
+  "session.agent.thinking": "Thinking",
+  "session.agent.responding": "Writing a reply",
+  "session.agent.reading": "Reading",
+  "session.agent.searching": "Searching",
+  "session.agent.writing": "Writing",
+  "session.agent.editing": "Editing",
+  "session.agent.running": "Running",
+  "session.agent.fetching": "Fetching",
+  "session.agent.delegating": "Delegating",
+  "session.agent.using": "Using",
+  "session.agent.working": "Working",
+  "session.agent.actions.one": "{{count}} action",
+  "session.agent.actions.other": "{{count}} actions",
   "session.running.stop.subagent": "Interrupt subagent",
   "session.running.stop.shell": "Kill shell command",
 
@@ -962,7 +978,8 @@ export const dict = {
   "settings.general.row.shell.autoDefault": "Auto (Default)",
   "settings.general.row.shell.terminalOnly": "terminal only",
   "settings.general.row.colorScheme.title": "Color scheme",
-  "settings.general.row.colorScheme.description": "Choose whether Context Code follows the system, light, or dark theme",
+  "settings.general.row.colorScheme.description":
+    "Choose whether Context Code follows the system, light, or dark theme",
   "settings.general.row.theme.title": "Theme",
   "settings.general.row.theme.description": "Customise how Context Code is themed.",
   "settings.general.row.font.title": "Code Font",

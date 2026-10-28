@@ -10,7 +10,6 @@ import { IconButton } from "@contextcode/ui/icon-button"
 import { Menu } from "@contextcode/ui/menu"
 import { InlineInput } from "@contextcode/ui/inline-input"
 import { Keybind } from "@contextcode/ui/keybind"
-import { TextShimmer } from "@contextcode/ui/text-shimmer"
 import type { BackgroundTask, MountedSession, SessionScreen } from "@contextcode/plugin/gui"
 import { PluginSlot } from "@/runtime/plugin/render"
 import { useLanguage } from "@/runtime/i18n/language"
@@ -36,6 +35,7 @@ import {
 import { SessionHeaderSpacer } from "@/session/header/session-header"
 import { SessionHeaderGap } from "@/session/header/drag-area"
 import { SessionWorkingIndicator } from "@/session/header/session-working-indicator"
+import { AgentStatus } from "./agent-status"
 
 type BlockingTask = { type: "shell" | "subagent"; partID: string; id?: string; label?: string }
 
@@ -458,8 +458,8 @@ function MessageTimelineView(
     >
       <div class={`flex h-9 items-center gap-2 pt-3 text-[13px] font-[530] leading-text-compact ${turnPadding()}`}>
         <Show when={live() && showWorking()}>
-          <div data-component="session-working" role="status">
-            <TextShimmer text={language.t("session.timeline.working")} active />
+          <div data-component="session-working" class="min-w-0">
+            <AgentStatus messages={props.session.history.messages()} />
           </div>
         </Show>
         <Show when={live() && backgroundHintPresence.present()}>
