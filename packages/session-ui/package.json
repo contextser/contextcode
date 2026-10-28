@@ -35,6 +35,7 @@
     "./markdown-stream": "./src/components/markdown-stream.ts",
     "./markdown-cache": "./src/components/markdown-cache.tsx",
     "./line-comment-styles": "./src/components/line-comment-styles.ts",
+    "./live-code-writer": "./src/tools/live-code-writer.tsx",
     "./pierre": "./src/pierre/index.ts",
     "./pierre/*": "./src/pierre/*.ts",
     "./context": "./src/context/index.ts",

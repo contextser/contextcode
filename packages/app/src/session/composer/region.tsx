@@ -48,6 +48,7 @@ import { createSessionRequestModel } from "../requests/model"
 import type { Region } from "@/runtime/plugin/panels"
 import { SessionLocationMissing } from "./location-missing"
 import { SessionPluginPills } from "./plugin-pills"
+import { SessionLiveWriter } from "./live-writer"
 import type { MountedSession, SessionScreen } from "@contextcode/plugin/gui"
 
 export function createActiveSessionRegion(input: {
@@ -509,6 +510,10 @@ export function ActiveSessionComposerRegion(props: {
       }
       above={
         <Show when={!missing() && !props.session.data.isChild()}>
+          {/* Keyed by session so opening another session starts from what it already holds. */}
+          <Show when={props.session.identity.params.id} keyed>
+            <SessionLiveWriter messages={props.session.history.messages()} />
+          </Show>
           <SessionComposerLane>
             <SessionActivityChips subagents={subagents()} shells={shells()} onOpen={open} onStop={stop} />
             <Show when={todosVisible()}>

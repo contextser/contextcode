@@ -66,7 +66,6 @@ import { AssistantReasoningContent, writeClipboard } from "../message/message-co
 import { stripAnsi } from "./ansi"
 import { followShellOutput } from "./shell-output"
 import { LinkedText } from "../components/linked-text"
-import { LiveCodeWriter } from "./live-code-writer"
 
 function ShellSubmessage(props: { text: string; animate?: boolean }) {
   let widthRef: HTMLSpanElement | undefined
@@ -1038,15 +1037,12 @@ export function CurrentFileToolGroup(props: {
     return name === "edit" || name === "write" ? name : "patch"
   })
 
-  const writing = createMemo(() => props.tools.filter((tool) => tool.state.status === "streaming"))
-
   return (
     <div
       data-component="tool-part-wrapper"
       data-timeline-part-id={props.tools.length === 1 ? props.tools[0]?.id : undefined}
       data-timeline-part-ids={props.tools.length > 1 ? props.tools.map((tool) => tool.id).join(",") : undefined}
     >
-      <For each={writing()}>{(tool) => <LiveCodeWriter tool={tool} onSizeChange={props.onSizeChange} />}</For>
       <Dynamic
         component={render}
         tool={tool()}

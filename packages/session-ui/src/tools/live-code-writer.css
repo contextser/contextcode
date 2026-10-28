@@ -275,6 +275,45 @@
   }
 }
 
+/* Floating above the composer: lifted, and it slides in when the agent starts a file. */
+[data-component="live-code-writer"][data-floating] {
+  margin: 0;
+  box-shadow:
+    var(--v2-elevation-floating),
+    0 24px 60px -30px color-mix(in srgb, var(--live-accent) 60%, transparent);
+  animation: live-code-enter 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  [data-slot="live-code-body"] {
+    max-height: 280px;
+  }
+}
+
+/* Once the whole file is shown, the live affordances settle before the card hands back to the diff. */
+[data-component="live-code-writer"][data-finished] {
+  &::before {
+    opacity: 0;
+    animation: none;
+  }
+
+  [data-slot="live-code-avatar"]::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  [data-slot="live-code-caret"],
+  [data-slot="live-code-cursor"] {
+    opacity: 0;
+    transition: opacity 400ms ease-out;
+  }
+}
+
+@keyframes live-code-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
 @property --live-angle {
   syntax: "<angle>";
   inherits: false;
@@ -306,6 +345,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   [data-component="live-code-writer"] {
+    &,
     &::before,
     [data-slot="live-code-avatar"]::after,
     [data-slot="live-code-caret"] {

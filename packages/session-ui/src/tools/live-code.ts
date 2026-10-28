@@ -6,10 +6,18 @@ export type LiveCode = {
   code: string
 }
 
-/** The file a streaming write, edit or patch call is producing, read from its partial JSON input. */
+/**
+ * The file a write, edit or patch call is producing: read from its partial JSON input while it streams, and from its
+ * decoded input once the call has it.
+ */
 export function liveCode(tool: SessionMessageAssistantTool): LiveCode | undefined {
-  if (tool.state.status !== "streaming") return
-  const input = partialStrings(tool.state.input)
+  if (!("input" in tool.state)) return
+  const input =
+    tool.state.status === "streaming"
+      ? partialStrings(tool.state.input)
+      : Object.fromEntries(
+          Object.entries(tool.state.input).filter((entry): entry is [string, string] => typeof entry[1] === "string"),
+        )
 
   if (tool.name === "write") return { mode: "write", path: input.path ?? "", code: input.content ?? "" }
 

@@ -11,15 +11,21 @@ import { highlightLine, liveCode } from "./live-code"
 import "./live-code-writer.css"
 
 /**
- * A live editor for a file the agent is still writing: the streamed code types itself out, and the agent's cursor and
- * name tag follow the caret the way a collaborator's cursor does in a shared document.
+ * A live editor for a file the agent writes: its code types itself out, and the agent's cursor and name tag follow the
+ * caret the way a collaborator's cursor does in a shared document. Many providers deliver a call's arguments in one
+ * burst, so the typing is paced here rather than by the stream; `onDone` fires once the whole file has been shown.
  */
-export function LiveCodeWriter(props: { tool: SessionMessageAssistantTool; onSizeChange?: () => void }) {
+export function LiveCodeWriter(props: {
+  tool: SessionMessageAssistantTool
+  floating?: boolean
+  onSizeChange?: () => void
+  onDone?: () => void
+}) {
   const i18n = useI18n()
   const live = createMemo(() => liveCode(props.tool))
   const target = () => live()?.code ?? ""
-  // Streamed input arrives in bursts; `shown` eases toward it so the code reads as typed rather than pasted.
-  const [view, setView] = createStore({ shown: 0, cursor: { x: 0, y: 0 }, follow: true })
+  const streaming = () => props.tool.state.status === "streaming"
+  const [view, setView] = createStore({ shown: 0, cursor: { x: 0, y: 0 }, follow: true, done: false })
   let body: HTMLDivElement | undefined
   let caret: HTMLSpanElement | undefined
   let frame: number | undefined
@@ -31,7 +37,9 @@ export function LiveCodeWriter(props: { tool: SessionMessageAssistantTool; onSiz
     if (view.shown >= length) return
 
     if (prefersReducedMotion()) return setView("shown", length)
-    setView("shown", (shown) => Math.min(length, shown + Math.max(2, Math.ceil((length - shown) / 6))))
+    // Type a file in one to four seconds, whatever its size, and catch up quickly if the stream runs ahead.
+    const pace = Math.ceil(length / (60 * Math.min(4, Math.max(1, length / 450))))
+    setView("shown", (shown) => Math.min(length, shown + Math.max(2, pace, Math.ceil((length - shown) / 40))))
     frame = requestAnimationFrame(step)
   }
 
@@ -43,6 +51,16 @@ export function LiveCodeWriter(props: { tool: SessionMessageAssistantTool; onSiz
     }),
   )
   onCleanup(() => frame !== undefined && cancelAnimationFrame(frame))
+
+  // Linger on the finished file for a moment, then hand back to the regular diff.
+  createEffect(() => {
+    if (streaming() || view.shown < target().length || !live()) return
+    const timer = setTimeout(() => {
+      setView("done", true)
+      props.onDone?.()
+    }, 1200)
+    onCleanup(() => clearTimeout(timer))
+  })
 
   const text = () => target().slice(0, view.shown)
   const lines = createMemo(() => text().split("\n"))
@@ -65,6 +83,8 @@ export function LiveCodeWriter(props: { tool: SessionMessageAssistantTool; onSiz
   const verb = () => {
     const mode = live()?.mode
 
+    if (!streaming() && view.shown >= target().length) return i18n.t("ui.liveCode.done")
+
     if (mode === "edit") return i18n.t("ui.liveCode.editing")
 
     if (mode === "patch") return i18n.t("ui.liveCode.patching")
@@ -78,6 +98,8 @@ export function LiveCodeWriter(props: { tool: SessionMessageAssistantTool; onSiz
         <section
           data-component="live-code-writer"
           data-mode={current().mode}
+          data-floating={props.floating ? "" : undefined}
+          data-finished={!streaming() && view.shown >= target().length ? "" : undefined}
           aria-label={i18n.t("ui.liveCode.label", { file: getFilename(path()) || path() })}
           aria-busy="true"
         >
@@ -98,7 +120,7 @@ export function LiveCodeWriter(props: { tool: SessionMessageAssistantTool; onSiz
             </span>
             <span data-slot="live-code-presence">
               <span data-slot="live-code-verb">
-                <TextShimmer text={verb()} />
+                <TextShimmer text={verb()} active={streaming() || view.shown < target().length} />
               </span>
               <span data-slot="live-code-count">
                 +<AnimatedNumber value={added()} />
