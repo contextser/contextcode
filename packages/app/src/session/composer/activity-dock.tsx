@@ -1,7 +1,8 @@
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { Icon } from "@contextcode/ui/icon"
 import { IconButton } from "@contextcode/ui/icon-button"
-import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js"
+import { createEffect, For, onCleanup, onMount, Show } from "solid-js"
+import { createStore } from "solid-js/store"
 import { useLanguage } from "@/runtime/i18n/language"
 import { useSettings } from "@/settings/model"
 import { ActivityGlyph } from "./activity-glyph"
@@ -11,8 +12,9 @@ const width = 248
 const margin = 16
 
 /**
- * Running shells and subagents as a floating bar in the gutter beside the composer. It shows only while the gutter
- * can hold it, and reports that through `onFit` so the capsule above the composer can stand in when it cannot.
+ * Running shells and subagents as a floating bar on the composer's end side. It sits in the gutter beside the composer
+ * when the gutter can hold it, and otherwise just above the composer's end edge. It starts as a small pill and opens
+ * into the list on click; `onFit` reports that it is showing, so the capsule above the composer stays out of its way.
  */
 export function SessionActivityDock(props: {
   subagents: readonly SessionActivityItem[]
@@ -23,7 +25,7 @@ export function SessionActivityDock(props: {
 }) {
   const language = useLanguage()
   const settings = useSettings()
-  const [state, setState] = createSignal({ fits: false, collapsed: false, now: Date.now() })
+  const [state, setState] = createStore({ fits: false, edge: 0, collapsed: true, now: Date.now() })
   let anchor!: HTMLDivElement
 
   const active = () =>
@@ -35,15 +37,15 @@ export function SessionActivityDock(props: {
     const column = dock?.firstElementChild
 
     if (!dock || !(column instanceof HTMLElement)) return
-    const fits = (dock.clientWidth - column.clientWidth) / 2 >= width + margin * 2
-    setState((current) => (current.fits === fits ? current : { ...current, fits }))
+    const edge = (dock.clientWidth - column.clientWidth) / 2
+    setState({ fits: edge >= width + margin * 2, edge })
   }
 
-  createEffect(() => props.onFit(state().fits))
+  createEffect(() => props.onFit(active()))
 
   createEffect(() => {
     if (!active()) return
-    const timer = setInterval(() => setState((current) => ({ ...current, now: Date.now() })), 1000)
+    const timer = setInterval(() => setState("now", Date.now()), 1000)
     onCleanup(() => clearInterval(timer))
   })
 
@@ -60,15 +62,24 @@ export function SessionActivityDock(props: {
 
   return (
     <div ref={anchor} data-component="session-activity-dock" class="pointer-events-none absolute inset-0">
-      <Show when={active() && state().fits}>
+      <Show when={active()}>
+        {/* Beside the composer it rests on the dock's floor; without room, it floats above the composer's end edge,
+            whose column has 12px of padding. */}
         <section
           data-slot="session-activity-dock-panel"
-          data-collapsed={state().collapsed ? "" : undefined}
+          data-collapsed={state.collapsed ? "" : undefined}
           aria-label={language.activitySummary({ subagents: props.subagents.length, shells: props.shells.length })}
-          class="pointer-events-auto absolute bottom-3"
-          style={{ width: `${width}px`, "inset-inline-end": `${margin}px` }}
+          class="pointer-events-auto absolute"
+          style={{
+            width: state.collapsed ? undefined : `${width}px`,
+            "inset-inline-end": `${state.fits ? margin : state.edge + 12}px`,
+            bottom: state.fits ? "12px" : "calc(100% + 8px)",
+          }}
         >
-          <header data-slot="session-activity-dock-header">
+          <header
+            data-slot="session-activity-dock-header"
+            onClick={() => setState("collapsed", (collapsed) => !collapsed)}
+          >
             <span class="flex shrink-0 items-center gap-1">
               <Show when={props.shells.length > 0}>
                 <ActivityGlyph kind="shell" class="size-4" />
@@ -87,12 +98,15 @@ export function SessionActivityDock(props: {
               variant="ghost-muted"
               data-slot="session-activity-dock-toggle"
               icon={<Icon name="chevron-down" size="small" />}
-              aria-expanded={!state().collapsed}
-              aria-label={language.t(state().collapsed ? "session.activity.expand" : "session.activity.collapse")}
-              onClick={() => setState((current) => ({ ...current, collapsed: !current.collapsed }))}
+              aria-expanded={!state.collapsed}
+              aria-label={language.t(state.collapsed ? "session.activity.expand" : "session.activity.collapse")}
+              onClick={(event) => {
+                event.stopPropagation()
+                setState("collapsed", (collapsed) => !collapsed)
+              }}
             />
           </header>
-          <Show when={!state().collapsed}>
+          <Show when={!state.collapsed}>
             <div data-slot="session-activity-dock-list">
               <For each={[...props.shells, ...props.subagents]}>
                 {(item) => (
@@ -120,7 +134,7 @@ export function SessionActivityDock(props: {
                           : item.label}
                       </span>
                       <span data-slot="session-activity-dock-elapsed">
-                        {formatElapsed(state().now - item.started, language.t)}
+                        {formatElapsed(state.now - item.started, language.t)}
                       </span>
                     </span>
                     <Show when={stoppable(item)}>
