@@ -328,7 +328,7 @@ export default function Layout(props: ParentProps) {
                 session's title row after a divider, as in Codex. Controls inside a drag region opt out of dragging. */}
             <div
               data-slot="shell-chrome"
-              class="absolute inset-x-0 top-0 flex items-center ps-2 pe-2 pt-2"
+              class="absolute inset-x-0 top-0 z-30 flex items-center ps-2 pe-2 pt-2"
               style={{ height: `${joinedTop}px` }}
               data-tauri-drag-region={dragInset() ? "" : undefined}
             >

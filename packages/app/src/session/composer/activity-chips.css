@@ -397,6 +397,8 @@
 [data-slot="session-activity-dock-panel"][data-inline] {
   position: relative;
   overflow: visible;
+  /* The whole pill takes clicks: inside the chrome row's drag region only real buttons opt out on their own. */
+  app-region: no-drag;
   border-radius: 999px;
   box-shadow: none;
   animation: none;
