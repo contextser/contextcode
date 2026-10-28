@@ -6,7 +6,7 @@ import { useDialog } from "@contextcode/ui/context/dialog"
 import { prefersReducedMotion } from "@contextcode/ui/motion"
 import { Titlebar } from "@/shell/titlebar/titlebar"
 import { SidebarRail } from "@/shell/titlebar/sidebar-nav"
-import { setChromeTitleMount } from "@/shell/chrome-title"
+import { setChromeEndMount, setChromeTitleMount } from "@/shell/chrome-title"
 import { usePlatform } from "@/runtime/platform/platform"
 import { ToastRegion } from "@/shell/notifications/toast"
 import { UploadToastHost } from "@/composer/attachments/uploads"
@@ -341,6 +341,13 @@ export default function Layout(props: ParentProps) {
                 ref={(element) => {
                   setChromeTitleMount(element)
                   onCleanup(() => setChromeTitleMount(undefined))
+                }}
+              />
+              <div
+                class="flex h-full shrink-0 items-center"
+                ref={(element) => {
+                  setChromeEndMount(element)
+                  onCleanup(() => setChromeEndMount(undefined))
                 }}
               />
             </div>

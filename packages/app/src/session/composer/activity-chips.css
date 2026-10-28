@@ -395,6 +395,7 @@
 
 /* In the chrome row: a quiet pill among the header's actions, whose list drops down beneath it. */
 [data-slot="session-activity-dock-panel"][data-inline] {
+  position: relative;
   overflow: visible;
   border-radius: 999px;
   box-shadow: none;

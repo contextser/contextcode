@@ -1,3 +1,5 @@
+import { chromeEndMount } from "@/shell/chrome-title"
+import { Portal } from "solid-js/web"
 import {
   batch,
   ErrorBoundary,
@@ -306,7 +308,7 @@ function SessionScreenContent(props: {
           onSelectionInteraction={timeline.view.selectionInteraction}
           pinned={timeline.view.pinned()}
           centered={screen.centered()}
-          reserveReviewToggle={!sideVisible()}
+          reserveReviewToggle={!sideVisible() && !chromeEndMount()}
           setContentRef={timeline.view.setContentRef}
           bottomInset={timeline.inset()}
           setVisibleRef={timeline.view.setVisibleRef}
@@ -445,26 +447,49 @@ function SessionScreenContent(props: {
     </>
   )
 
+  const reviewToggle = () => (
+    <SessionReviewToggle
+      onToggle={region.toggle}
+      glyph={(fill) => {
+        sideGlyph = fill
+        paintSideGlyph()
+      }}
+    />
+  )
+
   return (
     <>
       <div class="flex-1 min-h-0 flex flex-col gap-2 px-[var(--shell-inline-inset,8px)] pb-[var(--shell-bottom-inset,8px)] pt-[var(--shell-top-inset,8px)]">
         <div ref={screen.panel.ref} data-pane-row class="relative flex-1 min-h-0 flex flex-col md:flex-row gap-2">
           {/* Keep the control outside panel animations. */}
           <Show when={isDesktop() && messagesReady() && session.identity.params.id}>
-            <div
-              class="absolute end-3 top-0 z-30 h-12 flex items-center"
-              data-slot="session-review-toggle"
-              onPointerDown={hideTimelineScrollbar}
-              onClick={hideTimelineScrollbar}
+            {/* In the chrome row it follows the title row and the running-work menu in the row's flow. */}
+            <Show
+              when={chromeEndMount()}
+              fallback={
+                <div
+                  class="absolute end-3 top-0 z-30 h-12 flex items-center"
+                  data-slot="session-review-toggle"
+                  onPointerDown={hideTimelineScrollbar}
+                  onClick={hideTimelineScrollbar}
+                >
+                  {reviewToggle()}
+                </div>
+              }
             >
-              <SessionReviewToggle
-                onToggle={region.toggle}
-                glyph={(fill) => {
-                  sideGlyph = fill
-                  paintSideGlyph()
-                }}
-              />
-            </div>
+              {(mount) => (
+                <Portal mount={mount()}>
+                  <div
+                    class="flex h-12 items-center"
+                    data-slot="session-review-toggle"
+                    onPointerDown={hideTimelineScrollbar}
+                    onClick={hideTimelineScrollbar}
+                  >
+                    {reviewToggle()}
+                  </div>
+                </Portal>
+              )}
+            </Show>
           </Show>
           <div
             ref={chat}

@@ -8,3 +8,6 @@ export const [chromeTitleMount, setChromeTitleMount] = createSignal<HTMLElement>
 
 /** A slot at the start of the chrome row's header actions, where the running-work menu renders. */
 export const [chromeActivityMount, setChromeActivityMount] = createSignal<HTMLElement>()
+
+/** The chrome row's end, after the title row: the session's review toggle sits here in the row's flow. */
+export const [chromeEndMount, setChromeEndMount] = createSignal<HTMLElement>()
