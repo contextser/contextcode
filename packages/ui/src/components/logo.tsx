@@ -75,15 +75,16 @@ export const Splash = (props: Pick<ComponentProps<"svg">, "ref" | "class">) => {
   )
 }
 
-export const Logo = (props: { class?: string }) => {
+/** The mark and "context code"; `mark={false}` keeps only the words, trimmed to their own bounds. */
+export const Logo = (props: { class?: string; mark?: boolean }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 -2.2 345.55 34.4"
+      viewBox={props.mark === false ? "42.27 -2.2 303.28 34.4" : "0 -2.2 345.55 34.4"}
       fill="none"
       classList={{ [props.class ?? ""]: !!props.class }}
     >
-      <g transform="translate(-2.74 -2.8) scale(1.3)">
+      <g transform="translate(-2.74 -2.8) scale(1.3)" display={props.mark === false ? "none" : undefined}>
         <path
           data-slot="logo-logo-mark-c"
           d="M24.98 9.84A10 10 0 1 0 24.98 22.16"

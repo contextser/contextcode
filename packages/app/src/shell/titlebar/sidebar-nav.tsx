@@ -206,8 +206,7 @@ export function SidebarPanel(props: { onNewChat: () => void }) {
           aria-label="Context Code"
           onClick={() => command.trigger("home.toggle")}
         >
-          <Logo class="h-[15px] w-auto shrink-0" />
-          <Icon name="chevron-down" size="small" />
+          <Logo mark={false} class="h-[15px] w-auto shrink-0" />
         </button>
         <div class="flex-1" />
         <Tooltip placement="bottom" value={language.t("sidebar.attention")}>
