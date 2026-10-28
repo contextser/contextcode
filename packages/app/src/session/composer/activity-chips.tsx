@@ -47,12 +47,16 @@ export function SessionActivityChips(props: {
   shells: readonly SessionActivityItem[]
   onOpen: (item: SessionActivityItem) => void
   onStop: (item: SessionActivityItem) => void
+  /** The running-work bar beside the composer is showing this work instead. */
+  docked?: boolean
 }) {
   const language = useLanguage()
   const settings = useSettings()
 
   const active = () =>
-    settings.general.backgroundActivity() !== "off" && (props.subagents.length > 0 || props.shells.length > 0)
+    !props.docked &&
+    settings.general.backgroundActivity() !== "off" &&
+    (props.subagents.length > 0 || props.shells.length > 0)
 
   const alignment = useComposerLaneAlignment()
 

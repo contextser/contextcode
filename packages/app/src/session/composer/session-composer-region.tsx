@@ -26,6 +26,8 @@ export type SessionComposerRegionViewController = Pick<
 export function SessionComposerRegion(props: {
   controller: SessionComposerRegionViewController
   above?: JSX.Element
+  /** Floats in the dock beside the composer column, such as the running-work bar. */
+  aside?: JSX.Element
   composer: JSX.Element
   subagent: JSX.Element
 }) {
@@ -45,7 +47,7 @@ export function SessionComposerRegion(props: {
     <div
       ref={controller.setDockRef}
       data-component="session-composer-dock"
-      class="w-full shrink-0 flex flex-col justify-center items-center pb-3 pointer-events-none"
+      class="relative w-full shrink-0 flex flex-col justify-center items-center pb-3 pointer-events-none"
     >
       {/* Only the docks and composer take the pointer; the gaps beside them belong to the timeline underneath. */}
       <div
@@ -104,6 +106,7 @@ export function SessionComposerRegion(props: {
           <Show when={controller.showComposer() && controller.child()}>{props.subagent}</Show>
         </div>
       </div>
+      {props.aside}
     </div>
   )
 }

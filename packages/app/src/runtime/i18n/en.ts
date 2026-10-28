@@ -631,6 +631,9 @@ export const dict = {
   "session.agent.actions.other": "{{count}} actions",
   "session.running.stop.subagent": "Interrupt subagent",
   "session.running.stop.shell": "Kill shell command",
+  "session.activity.running": "Running",
+  "session.activity.collapse": "Collapse running work",
+  "session.activity.expand": "Expand running work",
 
   "session.files.selectToOpen": "Select a file to open",
 

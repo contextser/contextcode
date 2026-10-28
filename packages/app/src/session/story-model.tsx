@@ -8,6 +8,7 @@ import {
 } from "@/session/composer/session-composer-region"
 import { SessionActivityChips, type SessionActivityItem } from "@/session/composer/activity-chips"
 import { SessionComposerLane } from "@/session/composer/composer-lane"
+import { SessionActivityDock } from "@/session/composer/activity-dock"
 import { SessionTodoPill } from "@/session/composer/todo-pill"
 import type { Todo } from "@/session/composer/todos"
 import { SettingsProvider } from "@/settings/model"
@@ -23,7 +24,7 @@ import type { ComposerPersistedState } from "@/composer/types"
 import { Button } from "@contextcode/ui/button"
 import { Icon } from "@contextcode/ui/icon"
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
-import { children, Show, type ComponentProps, type JSX } from "solid-js"
+import { children, createSignal, Show, type ComponentProps, type JSX } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useLanguage } from "@/runtime/i18n/language"
 import type { WebSearchRequestModel } from "./requests/websearch"
@@ -193,6 +194,7 @@ function SessionSurfaceState(props: SessionPreviewProps & { onReset: () => void 
   const language = useLanguage()
   const side = children(() => props.side)
 
+  const [docked, setDocked] = createSignal(false)
   const [state, setState] = createStore<{
     activity: string
     reviewOpened: boolean
@@ -309,6 +311,17 @@ function SessionSurfaceState(props: SessionPreviewProps & { onReset: () => void 
                         )}
                       </Show>
                     }
+                    aside={
+                      <SettingsProvider>
+                        <SessionActivityDock
+                          subagents={props.activity?.subagents ?? []}
+                          shells={props.activity?.shells ?? []}
+                          onOpen={(item) => setState("activity", `Opened ${item.label ?? item.key}`)}
+                          onStop={(item) => setState("activity", `Stopped ${item.label ?? item.key}`)}
+                          onFit={setDocked}
+                        />
+                      </SettingsProvider>
+                    }
                     above={
                       <SettingsProvider>
                         <SessionComposerLane>
@@ -325,6 +338,7 @@ function SessionSurfaceState(props: SessionPreviewProps & { onReset: () => void 
                                 ? props.activity.onStop(item)
                                 : setState("activity", `Stopped ${item.label ?? item.key}`)
                             }
+                            docked={docked()}
                           />
                           <Show when={props.todos} keyed>
                             {(todos) => <SessionTodoPill todos={todos.items} defaultOpen={todos.open} />}

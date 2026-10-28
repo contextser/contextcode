@@ -4,7 +4,7 @@ import { useDialog } from "@contextcode/ui/context/dialog"
 import { isScrollKeyTarget, scrollKey, scrollKeyOwner } from "@contextcode/ui/scroll-view"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { useNavigate } from "@solidjs/router"
-import { createEffect, createMemo, on, onCleanup, onMount, Show, type Accessor } from "solid-js"
+import { createEffect, createMemo, createSignal, on, onCleanup, onMount, Show, type Accessor } from "solid-js"
 import { Composer } from "@/composer/composer"
 import { VoiceComposer } from "@/voice/composer"
 import { useComposerState } from "@/composer/persistence"
@@ -49,6 +49,7 @@ import type { Region } from "@/runtime/plugin/panels"
 import { SessionLocationMissing } from "./location-missing"
 import { SessionPluginPills } from "./plugin-pills"
 import { SessionLiveWriter } from "./live-writer"
+import { SessionActivityDock } from "./activity-dock"
 import type { MountedSession, SessionScreen } from "@contextcode/plugin/gui"
 
 export function createActiveSessionRegion(input: {
@@ -469,6 +470,8 @@ export function ActiveSessionComposerRegion(props: {
   }
 
   const providers = useProviders(() => props.session.data.info()?.location.directory)
+  // Whether the running-work bar fits beside the composer; the capsule above the composer stands in when it does not.
+  const [docked, setDocked] = createSignal(false)
 
   const subagentModel = () => {
     const ref =
@@ -508,6 +511,17 @@ export function ActiveSessionComposerRegion(props: {
           )}
         </Show>
       }
+      aside={
+        <Show when={!missing() && !props.session.data.isChild()}>
+          <SessionActivityDock
+            subagents={subagents()}
+            shells={shells()}
+            onOpen={open}
+            onStop={stop}
+            onFit={setDocked}
+          />
+        </Show>
+      }
       above={
         <Show when={!missing() && !props.session.data.isChild()}>
           {/* Keyed by session so opening another session starts from what it already holds. */}
@@ -515,7 +529,13 @@ export function ActiveSessionComposerRegion(props: {
             <SessionLiveWriter messages={props.session.history.messages()} />
           </Show>
           <SessionComposerLane>
-            <SessionActivityChips subagents={subagents()} shells={shells()} onOpen={open} onStop={stop} />
+            <SessionActivityChips
+              subagents={subagents()}
+              shells={shells()}
+              onOpen={open}
+              onStop={stop}
+              docked={docked()}
+            />
             <Show when={todosVisible()}>
               <SessionTodoPill todos={todos()} />
             </Show>
