@@ -10,6 +10,7 @@ import {
   ServerConnection,
   useCommand,
   useCurrentRoute,
+  useGlobal,
   usePluginServers,
   useTabs,
   type LayoutRoute,
@@ -44,6 +45,8 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
     onboardingReady: false,
     drawingReady: false,
     route,
+    // Set by signing in here, as opposed to opening the app already signed in.
+    signedIn: false,
   })
 
   // The window was created with the answers the shell gate needs; only a fresh install, which has no
@@ -128,6 +131,9 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
             onReady={() => setStartup("onboardingReady", true)}
           />
           <DesktopEffects api={props.api} />
+          <Show when={startup.signedIn && !firstLaunch()}>
+            <DesktopNewChatAfterSignIn />
+          </Show>
           <Suspense fallback={null}>
             <Show when={initializationData(sidecar)} keyed>
               {(server) => <MigrationStatus server={server} />}
@@ -152,7 +158,13 @@ export function DesktopApp(props: { api: ElectronAPI; version: string }) {
           <Show
             when={!gated()}
             fallback={
-              <DesktopSignIn api={props.api} onSignedIn={(profile) => setAccount({ required: true, profile })} />
+              <DesktopSignIn
+                api={props.api}
+                onSignedIn={(profile) => {
+                  setStartup("signedIn", true)
+                  setAccount({ required: true, profile })
+                }}
+              />
             }
           >
             <ReadyApp />
@@ -193,6 +205,31 @@ function DesktopStartupReady(props: {
   createEffect(() => {
     if (!props.routeReady || !tabs.ready() || !tabs.infoReady()) return
     props.onReady()
+  })
+
+  return null
+}
+
+/** Signing in opens a new chat, as the sidebar's New chat does, instead of the screen the app showed last. */
+function DesktopNewChatAfterSignIn() {
+  const command = useCommand()
+  const global = useGlobal()
+  const tabs = useTabs()
+  const route = useCurrentRoute()
+  const start = route().type
+  const [state, setState] = createStore({ done: start === "draft" })
+
+  createEffect(() => {
+    if (state.done) return
+
+    // Someone who went elsewhere before it could open stays where they went.
+    if (route().type !== start) return setState("done", true)
+
+    // New chat opens in a project, so it waits for the restored tabs and the project list.
+    if (!tabs.ready() || !global.servers.list().some((conn) => global.ensureServerCtx(conn).projects.list().length))
+      return
+    setState("done", true)
+    command.trigger("tab.new")
   })
 
   return null
