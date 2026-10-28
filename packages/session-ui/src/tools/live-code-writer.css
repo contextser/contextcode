@@ -9,9 +9,7 @@
   overflow: hidden;
   border-radius: 14px;
   background: var(--v2-background-bg-base);
-  box-shadow:
-    var(--v2-elevation-raised),
-    0 18px 48px -28px color-mix(in srgb, var(--live-accent) 55%, transparent);
+  box-shadow: var(--v2-elevation-raised);
 
   /* A slow accent sweep around the edge while the agent is typing. */
   &::before {
@@ -70,19 +68,12 @@
   }
 
   [data-slot="live-code-name"] {
-    flex-shrink: 0;
-    color: var(--v2-text-text-base);
-    font-weight: 530;
-  }
-
-  [data-slot="live-code-directory"] {
     min-width: 0;
     overflow: hidden;
-    color: var(--v2-text-text-faint);
+    color: var(--v2-text-text-base);
+    font-weight: 530;
     text-overflow: ellipsis;
     white-space: nowrap;
-    direction: rtl;
-    text-align: start;
   }
 
   [data-slot="live-code-presence"] {
@@ -285,12 +276,9 @@
   }
 }
 
-/* Floating above the composer: lifted, and it slides in when the agent starts a file. */
+/* Floating above the composer, it slides in when the agent starts a file; the shadow stays as light as inline. */
 [data-component="live-code-writer"][data-floating] {
   margin: 0;
-  box-shadow:
-    var(--v2-elevation-floating),
-    0 24px 60px -30px color-mix(in srgb, var(--live-accent) 60%, transparent);
 
   [data-slot="live-code-body"] {
     max-height: 280px;

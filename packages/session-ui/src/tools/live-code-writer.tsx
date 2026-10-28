@@ -6,7 +6,7 @@ import { FileIcon } from "@contextcode/ui/file-icon"
 import { AnimatedNumber } from "@contextcode/ui/animated-number"
 import { TextShimmer } from "@contextcode/ui/text-shimmer"
 import { prefersReducedMotion } from "@contextcode/ui/motion"
-import { getDirectory, getFilename } from "@contextcode/util/path"
+import { getFilename } from "@contextcode/util/path"
 import { editContext, highlightLine, liveCode } from "./live-code"
 import "./live-code-writer.css"
 
@@ -153,10 +153,9 @@ export function LiveCodeWriter(props: {
               <Show when={path()}>
                 <FileIcon node={{ path: path(), type: "file" }} class="size-4 shrink-0" />
               </Show>
-              <span data-slot="live-code-name">{getFilename(path()) || "…"}</span>
-              <Show when={getDirectory(path())}>
-                {(directory) => <span data-slot="live-code-directory">{directory()}</span>}
-              </Show>
+              <span data-slot="live-code-name" title={path() || undefined}>
+                {getFilename(path()) || "…"}
+              </span>
             </span>
             <span data-slot="live-code-presence">
               <span data-slot="live-code-verb">
