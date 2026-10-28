@@ -1006,6 +1006,13 @@ function toolGroupType(
   hasContextGroup: boolean,
   detail?: TimelineDetail,
 ) {
+  // A file the agent is still writing shows as a live editor, wherever finished edits of that kind are grouped.
+  if (
+    (content.name === "patch" || content.name === "edit" || content.name === "write") &&
+    content.state.status === "streaming"
+  )
+    return "file"
+
   if (detail) {
     if (content.name === "question" && !currentToolFailed(content)) return undefined
     const category = timelineCategory(content)!
