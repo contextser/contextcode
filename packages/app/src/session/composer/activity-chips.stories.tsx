@@ -101,41 +101,37 @@ function liveDocument(stage: Stage): SessionDocument {
   const done = stage.finished === stage.started && stage.finishedShells === stage.shells && stage.started > 0
 
   const tools = [
-    ...subagents.slice(0, stage.started).map(
-      (value, index): SessionMessageAssistantTool => ({
-        type: "tool",
-        id: `tool_${value.id}`,
-        name: "subagent",
-        state:
-          index < stage.finished
-            ? {
-                status: "completed",
-                input: { agent: value.agent, description: value.description, prompt: value.description },
-                content: [{ type: "text", text: "No issues found." }],
-                metadata: { sessionID: value.id, status: "completed" },
-              }
-            : {
-                status: "running",
-                input: { agent: value.agent, description: value.description, prompt: value.description },
-                metadata: { sessionID: value.id },
-              },
-        time: { created: STORY_TIME + 301_000 + index * 1_000, ran: STORY_TIME + 301_100 + index * 1_000 },
-      }),
-    ),
-    ...shells.slice(0, stage.shells).map(
-      (value, index): SessionMessageAssistantTool => ({
-        type: "tool",
-        id: `tool_${value.id}`,
-        name: "shell",
-        state: {
-          status: "completed",
-          input: { command: value.command, description: value.command },
-          content: [{ type: "text", text: index === 0 ? "Local: http://localhost:4444/" : "Watching src/session" }],
-          metadata: { shellID: value.id, status: index < stage.finishedShells ? "exited" : "running" },
-        },
-        time: { created: STORY_TIME + 304_000 + index * 1_000, ran: STORY_TIME + 304_100 + index * 1_000 },
-      }),
-    ),
+    ...subagents.slice(0, stage.started).map((value, index): SessionMessageAssistantTool => ({
+      type: "tool",
+      id: `tool_${value.id}`,
+      name: "subagent",
+      state:
+        index < stage.finished
+          ? {
+              status: "completed",
+              input: { agent: value.agent, description: value.description, prompt: value.description },
+              content: [{ type: "text", text: "No issues found." }],
+              metadata: { sessionID: value.id, status: "completed" },
+            }
+          : {
+              status: "running",
+              input: { agent: value.agent, description: value.description, prompt: value.description },
+              metadata: { sessionID: value.id },
+            },
+      time: { created: STORY_TIME + 301_000 + index * 1_000, ran: STORY_TIME + 301_100 + index * 1_000 },
+    })),
+    ...shells.slice(0, stage.shells).map((value, index): SessionMessageAssistantTool => ({
+      type: "tool",
+      id: `tool_${value.id}`,
+      name: "shell",
+      state: {
+        status: "completed",
+        input: { command: value.command, description: value.command },
+        content: [{ type: "text", text: index === 0 ? "Local: http://localhost:4444/" : "Watching src/session" }],
+        metadata: { shellID: value.id, status: index < stage.finishedShells ? "exited" : "running" },
+      },
+      time: { created: STORY_TIME + 304_000 + index * 1_000, ran: STORY_TIME + 304_100 + index * 1_000 },
+    })),
   ]
 
   const messages: SessionMessageInfo[] = [

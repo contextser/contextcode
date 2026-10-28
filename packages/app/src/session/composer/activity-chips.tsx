@@ -1,11 +1,11 @@
 import { Icon } from "@contextcode/ui/icon"
 import { IconButton } from "@contextcode/ui/icon-button"
 import { Menu } from "@contextcode/ui/menu"
-import { SessionProgressIndicatorV2 } from "@contextcode/session-ui/v2/session-progress-indicator-v2"
 import { createEffect, createSignal, For, onCleanup, Show } from "solid-js"
 import { useLanguage } from "@/runtime/i18n/language"
 import { useSettings } from "@/settings/model"
 import { useComposerLaneAlignment } from "./composer-lane"
+import { ActivityGlyph } from "./activity-glyph"
 import "./activity-chips.css"
 
 export type SessionActivityItem = {
@@ -20,9 +20,7 @@ export type SessionActivityItem = {
 }
 
 type DurationKey =
-  | "ui.message.duration.seconds"
-  | "ui.message.duration.minutesSeconds"
-  | "ui.message.duration.hoursMinutes"
+  "ui.message.duration.seconds" | "ui.message.duration.minutesSeconds" | "ui.message.duration.hoursMinutes"
 
 // 12s, 1m 05s, 1h 02m: the trailing unit is padded so ticking keeps the same digit count.
 export function formatElapsed(ms: number, t: (key: DurationKey, params: Record<string, string>) => string) {
@@ -74,11 +72,10 @@ export function SessionActivityChips(props: {
     },
   })
 
-  // One clock for every row, ticking only while the panel is open.
-  const [open, setOpen] = createSignal(false)
+  // One clock for the capsule and every row, ticking while there is work to time.
   const [now, setNow] = createSignal(Date.now())
   createEffect(() => {
-    if (!open() || !active()) return
+    if (!active()) return
 
     setNow(Date.now())
     const timer = setInterval(() => setNow(Date.now()), 1000)
@@ -124,6 +121,11 @@ export function SessionActivityChips(props: {
   )
 
   const label = () => language.activitySummary({ subagents: props.subagents.length, shells: props.shells.length })
+  const single = () => {
+    const items = [...props.subagents, ...props.shells]
+
+    return items.length === 1 && items[0]?.label ? items[0] : undefined
+  }
 
   // Each session mounts its own composer, so a capsule that is already there on a switch stays at rest; only work
   // that starts while the session is open fades in.
@@ -131,22 +133,28 @@ export function SessionActivityChips(props: {
   createEffect(() => {
     if (active()) return
     setEnter(true)
-    setOpen(false)
   })
 
   return (
     <Show when={active()}>
       <div data-component="session-activity-chips" class="flex min-w-0 shrink items-center">
-        <Menu gutter={8} placement={placement()} onOpenChange={setOpen}>
+        <Menu gutter={8} placement={placement()}>
           <Menu.Trigger
             as="button"
             type="button"
             data-slot="session-activity-chip"
             aria-label={label()}
-            class="pointer-events-auto flex h-7 min-w-0 max-w-full items-center gap-2 rounded-[12px] border-[0.5px] border-v2-border-border-muted bg-v2-background-bg-base ps-2.5 pe-2.5 text-[13px] font-[440] leading-text-compact tracking-[-0.04px] whitespace-nowrap tabular-nums text-v2-text-text-base shadow-[var(--v2-elevation-raised)] outline-none duration-150 ease-out motion-reduce:animate-none"
+            class="pointer-events-auto relative flex h-8 min-w-0 max-w-full items-center gap-2 overflow-hidden rounded-full border-[0.5px] border-v2-border-border-muted bg-v2-background-bg-base ps-2.5 pe-2.5 text-[13px] font-[440] leading-text-compact tracking-[-0.04px] whitespace-nowrap tabular-nums text-v2-text-text-base shadow-[var(--v2-elevation-raised)] outline-none duration-150 ease-out motion-reduce:animate-none"
             classList={{ "animate-in fade-in": enter() }}
           >
-            <SessionProgressIndicatorV2 class="shrink-0" />
+            <span data-slot="session-activity-glyphs" class="flex shrink-0 items-center gap-1">
+              <Show when={props.shells.length > 0}>
+                <ActivityGlyph kind="shell" class="size-4" />
+              </Show>
+              <Show when={props.subagents.length > 0}>
+                <ActivityGlyph kind="subagent" class="size-4" />
+              </Show>
+            </span>
             <span data-slot="session-activity-summary" class="flex min-w-0 items-center gap-2 overflow-hidden">
               {language.activitySummaryRich(
                 { subagents: props.subagents.length, shells: props.shells.length },
@@ -157,6 +165,21 @@ export function SessionActivityChips(props: {
                 ),
               )}
             </span>
+            {/* A single job names itself, so the capsule says what is running without opening the panel. */}
+            <Show when={single()}>
+              {(item) => (
+                <>
+                  <span
+                    data-slot="session-activity-detail"
+                    dir={item().type === "shell" ? "ltr" : "auto"}
+                    classList={{ "font-mono text-[12px]": item().type === "shell" }}
+                  >
+                    {item().label}
+                  </span>
+                  <span data-slot="session-activity-clock">{formatElapsed(now() - item().started, language.t)}</span>
+                </>
+              )}
+            </Show>
           </Menu.Trigger>
           <Menu.Portal>
             <Menu.Content
@@ -174,7 +197,7 @@ export function SessionActivityChips(props: {
               <For each={props.subagents}>
                 {(item) => (
                   <Menu.Item {...row(item)}>
-                    <SessionProgressIndicatorV2 class="shrink-0 text-v2-icon-icon-muted" />
+                    <ActivityGlyph kind="subagent" class="size-4 shrink-0" />
                     <span class="shrink-0 font-[530]">
                       <bdi>
                         {item.agent
@@ -192,7 +215,7 @@ export function SessionActivityChips(props: {
               <For each={props.shells}>
                 {(item) => (
                   <Menu.Item {...row(item)}>
-                    <Icon name="console" class="shrink-0 text-v2-icon-icon-muted" />
+                    <ActivityGlyph kind="shell" class="size-4 shrink-0" />
                     <span
                       dir="ltr"
                       class="min-w-0 flex-1 truncate font-mono text-[13px] tracking-[-0.04px] text-v2-text-text-base"

@@ -93,7 +93,7 @@ describe("settings schema", () => {
         timelineDetail: timelinePresets[2].value,
         showCustomAgents: false,
         showTurnDiffs: false,
-        backgroundActivity: "left",
+        backgroundActivity: "right",
         timelineWidth: "comfortable",
         newIcons: false,
         newModelPicker: false,
@@ -148,7 +148,7 @@ describe("settings schema", () => {
       autoSave: false,
       timelineDetail: timelinePresets[2].value,
       followUpBehavior: "steer",
-      backgroundActivity: "left",
+      backgroundActivity: "right",
       timelineWidth: "comfortable",
     })
     expect(settings.appearance).toEqual({

@@ -158,3 +158,132 @@
     min-height: 44px;
   }
 }
+
+/* A running job's name and clock inside the capsule, after the summary. */
+[data-slot="session-activity-detail"] {
+  min-width: 0;
+  max-width: 200px;
+  overflow: hidden;
+  color: var(--v2-text-text-muted);
+  text-overflow: ellipsis;
+}
+
+[data-slot="session-activity-clock"] {
+  flex-shrink: 0;
+  color: var(--v2-text-text-faint);
+  font-size: 12px;
+}
+
+/* Work is ongoing, so a light runs along the capsule's lower edge. */
+[data-slot="session-activity-chip"]::after {
+  content: "";
+  position: absolute;
+  inset-inline: 12px;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--v2-background-bg-accent) 80%, transparent),
+    transparent
+  );
+  background-size: 50% 100%;
+  background-repeat: no-repeat;
+  animation: session-activity-run 1.8s ease-in-out infinite;
+}
+
+[data-component="activity-glyph"] {
+  overflow: visible;
+  color: var(--v2-icon-icon-base);
+
+  &[data-kind="shell"] {
+    [data-slot="activity-glyph-frame"] {
+      stroke: currentColor;
+      stroke-width: 1.1;
+      opacity: 0.55;
+    }
+
+    [data-slot="activity-glyph-prompt"] {
+      stroke: currentColor;
+      stroke-width: 1.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* The caret blinks at the prompt while the command runs. */
+    [data-slot="activity-glyph-caret"] {
+      fill: var(--v2-background-bg-accent);
+      animation: activity-glyph-blink 1s steps(2, start) infinite;
+    }
+
+    /* Output arrives: a line fills in, clears, and fills again. */
+    [data-slot="activity-glyph-output"] {
+      fill: currentColor;
+      opacity: 0.45;
+      transform-origin: 4.25px 11px;
+      animation: activity-glyph-output 1.6s ease-in-out infinite;
+    }
+  }
+
+  &[data-kind="subagent"] {
+    [data-slot="activity-glyph-mark"] {
+      stroke: currentColor;
+      stroke-width: 4.4;
+      stroke-linecap: round;
+    }
+
+    [data-slot="activity-glyph-dot"] {
+      fill: currentColor;
+    }
+
+    /* A companion circling the C: work handed to another agent. */
+    [data-slot="activity-glyph-orbit"] {
+      fill: var(--v2-background-bg-accent);
+      transform-origin: 16px 16px;
+      animation: activity-glyph-orbit 1.4s linear infinite;
+    }
+  }
+}
+
+@keyframes session-activity-run {
+  from {
+    background-position: -100% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes activity-glyph-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+@keyframes activity-glyph-output {
+  0% {
+    transform: scaleX(0);
+  }
+  60%,
+  80% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes activity-glyph-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="session-activity-chip"]::after,
+  [data-component="activity-glyph"] * {
+    animation: none;
+  }
+}

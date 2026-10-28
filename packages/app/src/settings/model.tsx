@@ -296,7 +296,7 @@ export const defaultSettings: Settings = {
     timelineDetail: { ...timelinePresets[2].value },
     showCustomAgents: false,
     showTurnDiffs: false,
-    backgroundActivity: "left",
+    backgroundActivity: "right",
     timelineWidth: "comfortable",
     newIcons: false,
     newModelPicker: false,
