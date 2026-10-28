@@ -17,7 +17,7 @@ import { WindowsAppMenu } from "./windows-menu"
 import { applyPath, backPath, forwardPath, type HistoryLocation } from "./history"
 import { TitlebarTabStrip } from "@/shell/titlebar/tab-strip"
 import { macVerticalTrafficLights, SidebarToggle } from "@/shell/sidebar-toggle"
-import { SidebarInbox } from "@/shell/titlebar/inbox"
+import { SidebarPanel } from "./sidebar-nav"
 import { makeEventListener } from "@solid-primitives/event-listener"
 import { createMediaQuery } from "@solid-primitives/media"
 import { readSessionTabsRemovedDetail, SESSION_TABS_REMOVED_EVENT } from "@/shell/titlebar/session-events"
@@ -128,7 +128,6 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
 
   const titlebarItems = useTitlebarItems()
   const hideVerticalTitlebar = createMemo(() => !!props.verticalTabs && !windows())
-  const homeInSidebarHeader = () => !windows() && !macTrafficLights()
 
   const back = () => {
     const next = backPath(history)
@@ -815,12 +814,7 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
                                   start so the row doesn't leave an empty band. */}
                               <div
                                 data-slot="sidebar-header"
-                                data-home={homeInSidebarHeader() ? "" : undefined}
-                                class="flex w-full shrink-0 gap-2"
-                                classList={{
-                                  "items-start pt-2.5 pb-1": homeInSidebarHeader(),
-                                  "mb-2 h-12 items-center": !homeInSidebarHeader(),
-                                }}
+                                class="mb-2 flex h-12 w-full shrink-0 items-center gap-2"
                                 style={{
                                   "min-height": macVerticalTabs()
                                     ? `${macTrafficLightsTopClearance / zoom()}px`
@@ -829,58 +823,39 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
                                 data-tauri-drag-region
                               >
                                 <Show when={macTrafficLights()}>
-                                  {/* The sidebar's 18px start padding already covers part of the traffic lights. */}
+                                  {/* The rail and the sidebar's 18px start padding already cover part of the traffic
+                                      lights. */}
                                   <div
                                     class="shrink-0"
                                     style={{
-                                      width: `calc(${macVerticalTrafficLights(zoom()).width / zoom()}px - 18px)`,
+                                      width: `max(0px, calc(${macVerticalTrafficLights(zoom()).width / zoom()}px - 18px - 56px))`,
                                     }}
                                     aria-hidden="true"
                                   />
                                 </Show>
-                                <Show when={homeInSidebarHeader()} fallback={<div class="flex-1" />}>
-                                  <div class="min-w-0 flex-1">{homeButton(true)}</div>
-                                </Show>
-                                {/* Optically aligns the toggle's glyph with the selected session's end edge. */}
-                                <div class="-me-0.5 flex shrink-0">
+                                <div class="flex shrink-0 items-center gap-0.5">
+                                  <IconButton
+                                    type="button"
+                                    icon={<Icon name="arrow-left" />}
+                                    variant="ghost-muted"
+                                    disabled={!backPath(history)}
+                                    aria-label={language.t("common.goBack")}
+                                    onClick={back}
+                                  />
+                                  <IconButton
+                                    type="button"
+                                    icon={<Icon name="arrow-right" />}
+                                    variant="ghost-muted"
+                                    disabled={!forwardPath(history)}
+                                    aria-label={language.t("common.goForward")}
+                                    onClick={forward}
+                                  />
                                   <SidebarToggle handoff="out" />
                                 </div>
+                                <div class="flex-1" />
                               </div>
                             </Show>
-                            <div class="flex w-full shrink-0 flex-col gap-1">
-                              <Show when={!homeInSidebarHeader()}>{homeButton(true)}</Show>
-                              {searchButton(true)}
-                              <RecentlyClosedTabsMenu
-                                vertical
-                                onNewTab={openNewTab}
-                                keybind={command.keybind("tab.new")}
-                              />
-                            </div>
-                            <div class="h-4 w-full shrink-0" aria-hidden="true" />
-                            <div class="flex min-h-0 flex-1 flex-col gap-1">
-                              <Show
-                                when={settings.appearance.tabLayout() === "inbox"}
-                                fallback={
-                                  <TitlebarTabStrip
-                                    orientation="vertical"
-                                    tabs={tabsStore}
-                                    currentTab={currentTab()}
-                                    onNavigate={(tab, el) => {
-                                      tabs.select(tab)
-                                      el?.scrollIntoView({ behavior: "instant", block: "nearest" })
-                                    }}
-                                    onClose={(tab) => {
-                                      const index = tabsStore.findIndex((item) => tabKey(item) === tabKey(tab))
-
-                                      if (index !== -1) tabsStoreActions.closeTab(index)
-                                    }}
-                                    onReorder={(keys) => tabsStoreActions.reorder(keys)}
-                                  />
-                                }
-                              >
-                                <SidebarInbox />
-                              </Show>
-                            </div>
+                            <SidebarPanel onNewChat={openNewTab} />
                             <Show when={titlebarItems.ids().length > 0}>
                               <div data-slot="vertical-tabs-footer" class="mt-2 flex w-full shrink-0 flex-col">
                                 <TitlebarItems items={titlebarItems} vertical />

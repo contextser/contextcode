@@ -5,6 +5,7 @@ import { ResizeHandle } from "@contextcode/ui/resize-handle"
 import { useDialog } from "@contextcode/ui/context/dialog"
 import { prefersReducedMotion } from "@contextcode/ui/motion"
 import { Titlebar } from "@/shell/titlebar/titlebar"
+import { SidebarRail } from "@/shell/titlebar/sidebar-nav"
 import { usePlatform } from "@/runtime/platform/platform"
 import { ToastRegion } from "@/shell/notifications/toast"
 import { UploadToastHost } from "@/composer/attachments/uploads"
@@ -231,6 +232,9 @@ export default function Layout(props: ParentProps) {
             class="absolute inset-x-0 top-0 h-[var(--shell-top-inset,8px)]"
             data-tauri-drag-region
           />
+        </Show>
+        <Show when={verticalTabs() && !mobile()}>
+          <SidebarRail />
         </Show>
         <Show when={verticalTabs()}>
           <aside
