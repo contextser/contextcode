@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto"
 import { createServer, type Server } from "node:http"
 import { readFile, rm, writeFile } from "node:fs/promises"
+import { cpus, hostname, totalmem } from "node:os"
 import { join } from "node:path"
 import { app, safeStorage, shell } from "electron"
 
@@ -199,7 +200,7 @@ async function exchange(body: Record<string, string>): Promise<TokenResponse | {
   const response = await fetch(endpoints.token, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded", accept: "application/json" },
-    body: new URLSearchParams({ ...body, ...client() }),
+    body: new URLSearchParams({ ...body, ...client(), ...device() }),
   }).catch(() => undefined)
 
   if (!response) return { offline: true }
@@ -212,6 +213,21 @@ async function exchange(body: Record<string, string>): Promise<TokenResponse | {
     return { error: json.error_description ?? json.error ?? `token request failed (${response.status})` }
 
   return { access_token: json.access_token, refresh_token: json.refresh_token, expires_in: json.expires_in }
+}
+
+// Sent with every token request so the person can tell their sign-ins apart under Connected apps on
+// accounts.contextser.com; sending it on refreshes too keeps the version and "last active" current.
+function device() {
+  const system = { darwin: "macOS", win32: "Windows", linux: "Linux" }[process.platform as string] ?? process.platform
+
+  return {
+    device_name: hostname().replace(/\.local$/, ""),
+    device_os: `${system} ${process.getSystemVersion()}`,
+    device_hardware: [cpus()[0]?.model.trim(), `${Math.round(totalmem() / 2 ** 30)} GB`, process.arch]
+      .filter(Boolean)
+      .join(" · "),
+    app_version: app.getVersion(),
+  }
 }
 
 function stored(tokens: TokenResponse, previousRefresh?: string): Omit<Stored, "profile"> {
