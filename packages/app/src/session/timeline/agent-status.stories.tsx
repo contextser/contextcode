@@ -10,10 +10,7 @@ export default {
 }
 
 const steps = [
-  {
-    type: "reasoning",
-    text: "**Planning the button refresh**\nThe base class sets the radius, so that is where to start.",
-  },
+  { type: "reasoning", text: "Planning" },
   { name: "read", input: { path: "src/components/ui/button.tsx" } },
   { name: "grep", input: { pattern: "rounded-lg" } },
   { name: "edit", input: { path: "src/components/ui/button.tsx" } },
@@ -29,27 +26,26 @@ export const Turn = {
     const [index, setIndex] = createSignal(0)
     const since = Date.now()
     const messages = () => {
-      // Step 0 has nothing back yet, so the line reads the request.
-      const content = steps.slice(0, index()).map((step, position) =>
+      const content = steps.slice(0, index() + 1).map((step, position) =>
         "name" in step
           ? {
               type: "tool",
               id: `call_${position}`,
               name: step.name,
               time: { created: since },
-              state: { status: position === index() - 1 ? "running" : "completed", input: step.input },
+              state: { status: position === index() ? "running" : "completed", input: step.input },
             }
           : step,
       )
 
       return [
-        { type: "user", id: "user", time: { created: since }, text: "Make the buttons rounded and add a hover glow" },
+        { type: "user", id: "user", time: { created: since } },
         { type: "assistant", id: "assistant", time: { created: since }, content },
       ] as SessionMessageInfo[]
     }
 
     onMount(() => {
-      const timer = setInterval(() => setIndex((value) => (value + 1) % (steps.length + 1)), 2200)
+      const timer = setInterval(() => setIndex((value) => (value + 1) % steps.length), 2200)
       onCleanup(() => clearInterval(timer))
     })
 

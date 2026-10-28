@@ -7,9 +7,7 @@ import { agentActivity, type AgentActivityKind } from "./agent-activity"
 import "./agent-status.css"
 
 const presentation = {
-  understanding: { icon: "bubble-5", label: "session.agent.understanding" },
   thinking: { icon: "outline-brain", label: "session.agent.thinking" },
-  reviewing: { icon: "glasses", label: "session.agent.reviewing" },
   responding: { icon: "outline-text", label: "session.agent.responding" },
   reading: { icon: "file-document", label: "session.agent.reading" },
   searching: { icon: "magnifying-glass", label: "session.agent.searching" },
