@@ -18,6 +18,8 @@ import "./live-code-writer.css"
 export function LiveCodeWriter(props: {
   tool: SessionMessageAssistantTool
   floating?: boolean
+  /** Files still waiting after this one; the typing speeds up so the preview keeps pace with the agent. */
+  backlog?: number
   onSizeChange?: () => void
   onDone?: () => void
 }) {
@@ -25,42 +27,66 @@ export function LiveCodeWriter(props: {
   const live = createMemo(() => liveCode(props.tool))
   const target = () => live()?.code ?? ""
   const streaming = () => props.tool.state.status === "streaming"
-  const [view, setView] = createStore({ shown: 0, cursor: { x: 0, y: 0 }, follow: true, done: false })
+  const [view, setView] = createStore({ shown: 0, cursor: { x: 0, y: 0 }, follow: true, done: false, held: false })
   let body: HTMLDivElement | undefined
   let caret: HTMLSpanElement | undefined
-  let frame: number | undefined
+  let frame: ReturnType<typeof setTimeout> | undefined
+  // Paced by elapsed time on a timer rather than animation frames, which embedded or occluded windows can throttle to
+  // a stop; typing reads smoothly at this rate.
+  let last: number | undefined
+  let progress = 0
 
   const step = () => {
     frame = undefined
+    const now = performance.now()
     const length = target().length
 
-    if (view.shown >= length) return
+    if (view.shown >= length) {
+      last = undefined
+      return
+    }
 
     if (prefersReducedMotion()) return setView("shown", length)
-    // Type a file in one to four seconds, whatever its size, and catch up quickly if the stream runs ahead.
-    const pace = Math.ceil(length / (60 * Math.min(4, Math.max(1, length / 450))))
-    setView("shown", (shown) => Math.min(length, shown + Math.max(2, pace, Math.ceil((length - shown) / 40))))
-    frame = requestAnimationFrame(step)
+    // Read like typing: about eight lines a second, two and a half to ten seconds a file. Files queued behind this one
+    // divide the time, so the preview never trails the agent by more than a file or two.
+    const lineCount = target().split("\n").length
+    const seconds = Math.min(10, Math.max(2.5, lineCount * 0.12)) / (1 + (props.backlog ?? 0))
+    progress = Math.max(progress, view.shown) + (length / (seconds * 1000)) * Math.min(100, now - (last ?? now))
+    last = now
+    setView("shown", Math.min(length, Math.floor(progress)))
+    frame = setTimeout(step, 33)
   }
 
   createEffect(
     on(target, (text) => {
       // A rewrite (a new patch file, a retried call) can shrink the input; restart from what still matches.
       if (view.shown > text.length) setView("shown", text.length)
-      frame ??= requestAnimationFrame(step)
+      frame ??= setTimeout(step, 0)
     }),
   )
-  onCleanup(() => frame !== undefined && cancelAnimationFrame(frame))
+  onCleanup(() => clearTimeout(frame))
 
-  // Linger on the finished file for a moment, then hand back to the regular diff.
+  // Frames stop while the window is hidden; finish the file then, so a return does not replay a backlog of old files.
+  const finishHidden = () => document.hidden && setView("shown", target().length)
+  finishHidden()
+  document.addEventListener("visibilitychange", finishHidden)
+  onCleanup(() => document.removeEventListener("visibilitychange", finishHidden))
+
+  // Linger on the finished file so it can be read, longer when nothing waits behind it, and not at all while the
+  // pointer rests on the card.
   createEffect(() => {
-    if (streaming() || view.shown < target().length || !live()) return
-    const timer = setTimeout(() => {
-      setView("done", true)
-      props.onDone?.()
-    }, 1200)
+    if (streaming() || view.shown < target().length || !live() || view.held) return
+    const timer = setTimeout(
+      () => {
+        setView("done", true)
+        props.onDone?.()
+      },
+      props.backlog ? 900 : 2400,
+    )
     onCleanup(() => clearTimeout(timer))
   })
+
+  const typing = () => streaming() || view.shown < target().length
 
   const text = () => target().slice(0, view.shown)
   const lines = createMemo(() => text().split("\n"))
@@ -70,7 +96,7 @@ export function LiveCodeWriter(props: {
   // Place the agent's cursor on the caret and keep it in view unless the reader scrolled away.
   createEffect(
     on(text, () => {
-      requestAnimationFrame(() => {
+      queueMicrotask(() => {
         if (!caret || !body) return
         setView("cursor", { x: caret.offsetLeft, y: caret.offsetTop })
 
@@ -101,7 +127,9 @@ export function LiveCodeWriter(props: {
           data-floating={props.floating ? "" : undefined}
           data-finished={!streaming() && view.shown >= target().length ? "" : undefined}
           aria-label={i18n.t("ui.liveCode.label", { file: getFilename(path()) || path() })}
-          aria-busy="true"
+          aria-busy={typing()}
+          onPointerEnter={() => setView("held", true)}
+          onPointerLeave={() => setView("held", false)}
         >
           <header data-slot="live-code-header">
             <span data-slot="live-code-traffic" aria-hidden="true">
@@ -120,11 +148,24 @@ export function LiveCodeWriter(props: {
             </span>
             <span data-slot="live-code-presence">
               <span data-slot="live-code-verb">
-                <TextShimmer text={verb()} active={streaming() || view.shown < target().length} />
+                <TextShimmer text={verb()} active={typing()} />
               </span>
               <span data-slot="live-code-count">
                 +<AnimatedNumber value={added()} />
               </span>
+              <Show when={typing() && !streaming()}>
+                <button
+                  type="button"
+                  data-slot="live-code-skip"
+                  aria-label={i18n.t("ui.liveCode.skip")}
+                  title={i18n.t("ui.liveCode.skip")}
+                  onClick={() => setView("shown", target().length)}
+                >
+                  <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                    <path d="M3 4l5 4-5 4V4zM8.5 4l5 4-5 4V4z" fill="currentColor" />
+                  </svg>
+                </button>
+              </Show>
               <span data-slot="live-code-avatar" title={i18n.t("ui.liveCode.agent")}>
                 <AgentMark />
               </span>

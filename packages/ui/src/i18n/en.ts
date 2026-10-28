@@ -127,6 +127,7 @@ const source = {
   "ui.liveCode.editing": "Editing",
   "ui.liveCode.patching": "Patching",
   "ui.liveCode.done": "Done",
+  "ui.liveCode.skip": "Skip to the end",
   "ui.liveCode.label": "Context Agent is writing {{file}}",
   "ui.messagePart.option.typeOwnAnswer": "Type your own answer",
   "ui.messagePart.review.title": "Review your answers",

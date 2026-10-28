@@ -1,4 +1,4 @@
-import { onCleanup, onMount } from "solid-js"
+import { onCleanup, onMount, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import type { SessionMessageAssistantTool } from "@contextcode/client/promise"
 import { CurrentSessionProviders } from "../storybook/current-session-story"
@@ -57,6 +57,29 @@ export const Writing = {
       <section style={{ width: "100%", "max-width": "760px", padding: "24px" }}>
         <CurrentSessionProviders document={storyDocument([])}>
           <LiveCodeWriter tool={tool} />
+        </CurrentSessionProviders>
+      </section>
+    )
+  },
+}
+
+/** The whole file arrives at once, as most providers send it; the card paces the typing itself and offers a skip. */
+export const Burst = {
+  render: () => {
+    const [tool, setTool] = createStore<SessionMessageAssistantTool>({
+      type: "tool",
+      id: "live_burst",
+      name: "write",
+      time: { created: 0 },
+      state: { status: "running", input: { path: "src/components/counter.tsx", content: source }, metadata: {} },
+    })
+
+    return (
+      <section style={{ width: "100%", "max-width": "760px", padding: "24px" }}>
+        <CurrentSessionProviders document={storyDocument([])}>
+          <Show when={tool.id} keyed>
+            <LiveCodeWriter tool={tool} onDone={() => setTool("id", `live_burst_${Date.now()}`)} />
+          </Show>
         </CurrentSessionProviders>
       </section>
     )
