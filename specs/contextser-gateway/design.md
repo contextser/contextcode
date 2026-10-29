@@ -1,6 +1,6 @@
 # Contextser Gateway — Design
 
-Status: draft for review · Written: 2026-10-29
+Status: draft for review · Written: 2026-10-29 · Upstream decided 2026-10-30 (DeepSeek API, §3.1)
 
 This document specifies the service that gives Context Code users access to models: per-user authentication, three
 product tiers on one upstream model, rate limits, metering and credits, and remote delivery of the system prompt and
@@ -30,7 +30,8 @@ before the part that depends on it is built. Numbers that depend on real traffic
 
 **Costs that exist regardless of this design** (listed so nothing is hidden):
 
-- Model usage billed per token by the upstream provider (§5, O1). This is the cost of selling model access, not
+- Model usage billed per token by the upstream, the DeepSeek API (§3.1). Its prices differ for cache hits, cache
+  misses and output, and between peak and off-peak hours. This is the cost of selling model access, not
   infrastructure.
 - The domain `contextser.com`, already owned. The gateway needs one DNS record.
 - accounts.contextser.com, an existing service this design depends on over HTTPS and does not change (§3).
@@ -80,6 +81,30 @@ The gateway must satisfy these behaviours exactly. Paths are relative to the `co
 
 The gateway uses only A1's userinfo endpoint and JWKS, plus A3's events. It never reads accounts' database.
 
+### 3.1 Upstream: DeepSeek API (verified 2026-10-30)
+
+Decision O1: production uses the provider's official API with a commercial key. These facts come from DeepSeek's docs
+and terms on the date above. Re-check them before launch, because prices and limits change.
+
+| # | Fact | Source |
+|---|---|---|
+| U1 | The OpenAI-format base URL is `https://api.deepseek.com`, with chat at `/chat/completions`. | api-docs.deepseek.com (home) |
+| U2 | Model id `deepseek-flash` "is now served by DeepSeek-V4.1-Flash-1017", the model Context Code uses today (C15). The legacy ids `deepseek-v4-flash` and `deepseek-v4-flash-vision-exp` are retired and route to the same model at the Flash price. | home, Models & Pricing |
+| U3 | `deepseek-flash`: context length 1M; max output up to 384K; both non-thinking and thinking modes, with thinking as the default; supports tool calls and JSON output. | Models & Pricing |
+| U4 | `thinking: { type: "enabled" \| "disabled" }`, default `enabled`. `reasoning_effort` accepts `none`, `low`, `high` or `max`, default `high`. `minimal` maps to `low`, and `medium`/`xhigh` map to `high`. | API reference, create chat completion |
+| U5 | The output limit field is `max_tokens`, from 1 to 393216; `max_completion_tokens` is not a parameter. Defaults when unset: 8K non-thinking, 64K thinking, 128K with `reasoning_effort: "max"`. | API reference |
+| U6 | `stream_options.include_usage` is supported with `stream: true`. Usage carries the following fields: `prompt_tokens`, which equals hits plus misses; `prompt_cache_hit_tokens` and `prompt_cache_miss_tokens`; `prompt_tokens_details.cached_tokens`, which equals hits; `completion_tokens`; `completion_tokens_details.reasoning_tokens`; and `total_tokens`. The docs do **not** say whether `completion_tokens` includes reasoning tokens. | API reference |
+| U7 | Reasoning text streams in `delta.reasoning_content` (thinking mode), and tool calls in `delta.tool_calls`. Both are the fields Context Code reads (C7). | API reference |
+| U8 | In thinking mode, `temperature` has no effect and `top_p` is clamped to 0.95–1.0. `tool_choice` set to `required` or a named tool returns **400**. `frequency_penalty` and `presence_penalty` are ignored in every mode. | API reference |
+| U9 | Concurrency is limited per **account**, not per key: 2500 in flight for `deepseek-flash`. Going over returns 429. A request counts until its response completes. Capacity expansion can be requested at no extra cost. | Rate Limit & Isolation |
+| U10 | While a request waits, streams receive SSE `: keep-alive` comments. If inference has not started after 10 minutes, the server closes the connection. | Rate Limit & Isolation |
+| U11 | The optional `user_id` (up to 512 chars, `[a-zA-Z0-9\-_]+`, no personal information) isolates end users for content safety, KV-cache privacy and scheduling. On standard accounts every `user_id` shares the account limit. | Rate Limit & Isolation |
+| U12 | Prices per 1M tokens for `deepseek-flash`, as shown on the page in $ (off-peak / peak): input cache hit 0.003 / 0.006; input cache miss 0.15 / 0.3; output 0.6 / 1.2. Off-peak is half of peak. Peak is 01:00–04:00 and 06:00–10:00 UTC on weekdays, excluding Chinese public holidays. | Models & Pricing |
+| U13 | The Open Platform Terms (released 2026-04-22, effective 2026-04-29) cover building applications for end users. They require developers to: make agreements with end users (§3.2); disclose personal-information processing before providing service (§3.3); put user-management measures in place (§3.4); and disclose that output is AI-generated (§8.1). They forbid sharing the API key or exposing it in client-side code (§2.2). They **do not explicitly address** reselling or sublicensing API access. | cdn.deepseek.com Open Platform Terms of Service |
+
+Context Code's SSE framing (`packages/ai/src/route/framing.ts`, Effect `makeParser`) consumes only parsed `Event`
+items, so U10's `: keep-alive` comment lines are not treated as data.
+
 ---
 
 ## 4. Decisions
@@ -94,6 +119,9 @@ The gateway uses only A1's userinfo endpoint and JWKS, plus A3's events. It neve
 | D6 | Caddy serves the system prompt and skills as static files from the VPS. The app consumes them through its existing remote `instructions` and `skills` support (C10, C11). | No new code. They are **public** URLs, because the app fetches them without auth, so they must contain nothing secret. |
 | D7 | Credits are an append-only ledger plus a balance row, debited once per request from the usage the upstream reports, idempotently by request id. | Exactly-once charging survives retries and restarts. |
 | D8 | The runtime is Bun with its built-in PostgreSQL client (`Bun.sql`) and Hono, the only third-party runtime dependency. The SSE usage parser is in-house (around 40 lines, unit tested). | Few dependencies means few upgrades and few supply-chain risks. If `Bun.sql` shows a defect, swap it for `postgres` (porsager) behind the same small `db` module. |
+| D9 | The upstream is the DeepSeek API (§3.1): `base_url` `https://api.deepseek.com`, model `deepseek-flash`, `max_tokens_field` `max_tokens`. Its key is used only by the gateway, server-side (U13 §2.2). | Owner decision O1. One provider means one usage format (U6) and no translation. |
+| D10 | Every upstream request carries `user_id` = lowercase hex SHA-256 of the user's `sub`. | It gives per-user isolation for content safety, KV-cache privacy and scheduling (U11) without sending personal information. |
+| D11 | A global cap `UPSTREAM_MAX_CONCURRENT`, kept below the account's 2500 (U9), is enforced with the same lease table as per-user concurrency (§10.2). Requests over the cap get 429 from the gateway. | One account's limit is shared by every user (U9). Failing fast with `retry-after` beats letting the upstream queue requests for up to 10 minutes (U10). |
 
 ---
 
@@ -101,8 +129,8 @@ The gateway uses only A1's userinfo endpoint and JWKS, plus A3's events. It neve
 
 | ID | Question | Blocks |
 |---|---|---|
-| O1 | **Upstream.** Which OpenAI-compatible endpoint serves the model from the VPS? Today it is 9router → `river1` on a developer machine (C15). Options: (a) a provider's API with a commercial key; (b) 9router on the VPS using **API-key providers only**. In both cases, confirm the provider's terms allow reselling access. | M1 |
-| O2 | **Tier knobs.** Which request fields does the chosen upstream honour for thinking and effort (for example `reasoning_effort`, `thinking`, `enable_thinking`)? What are the model's real context window and maximum output? Does `completion_tokens` include reasoning tokens? Answer with the Phase-0 test in §18. | tier rows, pricing |
+| O1 | **Resolved 2026-10-30:** the DeepSeek API with a commercial key (§3.1, D9). Still to do: a legal review of offering paid access, because the terms neither allow nor forbid it explicitly (U13). | — |
+| O2 | **Narrowed.** The knobs are verified (U4, U5). Still open: (a) whether `completion_tokens` includes `reasoning_tokens`, which decides the cost formula (§9.1); (b) whether `deepseek-flash` accepts images, so keep `vision = false` until tested; (c) final tier values from the Phase-0 measurements, starting from the proposal in Appendix A. | tier rows, pricing |
 | O3 | **Pricing.** Credits per 1M input, cached-input and output tokens per tier. Is there a free allowance? How do credits map to the payment currency? | M2 |
 | O4 | **Aborted streams.** If a stream ends without a usage chunk, either (a) charge nothing, or (b) charge an estimate. Option (b) needs a calibrated estimator, because the upstream may still bill the request. | M2 |
 | O5 | **Top-ups.** How does payments.contextser.com tell the gateway a payment succeeded? §7.7 proposes the shape; the payments side is not designed yet. | M5 |
@@ -248,19 +276,24 @@ The content lives in a git repository checked out at `/srv/content` and deployed
    - Read the requested output limit from `max_completion_tokens`, or else `max_tokens`. Send
      `min(requested, tier.max_output)` in the field the upstream expects (`upstreams.max_tokens_field`), and remove the
      other field.
-   - Delete every field listed in `tier.locked_fields` (thinking and effort fields), then merge `tier.overrides`.
-   - Set `stream_options.include_usage = true`.
+   - Delete every field listed in `tier.locked_fields` (for DeepSeek: `thinking`, `reasoning_effort`), then merge
+     `tier.overrides`.
+   - Set `stream_options.include_usage = true` and `user_id` (D10).
 7. **Upstream call.** Open a `fetch` whose `AbortController` is aborted when the client disconnects (`request.signal`).
    Timeouts, all configurable: connect, time to first byte, and idle time between chunks. A timeout returns 504.
+   Keep-alive comments (U10) count as bytes for the idle timer, and are passed through unchanged. Set
+   `TTFB_TIMEOUT_MS` below the upstream's 10-minute close (U10).
 8. **Upstream errors**, before any byte is sent to the client:
-   - **429**: return 429, copying `retry-after` and `retry-after-ms`.
+   - **429**: the account concurrency limit (U9). Return 429, copying `retry-after` and `retry-after-ms` when
+     present, otherwise setting a short `retry-after`.
    - **400/413/422**: return the same status and body, so context-overflow detection works (C9).
    - **401/403**: this is our upstream credential failing, not the user's. Return 502 with `x-should-retry: false`, and
      alert.
    - **5xx or a network error**: return 502. The app retries it (C9).
 9. **Success.** Return `new Response(stream)` at once. The upstream body is `tee()`d:
    - one branch goes to the client unchanged;
-   - the other goes to the SSE parser, which keeps only the last `usage` object.
+   - the other goes to the SSE parser, which ignores comment lines (`:`) and `[DONE]`, and keeps only the last
+     `usage` object.
 
    Nothing is buffered beyond what the runtime holds in flight.
 10. **Settle** when the stream ends or aborts (§9). Then remove the active-stream lease (§10).
@@ -280,8 +313,14 @@ All amounts are integers in micro-credits. Prices are per 1M tokens and come fro
 cost = ceil((prompt − cached) × price_in + cached × price_cached + completion × price_out) / 1e6
 ```
 
-Whether `completion` already includes reasoning tokens depends on the upstream (O2). The formula uses the field as
-reported.
+Map DeepSeek's usage (U6) as: `prompt` = `prompt_tokens`, `cached` = `prompt_cache_hit_tokens`, `completion` =
+`completion_tokens`. Whether `completion_tokens` already includes `reasoning_tokens` is O2(a). Until it is answered the
+formula uses `completion_tokens` as reported, and `usage.reasoning_tokens` is stored separately so charges can be
+recomputed.
+
+Upstream cost varies with peak and off-peak hours (U12), while the credit price per tier is fixed (O3). To watch the
+margin, store `upstream_cost` per request, computed from U12's schedule. Update that schedule when DeepSeek changes its
+prices; this is a manual maintenance item.
 
 ### 9.2 Settlement (one transaction)
 
@@ -428,7 +467,8 @@ CREATE TABLE usage (
   tier_id           text NOT NULL,
   prompt_tokens     integer, cached_tokens integer,
   completion_tokens integer, reasoning_tokens integer,
-  cost              bigint NOT NULL DEFAULT 0,
+  cost              bigint NOT NULL DEFAULT 0,      -- charged to the user, micro-credits
+  upstream_cost     bigint,                         -- estimated DeepSeek cost, micro-dollars (U12)
   status            text NOT NULL CHECK (status IN ('complete','aborted','no_usage','upstream_error')),
   request_bytes     integer, response_bytes integer,
   ttfb_ms           integer, duration_ms integer,
@@ -576,6 +616,8 @@ before the test.
 | Failure | Effect | Response |
 |---|---|---|
 | Upstream down or erroring | 502s. The app retries (C9). | Alert on error rate. Check provider status. |
+| Account concurrency reached (U9) | Gateway 429 at `UPSTREAM_MAX_CONCURRENT` (D11). The app retries after `retry-after`. | Watch the in-flight metric. Request a capacity expansion from DeepSeek (free, U9). |
+| `tool_choice` `required` or named in thinking mode (U8) | 400 passed to the app as an invalid request | Phase 0 checks whether Context Code ever sends these. If it does, the tier sends them only with thinking disabled. |
 | Upstream credential rejected | 502 with `x-should-retry: false` | Rotate the key in the env file, then restart instances one at a time. |
 | PostgreSQL down | 503 with `x-should-retry: true` | Restart the container, check the disk. |
 | One gateway instance crashes | Caddy health check routes to the other. Leases expire. | Compose restart policy. |
@@ -601,14 +643,27 @@ before the test.
   `header Strict-Transport-Security "max-age=31536000"` to the site block. Admin work happens over SSH only.
 - Upstream secrets live in a root-only env file, never in the database or the repository.
 - Static instructions and skills are public (D6).
+- **Obligations from DeepSeek's terms (U13):**
+  - Context Code's terms of service and privacy policy must exist before launch.
+  - The privacy policy must state that prompts and code are sent to DeepSeek for processing.
+  - The app must disclose that output is AI-generated.
+  - The API key stays server-side (D9).
+  - User management exists (device keys, plans, revocation).
+- **Legal review** of selling access, because the terms are silent on resale (O1).
 
 ---
 
 ## 18. Testing
 
-- **Phase 0, before M1** (answers O1/O2). Send the same small prompt to the chosen upstream with each candidate
-  thinking/effort field. Record latency, `usage` (including whether reasoning tokens are counted in `completion_tokens`),
-  and whether tool calls still work. Lock the tier rows from these results.
+- **Phase 0, before M1** (answers O2). With a DeepSeek API key, run the Appendix A tier settings on a fixed set of
+  real Context Code tasks. Record:
+  - time to first token and total time;
+  - `usage`: does `completion_tokens` − `reasoning_tokens` equal the visible output? This answers O2(a);
+  - whether tool calls work in each tier;
+  - whether Context Code ever sends `tool_choice` `required` or a named tool (U8);
+  - whether an image input is accepted. This answers O2(b).
+
+  Lock the tier rows from these results.
 - **Unit:** the SSE usage parser (split chunks, `[DONE]`, a missing usage chunk), cost calculation, field rewrite.
 - **Integration** (Compose test profile with a mock upstream):
   - pass-through is byte-identical;
@@ -626,7 +681,7 @@ before the test.
 
 | Milestone | Content |
 |---|---|
-| M0 | Phase-0 upstream verification. Resolve O1 and O2. |
+| M0 | Phase-0 measurements against the DeepSeek API. Resolve O2. Start the legal review (O1). |
 | M1 | Gateway core: `/v1/models`, chat pass-through, device keys, schema, metering without enforcement. |
 | M2 | Credits enforcement, rate limits, the events endpoint. Resolve O3 and O4. |
 | M3 | App changes A1–A6. Resolve O6. |
@@ -640,3 +695,29 @@ before the test.
 - A second VPS with failover.
 - An admin web UI.
 - Request compression from app to gateway. Not verified to be supported by the app's HTTP client.
+
+---
+
+## Appendix A — Tier proposal (to be confirmed by Phase 0)
+
+The values below start from DeepSeek's documented defaults (U4, U5). `context_window` and the prices are product
+decisions (O3). `context_window` also controls when Context Code compacts the conversation, because the app sets the
+model's context limit from it (`local.ts`).
+
+| Tier | `overrides` | `locked_fields` | `max_output` | Basis |
+|---|---|---|---|---|
+| `context-neo` (Context Neo) | `{"thinking":{"type":"disabled"}}` | `thinking`, `reasoning_effort` | 8192 | The non-thinking default output (U5). Fastest; no reasoning tokens. |
+| `context-spark` (Context Spark) | `{"thinking":{"type":"enabled"},"reasoning_effort":"low"}` | same | 65536 | The thinking default output (U5) at the lowest thinking effort (U4). |
+| `context-apex` (Context Apex) | `{"thinking":{"type":"enabled"},"reasoning_effort":"max"}` | same | 131072 | The default output with `max` effort (U5). The deepest reasoning. |
+
+All three rows use `upstream_id = deepseek` and `upstream_model = deepseek-flash`. `vision = false` until O2(b) is
+answered.
+
+## Appendix B — Sources (read 2026-10-30)
+
+- DeepSeek API docs, home: https://api-docs.deepseek.com/
+- Create chat completion (API reference): https://api-docs.deepseek.com/api/create-chat-completion
+- Models & Pricing: https://api-docs.deepseek.com/quick_start/pricing
+- Rate Limit & Isolation: https://api-docs.deepseek.com/quick_start/rate_limit
+- DeepSeek Open Platform Terms of Service: https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html
+- accounts.contextser.com OIDC discovery: https://accounts.contextser.com/api/.well-known/openid-configuration
