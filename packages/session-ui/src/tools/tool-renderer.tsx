@@ -64,6 +64,7 @@ import {
 } from "../message/current-tool-state"
 import { AssistantReasoningContent, writeClipboard } from "../message/message-content"
 import { stripAnsi } from "./ansi"
+import { describeCommand } from "./command-activity"
 import { followShellOutput } from "./shell-output"
 import { LinkedText } from "../components/linked-text"
 
@@ -371,8 +372,22 @@ function activitySegments(parts: readonly ContextGroupPart[], i18n: UiI18n) {
       verb: i18n.t(`ui.messagePart.activity.verb.${kind}`),
       target: target.text,
       times: target.generic && items.length > 1 ? items.length : undefined,
+      live: kind === "shell" ? runningCommand(tools, i18n) : undefined,
     }
   })
+}
+
+// While a command runs the header says what it is doing ("Installing packages"); once it ends it reads like the rest.
+function runningCommand(tools: SessionMessageAssistantTool[], i18n: UiI18n) {
+  const running = tools.filter((tool) => tool.state.status === "streaming" || tool.state.status === "running").at(-1)
+
+  if (!running) return undefined
+  const command = toolInput(currentToolInput(running)).command
+
+  if (!command) return i18n.t("ui.tool.shell.writingCommand")
+  const activity = describeCommand(command)
+
+  return i18n.t(`ui.messagePart.activity.command.${activity.key}`, activity.params)
 }
 
 function activityTarget(
@@ -779,15 +794,24 @@ export function CurrentContextToolGroup(props: {
                       <span data-slot="context-tool-group-glyph" aria-hidden="true">
                         <Icon name={segment.icon} size="small" />
                       </span>
-                      <span data-slot="context-tool-group-verb">{segment.verb}</span>{" "}
-                      <span data-slot="context-tool-group-target">{segment.target}</span>
-                      <Show when={segment.times}>
-                        {(times) => (
+                      <Show
+                        when={segment.live}
+                        fallback={
                           <>
-                            {" "}
-                            <span data-slot="context-tool-group-times">×{times()}</span>
+                            <span data-slot="context-tool-group-verb">{segment.verb}</span>{" "}
+                            <span data-slot="context-tool-group-target">{segment.target}</span>
+                            <Show when={segment.times}>
+                              {(times) => (
+                                <>
+                                  {" "}
+                                  <span data-slot="context-tool-group-times">×{times()}</span>
+                                </>
+                              )}
+                            </Show>
                           </>
-                        )}
+                        }
+                      >
+                        {(live) => <span data-slot="context-tool-group-live">{live()}</span>}
                       </Show>
                     </span>
                   )}

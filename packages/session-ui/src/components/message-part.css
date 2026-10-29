@@ -1217,6 +1217,30 @@
     text-overflow: ellipsis;
   }
 
+  /* A running command's phrase, with light sweeping across it while the command works. */
+  [data-slot="context-tool-group-live"] {
+    min-width: 0;
+    max-width: 40ch;
+    overflow: hidden;
+    font-weight: 520;
+    text-overflow: ellipsis;
+    color: transparent;
+    background: linear-gradient(
+        90deg,
+        var(--v2-text-text-muted) 0%,
+        var(--v2-text-text-muted) 35%,
+        var(--v2-text-text-base) 50%,
+        var(--v2-text-text-muted) 65%,
+        var(--v2-text-text-muted) 100%
+      )
+      0 0 / 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation:
+      context-activity-live-in 220ms ease-out both,
+      context-activity-live-shimmer 1.8s linear infinite;
+  }
+
   [data-slot="context-tool-group-times"] {
     flex-shrink: 0;
     padding: 0 5px;
@@ -1236,8 +1260,13 @@
 
   @media (prefers-reduced-motion: reduce) {
     [data-slot="context-tool-group-glyph"],
-    [data-slot="context-tool-group-glyph"]::after {
+    [data-slot="context-tool-group-glyph"]::after,
+    [data-slot="context-tool-group-live"] {
       animation: none;
+    }
+
+    [data-slot="context-tool-group-live"] {
+      color: var(--v2-text-text-base);
     }
   }
 
@@ -1864,6 +1893,22 @@
   from {
     opacity: 0;
     transform: scale(0.6) rotate(-12deg);
+  }
+}
+
+@keyframes context-activity-live-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+@keyframes context-activity-live-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
   }
 }
 
