@@ -823,12 +823,12 @@ export function Titlebar(props: { verticalTabs?: { mount?: HTMLElement } }) {
                                 data-tauri-drag-region
                               >
                                 <Show when={macTrafficLights()}>
-                                  {/* The rail and the sidebar's 18px start padding already cover part of the traffic
-                                      lights. */}
+                                  {/* The 52px rail and the sidebar's 18px start padding already cover part of the
+                                      traffic lights; the history buttons start 8px past them, as Codex's do. */}
                                   <div
                                     class="shrink-0"
                                     style={{
-                                      width: `max(0px, calc(${macVerticalTrafficLights(zoom()).width / zoom()}px - 18px - 56px))`,
+                                      width: `max(0px, calc(${macVerticalTrafficLights(zoom()).width / zoom()}px + 8px - 18px - 52px))`,
                                     }}
                                     aria-hidden="true"
                                   />

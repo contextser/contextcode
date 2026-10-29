@@ -99,33 +99,33 @@
   box-shadow: none !important;
 }
 
-/* The new session screen's docked composer: a roomier, rounder card with a round accent send button. */
+/* The docked composer: Codex's proportions, a rounder card with a round accent send button. */
 [data-component="composer"][data-appearance="hero"] {
-  border-radius: 22px;
+  border-radius: 20px;
   box-shadow:
     var(--v2-elevation-raised),
     0 12px 40px -18px rgb(0 0 0 / 0.16);
 
   [data-component="composer-editor"],
   [data-slot="composer-placeholder"] {
-    padding-inline-start: 20px;
-    padding-top: 18px;
-    font-size: 15px;
-    line-height: 22px;
+    padding-inline-start: 14px;
+    padding-top: 14px;
+    font-size: 14px;
+    line-height: 20px;
   }
 
   [data-component="composer-editor"] {
-    min-height: 62px;
+    min-height: 52px;
   }
 
   [data-slot="composer-footer"] {
-    height: 56px;
-    padding-inline: 12px 10px;
+    height: 44px;
+    padding-inline: 8px;
   }
 
   [data-action="composer-submit"] {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 999px;
     /* The accent's own foreground: white on the light theme's ink, ink on the dark theme's white. */
     color: var(--v2-text-text-contrast);

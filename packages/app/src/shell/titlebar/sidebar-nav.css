@@ -5,8 +5,9 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 56px;
-  padding-top: calc(var(--shell-top-inset, 8px) + 56px);
+  width: 52px;
+  /* The first destination starts 8px under the chrome row, or under the session header without one. */
+  padding-top: calc(var(--shell-top-inset, 8px) + var(--shell-chrome-height, 56px));
   padding-bottom: 14px;
 
   [data-slot="sidebar-rail-item"] {
@@ -52,7 +53,7 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  padding: 10px 16px 0;
+  padding: 6px 16px 0;
   overflow: hidden;
   border-radius: 12px;
   background: var(--v2-background-bg-base);
@@ -68,7 +69,7 @@
     align-items: center;
     gap: 2px;
     height: 40px;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
   }
 
   [data-slot="sidebar-brand-name"] {
@@ -118,12 +119,12 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    height: 36px;
+    height: 32px;
     padding-inline: 8px;
     margin-inline: -8px;
     border-radius: 8px;
     color: var(--v2-text-text-base);
-    font-size: 14.5px;
+    font-size: 14px;
     text-align: start;
 
     &[data-muted] {
@@ -139,7 +140,7 @@
 
   [data-slot="sidebar-section"] {
     flex-shrink: 0;
-    padding: 18px 8px 6px;
+    padding: 18px 8px 9px;
     color: var(--v2-text-text-faint);
     font-size: 13.5px;
   }
@@ -160,11 +161,11 @@
     flex-shrink: 0;
     align-items: center;
     gap: 8px;
-    height: 36px;
+    height: 29px;
     padding-inline: 8px;
     border-radius: 8px;
     color: var(--v2-text-text-base);
-    font-size: 14.5px;
+    font-size: 14px;
     text-align: start;
 
     &:hover {
@@ -388,11 +389,16 @@
     padding-bottom: var(--shell-bottom-inset, 8px) !important;
   }
 
+  /* The history buttons share the chrome row's center line: the mount's 8px top inset, this row, then 8px down to the
+     card, which starts where the main card does. */
   [data-slot="sidebar-header"] {
-    margin-bottom: 0;
+    height: calc(var(--shell-chrome-height, 56px) - 16px);
+    margin-bottom: 8px;
   }
 
+  /* The card meets the rail, as Codex's does, rather than starting after the mount's 18px padding. */
   [data-component="sidebar-panel"] {
+    margin-inline-start: -18px;
     border-radius: 10px 0 0 10px;
     background: color-mix(in srgb, var(--v2-background-bg-base) 55%, var(--v2-background-bg-deep));
     clip-path: inset(-4px 0 -4px -4px);
@@ -402,4 +408,9 @@
     border-start-start-radius: 0;
     border-end-start-radius: 0;
   }
+}
+
+/* With the sidebar closed the floating toggle sits on the chrome row's center line too. */
+[data-shell-chrome] [data-slot="collapsed-sidebar-toggle"] {
+  top: calc((var(--shell-chrome-height) - 28px) / 2);
 }

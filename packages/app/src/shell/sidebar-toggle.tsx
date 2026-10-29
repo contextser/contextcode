@@ -9,6 +9,7 @@ import { useLanguage } from "@/runtime/i18n/language"
 import { usePlatform } from "@/runtime/platform/platform"
 import { useSettings } from "@/settings/model"
 import { sidebarUnread } from "@/shell/sidebar-peek"
+import { chromeRowHeight, chromeTitleMount } from "@/shell/chrome-title"
 
 // The toggle's dot for sidebar sessions with unread activity, shown while the sidebar is closed.
 function UnreadBadge(props: { show: boolean; ring: "base" | "deep" }) {
@@ -32,11 +33,11 @@ function UnreadBadge(props: { show: boolean; ring: "base" | "deep" }) {
 // 74px from the window edge. macOS 15 and earlier end at 68px.
 const macTrafficLightsBaseWidth = 74
 
-// Vertical tabs center the 14pt traffic lights on the session header's center line, 32px from the top, and inset them as
-// far from the left edge as from the top. The center scales with zoom. Returns window points; `width` is where the zoom
-// button ends.
+// Vertical tabs center the 14pt traffic lights on the session header's center line, 32px from the top — or, while the
+// shell shows its chrome row, on that row's — and inset them as far from the left edge as from the top. The center scales
+// with zoom. Returns window points; `width` is where the zoom button ends.
 export function macVerticalTrafficLights(zoom: number) {
-  const inset = 32 * zoom - 7
+  const inset = (chromeTitleMount() ? chromeRowHeight / 2 : 32) * zoom - 7
 
   return { x: inset, y: inset, width: inset + macTrafficLightsBaseWidth - 14 }
 }

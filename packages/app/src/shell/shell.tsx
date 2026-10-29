@@ -6,7 +6,7 @@ import { useDialog } from "@contextcode/ui/context/dialog"
 import { prefersReducedMotion } from "@contextcode/ui/motion"
 import { Titlebar } from "@/shell/titlebar/titlebar"
 import { SidebarRail } from "@/shell/titlebar/sidebar-nav"
-import { setChromeEndMount, setChromeTitleMount } from "@/shell/chrome-title"
+import { chromeRowHeight, setChromeEndMount, setChromeTitleMount } from "@/shell/chrome-title"
 import { usePlatform } from "@/runtime/platform/platform"
 import { ToastRegion } from "@/shell/notifications/toast"
 import { UploadToastHost } from "@/composer/attachments/uploads"
@@ -38,8 +38,6 @@ type SidebarPose = { closed: number; peek: number | undefined }
 
 export const sidebarToggleCommand = { id: "sidebar.toggle", keybind: "mod+shift+b" }
 
-// The chrome row's height: the sidebar header's 48px under the shell's 8px top inset.
-const joinedTop = 56
 
 export default function Layout(props: ParentProps) {
   const platform = usePlatform()
@@ -59,7 +57,8 @@ export default function Layout(props: ParentProps) {
     tabsAside: HTMLElement | undefined
     tabsPanel: HTMLElement | undefined
   }>({
-    tabsWidth: 276,
+    // With the 52px rail, the sidebar ends 340px from the window's edge, as Codex's does.
+    tabsWidth: 288,
     tabsMount: undefined,
     tabsAside: undefined,
     tabsPanel: undefined,
@@ -236,6 +235,8 @@ export default function Layout(props: ParentProps) {
         class="relative flex flex-1 min-h-0 min-w-0 flex-row"
         data-shell-chrome={chrome() ? "" : undefined}
         data-shell-joined={joined() ? "" : undefined}
+        // The rail, the sidebar's header and the floating toggle line up on the chrome row from CSS.
+        style={chrome() ? { "--shell-chrome-height": `${chromeRowHeight}px` } : undefined}
       >
         {/* The empty inset above the panels moves the window, as the titlebar does. */}
         <Show when={dragInset()}>
@@ -311,7 +312,7 @@ export default function Layout(props: ParentProps) {
           class="flex-1 min-h-0 min-w-0 overflow-x-hidden flex flex-col items-start contain-content"
           style={{
             // Joined to the sidebar, the main card starts on the sidebar tile's line and meets its edge.
-            ...(chrome() ? { "--shell-top-inset": `${joinedTop}px` } : {}),
+            ...(chrome() ? { "--shell-top-inset": `${chromeRowHeight}px` } : {}),
             ...(joined() ? { "margin-inline-start": "-8px" } : {}),
             "padding-top": bottomTitlebar() ? "env(safe-area-inset-top, 0px)" : "0px",
             "padding-bottom":
@@ -328,13 +329,13 @@ export default function Layout(props: ParentProps) {
                 session's title row after a divider, as in Codex. Controls inside a drag region opt out of dragging. */}
             <div
               data-slot="shell-chrome"
-              class="absolute inset-x-0 top-0 z-30 flex items-center ps-2 pe-2 pt-2"
-              style={{ height: `${joinedTop}px` }}
+              class="absolute inset-x-0 top-0 z-30 flex items-center ps-2 pe-2"
+              style={{ height: `${chromeRowHeight}px` }}
               data-tauri-drag-region={dragInset() ? "" : undefined}
             >
               {/* With the sidebar closed the floating toggle sits after the traffic lights; this row starts after the
                   rail and its own 8px padding, so it keeps the rest of the toggle's room. */}
-              <CollapsedSidebarToggleSpace start={64} />
+              <CollapsedSidebarToggleSpace start={60} />
               <div aria-hidden="true" class="h-4 w-px shrink-0 bg-v2-border-border-base" />
               <div
                 class="flex h-full min-w-0 flex-1"

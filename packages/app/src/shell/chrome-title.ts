@@ -1,5 +1,8 @@
 import { createSignal } from "solid-js"
 
+/** The chrome row's height, Codex's: the traffic lights, history buttons and session title share its center line. */
+export const chromeRowHeight = 44
+
 /**
  * The chrome row's slot above the joined main card. While the shell shows it, the active session renders its title
  * row here instead of at the top of its card, as Codex does.
