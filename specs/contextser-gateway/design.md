@@ -137,7 +137,7 @@ header, thinking and tool support, usage fields, and per-user field are open dec
 | D9 | Upstream API keys are submitted through the admin API and stored **encrypted** with AES-256-GCM. The key-encryption key is `SECRETS_KEY` in the environment file. The API never returns a stored key, only its last 4 characters. Upstream keys are used only server-side. | Models must be addable through the API at any time (goal 3), which includes their credentials. Encrypting at rest keeps a database dump from leaking the keys. DeepSeek forbids exposing the key client-side (U13 §2.2). |
 | D10 | Every upstream request carries a per-user id, the lowercase hex SHA-256 of `sub`, in the field the upstream names (`user_field`; for the DeepSeek OpenAI endpoint, `user_id`, U11). | It gives per-user isolation without sending personal information. |
 | D11 | Upstreams belong to a **concurrency group** with its own cap, enforced with the same lease table as per-user concurrency (§12.2). Every upstream on one provider account shares that account's group: for DeepSeek, cap it below the account's 2500 (U9). Requests over the cap get 429 from the gateway. | Provider limits are per account, not per endpoint (U9). Failing fast with `retry-after` beats letting the upstream queue for up to 10 minutes (U10). |
-| D12 | The admin API is served over HTTPS under `/admin/` and needs an admin token: `ctxa_` + 32 random bytes, stored as SHA-256, named and revocable. Every write is recorded in an audit table with secrets redacted. Caddy can restrict `/admin/*` to listed IPs (`ADMIN_ALLOW_IPS`). | This is the owner's choice. A future admin panel can call it. Tokens can be rotated without a deploy. |
+| D12 | The admin API is served over HTTPS under `/v1/admin/` and needs an admin token: `ctxa_` + 32 random bytes, stored as SHA-256, named and revocable. Every write is recorded in an audit table with secrets redacted. Caddy can restrict `/v1/admin/*` to listed IPs (`ADMIN_ALLOW_IPS`). | This is the owner's choice. A future admin panel can call it. Tokens can be rotated without a deploy. |
 
 ---
 
@@ -165,7 +165,7 @@ Context Code (desktop)
   core ── GET  /v1/models (both, with each model's format)  ┘
   core ── GET /instructions/*.md, /skills/index.json (public, static)
   desktop main ── POST /v1/auth/device-keys (Bearer <accounts access token>), once per sign-in
-Admin (owner, later the accounts admin panel) ── /admin/* (Bearer ctxa_…)
+Admin (owner, later the accounts admin panel) ── /v1/admin/* (Bearer ctxa_…)
         │
         ▼  HTTPS
 ┌──────────────────────────── one VPS ─────────────────────────────┐
@@ -262,7 +262,7 @@ This is Context Code's event endpoint, configured on its client in the accounts 
   Code's client id.
 - Reject a reused `jti` (kept for 24 h).
 - `backchannel-logout` revokes all active device keys of `sub`. `user-updated` refreshes `users.email`.
-- Respond 200 quickly. Catch up after downtime with `POST /admin/events/replay` (§8), which reads
+- Respond 200 quickly. Catch up after downtime with `POST /v1/admin/events/replay` (§8), which reads
   `GET /api/events?since=<seq>` (A3).
 
 ### 7.8 `POST /internal/credits` (proposal, depends on O5)
@@ -287,7 +287,7 @@ The content lives in a git repository at `/srv/content`. Bump a skill's `version
 
 ## 8. Admin API (D12)
 
-All endpoints live under `/admin/` and need `Authorization: Bearer ctxa_…`. Bodies are JSON and validated strictly:
+All endpoints live under `/v1/admin/`, beside the public `/v1/` API, and need `Authorization: Bearer ctxa_…`. Bodies are JSON and validated strictly:
 unknown fields are rejected. Each write commits to PostgreSQL and is recorded in `admin_audit`.
 
 Catalog changes take effect on every gateway process within `CATALOG_REFRESH_SECONDS`. Write responses include
@@ -297,12 +297,12 @@ Catalog changes take effect on every gateway process within `CATALOG_REFRESH_SEC
 
 | Method | Path | Body or effect |
 |---|---|---|
-| GET | `/admin/upstreams` | Lists upstreams. Keys appear only as `api_key_last4`. |
-| POST | `/admin/upstreams` | Creates one. Body fields below. |
-| PATCH | `/admin/upstreams/:id` | Any body field except `id` and `protocol`. Sending `api_key` replaces it. |
-| POST | `/admin/upstreams/:id/disable` | Its models stop being served (404 `model_not_found`). |
+| GET | `/v1/admin/upstreams` | Lists upstreams. Keys appear only as `api_key_last4`. |
+| POST | `/v1/admin/upstreams` | Creates one. Body fields below. |
+| PATCH | `/v1/admin/upstreams/:id` | Any body field except `id` and `protocol`. Sending `api_key` replaces it. |
+| POST | `/v1/admin/upstreams/:id/disable` | Its models stop being served (404 `model_not_found`). |
 
-Body fields for `POST /admin/upstreams`:
+Body fields for `POST /v1/admin/upstreams`:
 
 - `id`
 - `protocol`: `"openai"` or `"anthropic"`
@@ -319,19 +319,19 @@ Body fields for `POST /admin/upstreams`:
 
 | Method | Path | Body |
 |---|---|---|
-| GET | `/admin/concurrency-groups` | — |
-| PUT | `/admin/concurrency-groups/:id` | `{ max_concurrent }` |
+| GET | `/v1/admin/concurrency-groups` | — |
+| PUT | `/v1/admin/concurrency-groups/:id` | `{ max_concurrent }` |
 
 ### 8.3 Models
 
 | Method | Path | Body or effect |
 |---|---|---|
-| GET | `/admin/models` | Lists models. |
-| POST | `/admin/models` | Creates one. Body fields below. |
-| PATCH | `/admin/models/:id` | Any body field except `id`. |
-| POST | `/admin/models/:id/disable` | The model leaves `/v1/models` and its requests get 404. |
+| GET | `/v1/admin/models` | Lists models. |
+| POST | `/v1/admin/models` | Creates one. Body fields below. |
+| PATCH | `/v1/admin/models/:id` | Any body field except `id`. |
+| POST | `/v1/admin/models/:id/disable` | The model leaves `/v1/models` and its requests get 404. |
 
-Body fields for `POST /admin/models`:
+Body fields for `POST /v1/admin/models`:
 
 - `id`, matching `^[a-z0-9][a-z0-9._-]{0,63}$`
 - `name`, `description`
@@ -346,7 +346,7 @@ A model's format is its upstream's `protocol`.
 
 ### 8.4 Model test
 
-`POST /admin/models/:id/test` sends a minimal streamed request to the upstream in its own format: one user message,
+`POST /v1/admin/models/:id/test` sends a minimal streamed request to the upstream in its own format: one user message,
 `max_tokens` 16, the model's overrides applied. It returns the HTTP status, time to first byte, and the **raw usage
 object** as received, plus the parsed usage the gateway would bill. This verifies a newly added model, its credentials
 and its usage parsing before users see it. It costs a few upstream tokens.
@@ -355,22 +355,22 @@ and its usage parsing before users see it. It costs a few upstream tokens.
 
 | Method | Path | Body or effect |
 |---|---|---|
-| GET | `/admin/plans` | — |
-| PUT | `/admin/plans/:id` | `{ models: string[] \| null, rpm, max_concurrent }`. `models: null` allows every enabled model. |
-| GET | `/admin/users/:sub` | Plan, balance, active keys (prefix only), month's usage. |
-| PUT | `/admin/users/:sub/plan` | `{ plan_id }` |
-| POST | `/admin/credits` | `{ sub, amount, ref }`. Idempotent on `ref`. Negative amounts are corrections. |
-| POST | `/admin/keys/revoke` | `{ key_id }` or `{ sub }` (all of the user's keys) |
-| GET | `/admin/usage` | `?from&to&model&sub`: totals of tokens, cost and upstream cost |
-| POST | `/admin/events/replay` | Fetches missed accounts events (§7.7). |
+| GET | `/v1/admin/plans` | — |
+| PUT | `/v1/admin/plans/:id` | `{ models: string[] \| null, rpm, max_concurrent }`. `models: null` allows every enabled model. |
+| GET | `/v1/admin/users/:sub` | Plan, balance, active keys (prefix only), month's usage. |
+| PUT | `/v1/admin/users/:sub/plan` | `{ plan_id }` |
+| POST | `/v1/admin/credits` | `{ sub, amount, ref }`. Idempotent on `ref`. Negative amounts are corrections. |
+| POST | `/v1/admin/keys/revoke` | `{ key_id }` or `{ sub }` (all of the user's keys) |
+| GET | `/v1/admin/usage` | `?from&to&model&sub`: totals of tokens, cost and upstream cost |
+| POST | `/v1/admin/events/replay` | Fetches missed accounts events (§7.7). |
 
 ### 8.6 Admin tokens
 
 | Method | Path | Body or effect |
 |---|---|---|
-| POST | `/admin/tokens` | `{ name }` returns `{ token }` once. |
-| GET | `/admin/tokens` | Name, created, last used. |
-| DELETE | `/admin/tokens/:id` | Revokes it. |
+| POST | `/v1/admin/tokens` | `{ name }` returns `{ token }` once. |
+| GET | `/v1/admin/tokens` | Name, created, last used. |
+| DELETE | `/v1/admin/tokens/:id` | Revokes it. |
 
 The first admin token is created over SSH with `bun run admin token:create <name>` (§14.5). That is the only admin
 action without an API.
@@ -480,7 +480,7 @@ off-peak). It is used to watch the margin. Keeping those schedules current is a 
 - Requests are admitted while `balance > 0`, so the overdraft is bounded by one request. Its output side is capped by
   `max_output`.
 - A stream without usage is recorded as `no_usage` and charged per O4.
-- Top-ups arrive through §7.8. Grants and corrections go through `POST /admin/credits`.
+- Top-ups arrive through §7.8. Grants and corrections go through `POST /v1/admin/credits`.
 
 ---
 
@@ -551,7 +551,7 @@ api.contextser.com {
   request_body { max_size {$MAX_BODY} }
   handle_path /instructions/* { root * /srv/content/instructions; file_server }
   handle_path /skills/*       { root * /srv/content/skills; file_server }
-  @admin path /admin/*
+  @admin path /v1/admin/*
   handle @admin {
     # Optional: restrict to ADMIN_ALLOW_IPS with a remote_ip matcher.
     reverse_proxy gateway-a:8080 gateway-b:8080 { health_uri /healthz }
@@ -776,15 +776,15 @@ Choose the smallest VPS plan that passes with headroom. No plan size is claimed 
 | Failure | Effect | Response |
 |---|---|---|
 | Upstream down or erroring | 502s. The app retries (C12). | Alert on error rate. |
-| Upstream credential rejected | 502 with `x-should-retry: false` | `PATCH /admin/upstreams/:id` with a new key. No restart needed. |
+| Upstream credential rejected | 502 with `x-should-retry: false` | `PATCH /v1/admin/upstreams/:id` with a new key. No restart needed. |
 | Concurrency group full (U9) | 429 from the gateway. The app retries after `retry-after`. | Watch the in-flight metric. For DeepSeek, request a free capacity expansion (U9) and raise the group cap. |
 | `tool_choice` `required` or named in DeepSeek thinking mode (U8) | 400 passed through | Phase 0 checks whether Context Code sends these. |
-| Bad model row (wrong URL or upstream model) | Errors for that model only | `POST /admin/models/:id/test` before enabling. `disable` to withdraw it. |
+| Bad model row (wrong URL or upstream model) | Errors for that model only | `POST /v1/admin/models/:id/test` before enabling. `disable` to withdraw it. |
 | PostgreSQL down | 503 with `x-should-retry: true` | Restart the container, check the disk. |
 | One gateway instance crashes | Caddy routes to the other. Leases expire. | Compose restart policy. |
 | VPS down | All users down: the accepted single-VPS limit | Restore from backup on a new VPS. Re-supply `SECRETS_KEY`. |
-| Admin token leaked | Catalog and credit changes are possible | `DELETE /admin/tokens/:id`. Review `admin_audit`. |
-| Device key leaked | Misuse until revoked | `POST /admin/keys/revoke`. Effective within `KEY_CACHE_SECONDS`. |
+| Admin token leaked | Catalog and credit changes are possible | `DELETE /v1/admin/tokens/:id`. Review `admin_audit`. |
+| Device key leaked | Misuse until revoked | `POST /v1/admin/keys/revoke`. Effective within `KEY_CACHE_SECONDS`. |
 
 **Alerts without paid services:**
 
@@ -801,7 +801,7 @@ Choose the smallest VPS plan that passes with headroom. No plan size is claimed 
 - Accounts access tokens are used only on `POST /v1/auth/device-keys` and never stored.
 - Events are verified with EdDSA, `iss`, `aud` and `jti` checks.
 - TLS is mandatory. Caddy obtains certificates automatically. HSTS is not sent by default, so the site block adds the
-  header (§14.3). `/admin/*` can be restricted to listed IPs.
+  header (§14.3). `/v1/admin/*` can be restricted to listed IPs.
 - Static instructions and skills are public (D6).
 - **Obligations from DeepSeek's terms (U13):**
   - Context Code's terms of service and privacy policy must exist before launch.
@@ -878,10 +878,10 @@ These are proposals, to be confirmed by Phase 0. Prices are placeholders for O3.
 Context Code compacts the conversation, because the app takes the model's context limit from discovery (`local.ts`).
 
 ```http
-PUT /admin/concurrency-groups/deepseek-main
+PUT /v1/admin/concurrency-groups/deepseek-main
 { "max_concurrent": 2000 }
 
-POST /admin/upstreams
+POST /v1/admin/upstreams
 { "id": "deepseek-openai", "protocol": "openai",
   "endpoint_url": "https://api.deepseek.com/chat/completions",
   "auth_header": "authorization_bearer", "api_key": "<DeepSeek key>",
@@ -900,14 +900,14 @@ POST /admin/upstreams
 Each row is created with:
 
 ```http
-POST /admin/models
+POST /v1/admin/models
 { "id": "context-spark", "name": "Context Spark", "upstream_id": "deepseek-openai",
   "upstream_model": "deepseek-flash", "overrides": { … }, "locked_fields": ["thinking","reasoning_effort"],
   "max_output": 65536, "context_window": 1000000, "vision": false, "tools": true,
   "price_in": <O3>, "price_cached": <O3>, "price_out": <O3>, "enabled": false }
 ```
 
-Run `POST /admin/models/context-spark/test`, then `PATCH` it to `"enabled": true`.
+Run `POST /v1/admin/models/context-spark/test`, then `PATCH` it to `"enabled": true`.
 
 An Anthropic-format model on DeepSeek (U1) would use a second upstream with `"protocol": "anthropic"`. Its
 `endpoint_url`, `auth_header`, `version_header` and `user_field` depend on O8, so it is not given here.
