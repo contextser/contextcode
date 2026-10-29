@@ -1,5 +1,6 @@
 import { Show, createEffect, createMemo, createSignal, type JSX } from "solid-js"
 import { Dynamic } from "solid-js/web"
+import { createStore } from "solid-js/store"
 import { createMediaQuery } from "@solid-primitives/media"
 import { Button } from "@contextcode/ui/button"
 import { useDialog } from "@contextcode/ui/context/dialog"
@@ -8,8 +9,9 @@ import { Keybind } from "@contextcode/ui/keybind"
 import { Slash } from "@contextcode/ui/slash"
 import { Tooltip } from "@contextcode/ui/tooltip"
 import { ComposerEditor } from "./editor/editor"
-import { DialogSelectModel, ModelSelectorDrawer } from "@/providers/models/select-dialog"
-import { DialogSelectModelNext, ModelSelectorDrawerNext } from "@/providers/models/select-dialog-next"
+import { ModelPickerPopover } from "@/providers/models/picker-popover"
+import { ModelSelectorDrawer } from "@/providers/models/select-dialog"
+import { ModelSelectorDrawerNext } from "@/providers/models/select-dialog-next"
 import { useSettings } from "@/settings/model"
 import { DialogSelectModelUnpaid } from "@/providers/models/unpaid"
 import { formatKeybind, useCommand } from "@/shell/commands/command"
@@ -100,15 +102,15 @@ function ComposerModelControl(props: {
   // A preview paints the chip in its resting state, and the loaded names replace it in place.
   const shouldAnimate = createMemo<boolean>((previous) => previous ?? (props.loading && !props.preview))
   const mobile = createMediaQuery("(max-width: 767px)")
-  const dialog = useDialog()
   const settings = useSettings()
+
+  const [picker, setPicker] = createStore({ open: false, pointer: false })
 
   const open = (detail: number) => {
     if (!props.paid) return props.onUnpaidClick()
-    const Picker = settings.general.newModelPicker() ? DialogSelectModelNext : DialogSelectModel
-    // A pointer open keeps focus in the composer, so the dialog returns it to the caret. A keyboard open
+    // A pointer open keeps focus in the composer, so closing returns it to the caret. A keyboard open
     // (a click with no pointer presses) returns focus to this trigger instead of moving it to the editor.
-    void dialog.show(() => <Picker model={props.model} />, detail === 0 ? undefined : props.onClose)
+    setPicker({ open: !picker.open, pointer: detail !== 0 })
   }
 
   // A previewed chip is visible before the catalog loads, so a click on it opens the dialog once loading finishes.
@@ -145,7 +147,7 @@ function ComposerModelControl(props: {
   return (
     <Show when={!props.loading || props.preview}>
       <Tooltip
-        inactive={mobile()}
+        inactive={mobile() || picker.open}
         placement="top"
         value={
           <>
@@ -158,24 +160,32 @@ function ComposerModelControl(props: {
         <Show
           when={mobile() && !props.loading}
           fallback={
-            <Button
-              data-action="composer-model"
-              data-control-type="dialog"
-              variant="ghost-muted"
-              size="normal"
-              class="min-w-0 max-w-[60cqw] justify-start ![font-weight:440]"
-              classList={{ "animate-in fade-in": shouldAnimate() }}
-              style={{ height: "28px" }}
-              onMouseDown={(event: MouseEvent) => event.preventDefault()}
-              onClick={(event: MouseEvent) => {
-                if (!props.loading) return open(event.detail)
-
-                // On mobile this inert chip stands in for the drawer trigger, so a click there is dropped.
-                if (!mobile()) setDeferred(event.detail)
-              }}
+            <ModelPickerPopover
+              model={props.model}
+              open={picker.open}
+              onOpenChange={(value) => setPicker("open", value)}
+              onCloseFocus={picker.pointer ? props.onClose : undefined}
             >
-              {content()}
-            </Button>
+              <Button
+                data-action="composer-model"
+                data-control-type="popover"
+                aria-expanded={picker.open}
+                variant="ghost-muted"
+                size="normal"
+                class="min-w-0 max-w-[60cqw] justify-start ![font-weight:440]"
+                classList={{ "animate-in fade-in": shouldAnimate() }}
+                style={{ height: "28px" }}
+                onMouseDown={(event: MouseEvent) => event.preventDefault()}
+                onClick={(event: MouseEvent) => {
+                  if (!props.loading) return open(event.detail)
+
+                  // On mobile this inert chip stands in for the drawer trigger, so a click there is dropped.
+                  if (!mobile()) setDeferred(event.detail)
+                }}
+              >
+                {content()}
+              </Button>
+            </ModelPickerPopover>
           }
         >
           <Dynamic

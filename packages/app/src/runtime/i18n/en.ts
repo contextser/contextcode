@@ -161,6 +161,8 @@ export const dict = {
   "dialog.model.hint.favorite": "Favorite",
   "dialog.model.favorite": "Favorite",
   "dialog.model.unfavorite": "Unfavorite",
+  "dialog.model.reset": "Reset to default",
+  "dialog.model.effort": "Reasoning effort",
 
   "dialog.model.unpaid.freeModels.title": "Free models provided by Context Code",
   "dialog.model.unpaid.addMore.title": "Add more models from popular providers",

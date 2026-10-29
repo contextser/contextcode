@@ -781,8 +781,8 @@ test("keeps focus in a dialog that replaces the model dialog and returns it to t
   await editor.press("ArrowLeft")
   await editor.press("ArrowLeft")
   await editor.press("ArrowLeft")
-  // Clicking the trigger leaves focus at the caret, so the replacing dialog returns it there.
-  await page.locator('[data-component="composer"] [data-action="composer-model"]').click()
+  // The model command opens the dialog from the caret, so the replacing dialog returns focus there.
+  await editor.press("ControlOrMeta+'")
 
   const models = page.getByRole("dialog", { name: "Select model", exact: true })
   await expect(models.getByRole("combobox", { name: "Search models", exact: true })).toBeFocused()

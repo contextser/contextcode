@@ -101,17 +101,19 @@ test("creates a session in a new project and selects its model", async ({ page }
 
   const modelControl = page.locator('[data-action="composer-model"]')
   await expect(modelControl).toContainText("Go Model 1")
+  // The picker opens on the model in use; the arrows move through the list and Enter chooses.
+  const option = (name: string) => page.getByRole("option", { name, exact: true })
   await modelControl.click()
-  const modelSearch = page.getByPlaceholder("Search models", { exact: true })
-  await expect(modelSearch).toBeFocused()
-  await modelSearch.press("ArrowDown")
-  await modelSearch.press("Enter")
+  await expect(option("Go Model 1")).toBeFocused()
+  await page.keyboard.press("ArrowUp")
+  await expect(option("Free Model")).toBeFocused()
+  await page.keyboard.press("Enter")
   await expect(modelControl).toContainText("Free Model")
 
   await modelControl.click()
-  await expect(modelSearch).toBeFocused()
-  await modelSearch.press("ArrowUp")
-  await modelSearch.press("Enter")
+  await expect(option("Free Model")).toBeFocused()
+  await page.keyboard.press("ArrowDown")
+  await page.keyboard.press("Enter")
 
   await expect(modelControl).toContainText("Go Model 1")
 })
